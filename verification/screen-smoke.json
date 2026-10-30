@@ -1,0 +1,13 @@
+{
+  "project": "CommandCenter",
+  "scope": "Automated public AppKit/WebKit conformance; no new manual screenshot inspection",
+  "publicCatalog": [
+    "DRQS",
+    "HOST",
+    "SLOW"
+  ],
+  "nativeTests": {
+    "passed": 30,
+    "failed": 0
+  }
+}

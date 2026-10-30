@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-10-30T19:46:46.602Z",
+  "scope": "Specification structure and Allium analysis; application runtime evidence is maintained separately",
+  "featureCount": 7,
+  "requirementCount": 76,
+  "activeRequirementCount": 73,
+  "deprecatedRequirementCount": 3,
+  "modelCount": 5,
+  "adrCount": 15,
+  "errors": [],
+  "allium": [
+    {
+      "command": "check",
+      "exitCode": 0,
+      "reports": [
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/shell/invocation.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/navigation/entry-stack.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/function-workers/request-boundary.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/function-framework/function-contract.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/query-layer/query-lifecycle.allium"
+        }
+      ]
+    },
+    {
+      "command": "analyse",
+      "exitCode": 0,
+      "reports": [
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/shell/invocation.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/navigation/entry-stack.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/function-workers/request-boundary.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/function-framework/function-contract.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/query-layer/query-lifecycle.allium"
+        }
+      ]
+    }
+  ],
+  "runtimeVerification": "See verification/README.md for application tests, measurements and their limits"
+}

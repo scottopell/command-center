@@ -1,0 +1,10 @@
+{
+  "name": "@command-center/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./framework": "./src/framework.tsx",
+    "./queries": "./src/queries.tsx"
+  }
+}

@@ -1,0 +1,344 @@
+-- allium: 3
+use "../shell/invocation.allium" as lifecycle
+use "../navigation/entry-stack.allium" as navigation
+-- Requirements: REQ-QL-001, REQ-QL-002, REQ-QL-003, REQ-QL-004, REQ-QL-005,
+-- REQ-QL-006, REQ-QL-007, REQ-QL-008, REQ-QL-009, REQ-NV-006.
+-- Cache release below clears payloads. Released entities/attempts are logical
+-- history, not runtime tombstones, waiter retention or a global operation log.
+
+contract RegisteredDataOperations {
+    query_identity: (worker: String, operation: String, validated_input: Any) -> String
+    @invariant RegistryOwnsClassification
+        -- Only registry-declared reads become queries; only declared writes
+        -- become mutations. Typed arguments and runtime schemas share a source.
+        -- Identity includes worker, operation and normalized validated inputs.
+        -- Stored definitions contain descriptors/plain data, not entry callbacks.
+    @invariant BoundedNoRetryTransport
+        -- Finite time/byte/item bounds and single-page owner reads apply. Neither
+        -- queries nor mutations have transport retries; there is no infinite scroll.
+        -- Safe retries internal to owners remain their existing responsibility.
+}
+
+enum CachePhase { live | released }
+enum ReadState { pending | applied | failed | ignored }
+enum MutationState { ready | pending | committed | rejected | uncertain }
+
+entity Cache {
+    invocation: lifecycle/Invocation
+    phase: CachePhase
+    queries: Query with cache = this
+    current: phase = live and invocation.current
+}
+
+entity Query {
+    cache: Cache
+    key: String
+    version: Integer
+    stale: Boolean
+    has_result: Boolean
+    result: Any
+    last_success_at: Timestamp?
+    error: String?
+    uses: QueryUse with query = this
+    active_uses: uses where entry.authority
+    attempts: ReadAttempt with query = this
+    pending_reads: attempts where state = pending
+}
+
+entity QueryUse {
+    query: Query
+    entry: navigation/Entry
+}
+
+entity ReadAttempt {
+    query: Query
+    version: Integer
+    state: ReadState
+    waiter_attached: Boolean
+}
+
+entity MutationAttempt {
+    cache: Cache
+    origin: navigation/Entry
+    state: MutationState
+    handler_calls: Integer
+    transitions state {
+        ready -> pending
+        pending -> committed
+        pending -> rejected
+        pending -> uncertain
+        terminal: committed, rejected, uncertain
+    }
+}
+
+rule CreateFreshInvocationCache {
+    when: invocation: lifecycle/Invocation.created
+    ensures: Cache.created(invocation: invocation, phase: live)
+}
+
+rule ObserveNewQuery {
+    when: ObserveQuery(entry, key, declared_read, valid_input)
+    let cache = Cache{invocation: entry.stack.invocation}
+    requires: entry.authority
+    requires: cache.current
+    requires: declared_read and valid_input
+    requires: not exists Query{cache: cache, key: key}
+    ensures:
+        let query = Query.created(cache: cache, key: key, version: 0, stale: true,
+            has_result: false, result: null, last_success_at: null, error: null)
+        QueryUse.created(query: query, entry: entry)
+        ReadNeeded(query)
+}
+
+rule ObserveExistingQuery {
+    when: ObserveQuery(entry, key, declared_read, valid_input)
+    let cache = Cache{invocation: entry.stack.invocation}
+    let query = Query{cache: cache, key: key}
+    requires: entry.authority
+    requires: cache.current
+    requires: declared_read and valid_input
+    requires: exists query
+    ensures:
+        if not exists QueryUse{query: query, entry: entry}:
+            QueryUse.created(query: query, entry: entry)
+        if query.stale:
+            ReadNeeded(query)
+}
+
+rule DeduplicateActiveReadWork {
+    when: ReadNeeded(query)
+    requires: query.cache.current
+    requires: query.active_uses.count > 0
+    requires: query.stale
+    requires: query.pending_reads.count = 0
+    ensures:
+        query.version = query.version + 1
+        ReadAttempt.created(query: query, version: query.version,
+            state: pending, waiter_attached: true)
+}
+
+rule SupersedeReadOnExplicitRefresh {
+    when: RefreshQuery(entry, query)
+    requires: entry.authority
+    requires: entry.stack.invocation = query.cache.invocation
+    requires: query.cache.current
+    ensures:
+        query.version = query.version + 1
+        query.stale = true
+        for attempt in query.pending_reads:
+            attempt.state = ignored
+            attempt.waiter_attached = false
+            ReadPromiseRejected(attempt)
+        ReadNeeded(query)
+}
+
+rule ApplyCurrentReadSuccess {
+    when: ReadCompleted(attempt, success, result, message)
+    let query = attempt.query
+    requires: attempt.state = pending
+    requires: query.cache.current
+    requires: attempt.version = query.version
+    requires: success
+    ensures:
+        attempt.state = applied
+        attempt.waiter_attached = false
+        query.has_result = true
+        query.result = result
+        query.stale = false
+        query.last_success_at = now
+        query.error = null
+}
+
+rule RetainDataOnCurrentRefreshFailure {
+    when: ReadCompleted(attempt, success, result, message)
+    let query = attempt.query
+    requires: attempt.state = pending
+    requires: query.cache.current
+    requires: attempt.version = query.version
+    requires: not success
+    ensures:
+        attempt.state = failed
+        attempt.waiter_attached = false
+        query.stale = true
+        query.error = message
+}
+
+rule IgnoreCancelledOrSupersededReadReply {
+    when: ReadCompleted(attempt, success, result, message)
+    requires: attempt.state != pending or not attempt.query.cache.current or attempt.version != attempt.query.version
+    ensures:
+        attempt.waiter_attached = false
+        if attempt.state = pending:
+            attempt.state = ignored
+            ReadPromiseRejected(attempt)
+}
+
+rule CancelReadDeliveryWithoutClaimingOwnerCancellation {
+    when: CancelRead(attempt)
+    requires: attempt.state = pending
+    ensures:
+        attempt.state = ignored
+        attempt.waiter_attached = false
+        ReadPromiseRejected(attempt)
+}
+
+rule RevalidateStaleQueriesOnReveal {
+    when: revealed: navigation/Entry.visibility transitions_to visible
+    requires: revealed.authority
+    for use in QueryUses where entry = revealed:
+        requires: use.query.cache.current
+        requires: use.query.stale
+        ensures: ReadNeeded(use.query)
+}
+
+rule ReleaseEntryObserversWithoutEvictingData {
+    when: removed: navigation/Entry.visibility transitions_to retired
+    ensures:
+        for use in QueryUses where entry = removed:
+            not exists use
+}
+
+rule CreateDeliberateMutationIntent {
+    when: NewMutationIntent(entry, declared_write, valid_input)
+    let cache = Cache{invocation: entry.stack.invocation}
+    requires: entry.interactive
+    requires: cache.current
+    requires: declared_write and valid_input
+    ensures: MutationAttempt.created(cache: cache, origin: entry,
+        state: ready, handler_calls: 0)
+}
+
+rule AdmitHandleOnlyOnce {
+    when: SubmitMutation(attempt)
+    requires: attempt.origin.interactive
+    requires: attempt.cache.current
+    requires: attempt.state = ready
+    requires: attempt.handler_calls = 0
+    ensures:
+        attempt.state = pending
+        attempt.handler_calls = 1
+}
+
+rule ConfirmWriteAndInvalidateSurvivingInvocation {
+    when: MutationResult(attempt, outcome)
+    requires: attempt.state = pending
+    requires: outcome = committed
+    ensures:
+        attempt.state = committed
+        if attempt.cache.current:
+            for query in attempt.cache.queries:
+                query.stale = true
+                query.version = query.version + 1
+                for read in query.pending_reads:
+                    read.state = ignored
+                    read.waiter_attached = false
+                    ReadPromiseRejected(read)
+                ReadNeeded(query)
+}
+
+rule PreserveRejectionOrUnknownAsTerminalAttempt {
+    when: MutationResult(attempt, outcome)
+    requires: attempt.state = pending
+    requires: outcome in {rejected, uncertain}
+    ensures: attempt.state = outcome
+}
+
+rule ReleaseInvocationQueryOwnership {
+    when: invocation: lifecycle/Invocation.phase transitions_to retired
+    let cache = Cache{invocation: invocation}
+    ensures:
+        cache.phase = released
+        for query in cache.queries:
+            query.key = ""
+            query.has_result = false
+            query.result = null
+            query.last_success_at = null
+            query.error = null
+            for attempt in query.pending_reads:
+                attempt.state = ignored
+                attempt.waiter_attached = false
+                ReadPromiseRejected(attempt)
+            for use in query.uses:
+                not exists use
+}
+
+invariant QueryKeysAreInvocationLocalAndUnique {
+    Queries.all(q => not q.cache.current or (q.cache.queries where key = q.key).count = 1)
+}
+
+invariant ObserversStayWithinTheirInvocation {
+    QueryUses.all(u => u.query.cache.invocation = u.entry.stack.invocation)
+}
+
+invariant AtMostOneCurrentReadPerQuery {
+    Queries.all(q => q.pending_reads.count <= 1)
+}
+
+invariant SettledReadsReleaseDeliveryWaiters {
+    ReadAttempts.all(a => a.state = pending or not a.waiter_attached)
+}
+
+invariant OneDispatchPerMutationHandle {
+    MutationAttempts.all(a => a.handler_calls >= 0 and a.handler_calls <= 1 and
+        (a.state = ready or a.handler_calls = 1))
+}
+
+invariant ReleasedCachesOwnNoResultPayloads {
+    Queries.all(q => q.cache.phase = live or (not q.has_result and q.result = null and q.error = null and q.uses.count = 0))
+}
+
+surface FunctionDataBoundary {
+    context entry: navigation/Entry
+    provides:
+        ObserveQuery(entry, key, declared_read, valid_input) when entry.authority and declared_read and valid_input
+        NewMutationIntent(entry, declared_write, valid_input) when entry.interactive and declared_write and valid_input
+        RefreshQuery(entry, query) when entry.authority and entry.stack.invocation = query.cache.invocation and query.cache.current
+    contracts:
+        fulfils RegisteredDataOperations
+    @guarantee LifetimeAndSourceTruth
+        -- REQ-QL-002,004,009: successful results are retained without time-based eviction
+        -- and no inactivity GC before invocation disposal, even beyond five minutes
+        -- or after observer removal. Explicit invalidation/refresh makes them stale.
+        -- Retained results stay visible during refresh and on refresh failure, with
+        -- warning + last successful query check; uncached failure is a read error.
+        -- Owner observation timestamps remain separate from last_success_at.
+    @guarantee NoAuthorityFromCompletion
+        -- REQ-QL-003,006: completion can invalidate a live invocation after the
+        -- origin entry is covered/popped; it cannot navigate or focus that entry.
+        -- A pending/uncertain handle survives retained-entry Effect suspension,
+        -- Back and reads; refresh does not re-enable ordinary submit on that handle.
+        -- No repeat dispatch, retry or refresh transition leaves a terminal handle.
+        -- Distinct deliberate actions/handles are not deduplicated by this model.
+    @guarantee OwnerConcurrencyAndNoCrossInvocationBarrier
+        -- REQ-QL-007,008: submit narrow commands, not retained record replacements.
+        -- DRQS explicit fields are last committed command wins; comments
+        -- append to current owner history. Versioned replacement editors need an
+        -- atomic owner check; no generic CAS/idempotency/draft merge is supplied.
+        -- Cache creation/root reads never await older admitted writes. A retired
+        -- invocation's write may commit after a fresh read; ordinary refresh finds
+        -- it. Cancellation has no rollback/deduplication/completion-barrier meaning.
+    @guarantee ClientCancellationAndBounds
+        -- REQ-QL-005,009: consume read cancellation, reject its promise and detach
+        -- waiters. Supersession/invalidation cannot publish an older result;
+        -- underlying owner reads may still finish. Query identity deduplicates
+        -- concurrent work. Depth four does not bound distinct query-key count;
+        -- diagnostics report retained queries and response sizes, not exact heap.
+        -- Refresh does not reinitialize local state, reset readiness or convert
+        -- a committed mutation into a failed mutation. No polling is required.
+}
+
+surface ReadDeliveryBoundary {
+    context attempt: ReadAttempt
+    provides:
+        ReadCompleted(attempt, success, result, message)
+        CancelRead(attempt) when attempt.state = pending
+}
+
+surface MutationHandleBoundary {
+    context attempt: MutationAttempt
+    exposes:
+        attempt.state
+    provides:
+        SubmitMutation(attempt) when attempt.origin.interactive and attempt.cache.current and attempt.state = ready and attempt.handler_calls = 0
+        MutationResult(attempt, outcome) when attempt.state = pending and outcome in {committed, rejected, uncertain}
+}

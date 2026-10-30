@@ -1,0 +1,325 @@
+-- allium: 3
+use "../shell/invocation.allium" as lifecycle
+-- Requirements: REQ-NV-001, REQ-NV-002, REQ-NV-003, REQ-NV-004, REQ-NV-005,
+-- REQ-NV-006, REQ-NV-007, REQ-NV-008, REQ-NV-009, REQ-NV-010, REQ-NV-011, REQ-NV-012.
+-- Entries model retained identity, not React/DOM internals. Retired records are
+-- specification history, not a requirement to retain runtime references.
+
+value ReturnPlace {
+    primary_scroll: Integer
+    stable_anchor: String?
+    viewport_offset: Integer
+    ordered_items: List<String>
+    focus_target: String?
+}
+
+contract EntryPreparation {
+    validate_destination: (screen: String, parameters: Any) -> Boolean
+    resolve: (screen: String, parameters: Any) -> Any
+    @invariant RequiredReadsBeforeResolvedCommit
+        -- EntryResolved below means required queries have completed successfully.
+        -- A resolved View is not admitted to commit/handoff before those reads.
+        -- A prepared entry has a committed resolved View and one usable initial
+        -- focus destination; interactive additionally requires native handoff.
+    @invariant PerEntryNativeInput
+        -- Native admission serializes authority before a parent is covered or
+        -- child resolution starts. Only then does limited text/Tab capture target
+        -- that child, using the existing shell capture/drain/refusal contract.
+        -- Entry identity gates completion, focus, drain and cutover messages.
+        -- Back discards the departing entry's not-yet-applied input prefix.
+}
+
+contract RetainedPlace {
+    restore: (saved: ReturnPlace, surviving_items: Set<String>) -> Any
+    @invariant DeterministicFallback
+        -- Restore the saved stable anchor/focus target if available; otherwise
+        -- next surviving item in the saved ordering, then previous, then the
+        -- entry's usable initial destination. Anchor fallback is explained inline.
+        -- Restore primary scroll position and anchor viewport offset. Only one
+        -- framework primary viewport and data-nav-item anchors are supported.
+}
+
+contract SiblingBrowsing {
+    open: (source: Entry, screen: String, ordered_descriptors: List<Any>, selected_key: String) -> Any
+    step: (source: Entry, direction: Integer, repeated_key: Boolean, editing: Boolean) -> Any
+    @invariant BoundedStableDescriptors
+        -- REQ-NV-010: validate the registered destination, every parameter object,
+        -- unique nonempty item keys and the selected key before admitting a push.
+        -- Clone plain descriptor data: 1..200 items, at most 64 KiB serialized.
+        -- Keep the original order/membership until sequence disposal. Queries and
+        -- owner mutations cannot change it; no records/callbacks/DOM are stored.
+    @invariant SiblingIsFreshReplacement
+        -- REQ-NV-011: a step of -1 or +1 selects the adjacent descriptor, invokes
+        -- ReplaceAdmitted and keeps depth/parent. New resolution reads current data.
+        -- Retire the old detail, scroll, drafts and component state. No per-key
+        -- restoration exists. Back reveals the original retained parent/place.
+        -- Out-of-bounds steps do nothing; no wrapping, page fetch or missing-item
+        -- skip. A failed destination retains Back but disables sibling movement.
+    @invariant InteractiveSingleStep
+        -- REQ-NV-012: only active interactive function input may step. Command
+        -- focus, key repeats and pending admission cannot step. Keyboard shortcuts
+        -- leave editable controls alone.
+        -- No movement is queued through loading/error. Normal push/replace drops
+        -- sibling context. Direct detail roots have no fabricated sibling context.
+}
+
+enum Visibility { visible | covered | retired }
+enum EntryPhase { root_initializing | resolving | mounting | draining | interactive | error }
+
+entity Stack {
+    invocation: lifecycle/Invocation
+    entries: Entry with stack = this
+    retained: entries where visibility != retired
+    visible_entries: entries where visibility = visible
+    depth: retained.count
+    current: invocation.current
+}
+
+entity Entry {
+    stack: Stack
+    parent: Entry?
+    position: Integer
+    screen: String
+    parameters: Any
+    visibility: Visibility
+    phase: EntryPhase
+    prepared: Boolean
+    focus_pending: Boolean
+    place: ReturnPlace?
+    anchor_correction: Boolean
+    authority: stack.current and visibility = visible
+    interactive: authority and phase = interactive
+}
+
+config {
+    max_depth: Integer = 4
+}
+
+rule CreateInvocationRoot {
+    when: invocation: lifecycle/Invocation.created
+    ensures:
+        let stack = Stack.created(invocation: invocation)
+        Entry.created(stack: stack, parent: null, position: 1,
+            screen: "initial destination", parameters: invocation.tail,
+            visibility: visible, phase: root_initializing, prepared: false,
+            focus_pending: false, place: null, anchor_correction: false)
+}
+
+rule PreserveRootInitialHandoff {
+    when: invocation: lifecycle/Invocation.phase transitions_to interactive
+    let stack = Stack{invocation: invocation}
+    let root = Entry{stack: stack, position: 1, visibility: visible}
+    requires: root.phase = root_initializing
+    ensures:
+        root.prepared = true
+        root.phase = interactive
+}
+
+rule PreserveRootInitializationFailure {
+    when: invocation: lifecycle/Invocation.phase transitions_to error
+    let stack = Stack{invocation: invocation}
+    let root = Entry{stack: stack, position: 1, visibility: visible}
+    requires: root.phase = root_initializing
+    ensures: root.phase = error
+}
+
+rule PushAfterNativeAdmission {
+    when: PushAdmitted(source, screen, parameters, valid, place)
+    requires: source.interactive
+    requires: valid
+    requires: source.stack.depth < config.max_depth
+    ensures:
+        source.place = place
+        source.visibility = covered
+        source.anchor_correction = false
+        let child = Entry.created(stack: source.stack, parent: source,
+            position: source.position + 1, screen: screen, parameters: parameters,
+            visibility: visible, phase: resolving, prepared: false,
+            focus_pending: true, place: null, anchor_correction: false)
+        CaptureTargetsEntry(child)
+}
+
+rule RefuseCeilingWithoutEviction {
+    when: PushAdmitted(source, screen, parameters, valid, place)
+    requires: source.interactive
+    requires: valid
+    requires: source.stack.depth = config.max_depth
+    ensures: NavigationRefused(source, "Navigation limit reached")
+}
+
+rule ReplaceAfterNativeAdmission {
+    when: ReplaceAdmitted(source, screen, parameters, valid)
+    requires: source.interactive
+    requires: valid
+    ensures:
+        source.visibility = retired
+        source.focus_pending = false
+        source.anchor_correction = false
+        let replacement = Entry.created(stack: source.stack, parent: source.parent,
+            position: source.position, screen: screen, parameters: parameters,
+            visibility: visible, phase: resolving, prepared: false,
+            focus_pending: true, place: null, anchor_correction: false)
+        CaptureTargetsEntry(replacement)
+        EntryRetired(source)
+}
+
+rule BackRevealsOneRetainedParent {
+    when: BackAdmitted(source, pointer_resume)
+    requires: source.authority
+    requires: source.parent != null
+    let parent = source.parent
+    ensures:
+        source.visibility = retired
+        source.focus_pending = false
+        source.anchor_correction = false
+        parent.visibility = visible
+        parent.focus_pending = true
+        parent.anchor_correction = true
+        if pointer_resume:
+            source.stack.invocation.command_center.focus_owner = function_view
+        DiscardEntryInput(source)
+        EntryRetired(source)
+        EntryRevealed(parent)
+}
+
+rule ResolveAdmittedChild {
+    when: EntryResolved(entry, success)
+    requires: entry.authority
+    requires: entry.phase = resolving
+    ensures:
+        if success:
+            entry.phase = mounting
+        else:
+            entry.phase = error
+            entry.focus_pending = false
+            DiscardEntryInput(entry)
+}
+
+rule PrepareCommittedChild {
+    when: EntryCommitted(entry, usable_focus)
+    requires: entry.authority
+    requires: entry.phase = mounting
+    ensures:
+        if usable_focus:
+            entry.prepared = true
+            entry.phase = draining
+        else:
+            entry.phase = error
+            entry.focus_pending = false
+            DiscardEntryInput(entry)
+}
+
+rule FinishChildNativeHandoff {
+    when: EntryHandoffFinished(entry)
+    requires: entry.authority
+    requires: entry.phase = draining
+    requires: entry.prepared
+    requires: entry.stack.invocation.command_center.focus_owner != command_bar
+    ensures:
+        entry.phase = interactive
+        entry.focus_pending = false
+}
+
+rule RestoreReadyEntryFocus {
+    when: RestoreEntryFocus(entry)
+    requires: entry.interactive
+    requires: entry.focus_pending
+    requires: entry.stack.invocation.command_center.focus_owner != command_bar
+    ensures:
+        entry.focus_pending = false
+        EntryFocusRestored(entry)
+}
+
+rule CorrectPlaceOnRevealOrQueryLayout {
+    when: EntryLayoutCommitted(entry, surviving_items)
+    requires: entry.authority
+    requires: entry.anchor_correction
+    requires: entry.place != null
+    ensures: EntryPlaceRestored(entry, restore_place(entry.place, surviving_items))
+}
+
+rule UserIntentEndsAnchorCorrection {
+    when: EntryUserInteraction(entry)
+    requires: entry.authority
+    ensures: entry.anchor_correction = false
+}
+
+rule RetireWholeStack {
+    when: invocation: lifecycle/Invocation.phase transitions_to retired
+    let stack = Stack{invocation: invocation}
+    ensures:
+        for entry in stack.retained:
+            entry.visibility = retired
+            entry.focus_pending = false
+            entry.anchor_correction = false
+            EntryRetired(entry)
+}
+
+invariant BoundedRetainedHistory {
+    Stacks.all(s => not s.current or (s.depth >= 1 and s.depth <= config.max_depth))
+}
+
+invariant OneVisibleEntryPerLiveInvocation {
+    Stacks.all(s => not s.current or s.visible_entries.count = 1)
+}
+
+invariant EveryChildHasAnEarlierRetainedParent {
+    Entries.all(e => e.visibility = retired or e.parent = null or
+        (e.parent.stack = e.stack and e.parent.position = e.position - 1 and e.parent.visibility = covered))
+}
+
+invariant EntryPositionsAreUnique {
+    Entries.all(e => e.visibility = retired or
+        (e.stack.retained where position = e.position).count = 1)
+}
+
+surface FunctionNavigation {
+    context entry: Entry
+    exposes:
+        entry.screen
+        entry.stack.depth
+        entry.phase
+        entry.prepared
+        entry.focus_pending
+    provides:
+        PushAdmitted(entry, screen, parameters, valid, place) when entry.interactive and valid
+        ReplaceAdmitted(entry, screen, parameters, valid) when entry.interactive and valid
+        BackAdmitted(entry, pointer_resume) when entry.authority and entry.parent != null
+        EntryResolved(entry, success) when entry.authority and entry.phase = resolving
+        EntryCommitted(entry, usable_focus) when entry.authority and entry.phase = mounting
+        EntryHandoffFinished(entry) when entry.authority and entry.phase = draining and entry.prepared and entry.stack.invocation.command_center.focus_owner != command_bar
+        RestoreEntryFocus(entry) when entry.interactive and entry.focus_pending and entry.stack.invocation.command_center.focus_owner != command_bar
+        EntryLayoutCommitted(entry, surviving_items) when entry.authority and entry.anchor_correction and entry.place != null
+        EntryUserInteraction(entry) when entry.authority
+    contracts:
+        demands EntryPreparation
+        fulfils RetainedPlace
+        fulfils SiblingBrowsing
+    @guarantee TypedDestinationsAndRoot
+        -- REQ-NV-001: names/parameters are validated in typed author APIs and at
+        -- native admission. Invalid requests are refused without stack changes.
+        -- The initial resolved destination may be a detail; it is the one root,
+        -- not a fabricated list+detail history. Root Back is disabled, never cancel.
+    @guarantee RetentionAndAuthority
+        -- REQ-NV-004,006: covering retains actual React/DOM state and suspends
+        -- Effects; reveal resumes that identity, not reconstructed author state.
+        -- Only the active interactive entry may open sources, request application
+        -- navigation or start mutations. Framework Back/Escape and preparation
+        -- reads remain available while loading/error; handoff owns initial focus.
+        -- Late covered/retired entry events cannot act. A query completion cannot
+        -- itself navigate or claim input.
+    @guarantee CommandFocusAndReturnPlace
+        -- REQ-NV-005,007: non-pointer Back preserves command text/focus. Restored
+        -- focus waits for function resume; a pointer Back explicitly resumes it.
+        -- Correction runs on reveal and query-result layout commits only, until
+        -- the first subsequent user scroll/key/pointer event; the Back-initiating
+        -- event and programmatic restoration are not subsequent user intent.
+        -- No nested/virtualized/media/animation tracking promised.
+        -- Revalidation never resets readiness or reapplies initial focus.
+    @guarantee BoundedDiagnosticsAndConformance
+        -- REQ-NV-008,009: bounded identity/depth/visibility/lifetime/timing and
+        -- count/response-size metadata excludes payloads, DOM and callbacks.
+        -- Repetition, loading/error Back, late replies, retained state and anchor
+        -- fallback are tested with fixtures; actual focus/scroll needs WebKit.
+        -- Ownership counters do not prove exact heap attribution or RSS deadlines.
+}

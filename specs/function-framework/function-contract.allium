@@ -1,0 +1,75 @@
+-- allium: 3
+use "../shell/invocation.allium" as lifecycle
+-- Requirements: REQ-FF-001, REQ-FF-002, REQ-FF-003, REQ-FF-006,
+-- REQ-FF-007, REQ-FF-008, REQ-NV-006, REQ-QL-001.
+-- Programmatic contracts are not UI controls.
+
+contract ResolveInitialView {
+    resolve: (tail: String) -> Any
+    @invariant ReadOnlyPreparation
+        -- The result selects the initial view and supplies its complete initial
+        -- props, including tail-prefilled values. Resolution performs no mutation.
+        -- Required query preparation completes before the resolved View commits;
+        -- query-refresh failure later does not revoke existing entry readiness.
+    @invariant PropsMatchView
+        -- The view consumes exactly the loader result type; it does not invent
+        -- a separate incompatible type for the same initialization data.
+}
+
+contract InitialFocusDeclaration {
+    initial_destination: (committed_view: Any) -> Any
+    @invariant ExactlyOneUsableDestination
+        -- The first committed resolved view declares one attached, enabled,
+        -- visible focus destination. A read-only view can declare its container.
+        -- If the operator has claimed command-bar focus, validation does not
+        -- claim native keyboard focus: handoff waits for return to the function.
+        -- Native/browser editing owns ordinary control traversal after handoff;
+        -- the framework owns entry push/replace/Back. It does not refocus the
+        -- destination on later data updates. Markers in covered entries do not
+        -- participate in the active entry's focus declaration.
+}
+
+contract DisposableOwnership {
+    release: (generation: Integer) -> Boolean
+    @invariant ReleaseFrameworkReferences
+        -- Retire input and UI authority first, then unmount and drop platform-owned
+        -- DOM, bridge, payload, view-callback and resolver-result references.
+        -- No custom exit callback, temporary save, or preservation grace period
+        -- exists. Normal view cleanup is not awaited by native shell retirement.
+        -- No immediate RSS or arbitrary-module reclamation is claimed.
+}
+
+surface FunctionAuthorBoundary {
+    context invocation: lifecycle/Invocation
+    exposes:
+        invocation.mnemonic
+        invocation.tail
+        invocation.abort_requested
+    contracts:
+        demands ResolveInitialView
+        demands InitialFocusDeclaration
+        fulfils DisposableOwnership
+    @guarantee FrameworkOwnsHandoff
+        -- REQ-FF-003: the author never calls a public ready function. The
+        -- framework waits for resolution and the first view commit, validates
+        -- initial focus, and hands over only the active generation's input while
+        -- function input ownership is active. Command focus is never stolen.
+    @guarantee DisposalIsNotBackendCancellation
+        -- REQ-SH-012, REQ-BW-008: disposal cannot cancel, retry, or imply rollback
+        -- of an already admitted Function Worker operation.
+    @guarantee RetiredBridgeCannotStartNewWorkerCalls
+        -- REQ-FF-008: the native bridge checks the invocation identity before
+        -- accepting a new outbound worker call. A late callback in a retired view
+        -- cannot use the bridge to start another operation. Previously admitted
+        -- worker calls remain independent of that UI authority check.
+    @guarantee UiMutationsRequireInteractivePhase
+        -- REQ-SH-013, REQ-FF-002,008: a UI invocation can issue read calls during
+        -- resolution but mutating bridge calls require the active generation and
+        -- active interactive entry (not merely the invocation's root phase).
+        -- Registration supplies read/mutation classification;
+        -- the UI payload cannot override it. This is an ingress check, not a
+        -- backend dependency on the continued existence of the view or a gate on
+        -- independent CLI calls. Covered/loading/error entries cannot start new
+        -- mutations. Views consume application results through the shared typed
+        -- query/mutation integration, preserving worker-defined result semantics.
+}

@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-10-30T19:45:00.392Z",
+  "project": "CommandCenter",
+  "checks": {
+    "typecheck": "passed",
+    "functionSourceGuards": "passed",
+    "backendCLITests": {
+      "passed": 28,
+      "failed": 0
+    },
+    "nativeTests": {
+      "passed": 30,
+      "failed": 0
+    },
+    "specificationModels": 5,
+    "build": "passed",
+    "installedService": "passed"
+  },
+  "nativeMeasurements": {
+    "samples": 30,
+    "maximumDisplayFlushMs": 2.424458391033113,
+    "releasedWebViews": 30,
+    "scope": "Native display flush; not compositor latency or an RSS reclamation deadline"
+  },
+  "dataMigration": "Application data and credentials kept outside Git; store verified across the local service rename",
+  "navigation": {
+    "framework": "React Activity retained entries and TanStack Query invocation cache",
+    "maximumEntries": 4,
+    "soakPushes": 224,
+    "soakPops": 200,
+    "maxDepthCancellations": 8,
+    "measurementScope": "Entry counts, native object ownership and lifecycle assertions; no heap/RSS reclamation claim"
+  },
+  "selectionAndSiblings": {
+    "sequenceItemsMax": 200,
+    "descriptorBytesMax": 65536,
+    "clipboardBytesMax": 2097152,
+    "detailUI": "Fresh replacement; no per-item restoration",
+    "automatedClipboardScope": "Injected writer and unique native pasteboard; no general clipboard history"
+  },
+  "commandBar": {
+    "retainedLaunchText": true,
+    "inlineDiscovery": true,
+    "rotatingExamples": false,
+    "verification": "Native command retention, buffered input, invalid correction, draft focus and autocomplete fixtures"
+  },
+  "projectGroups": {
+    "groups": [
+      {
+        "number": 1,
+        "slug": "inbox"
+      },
+      {
+        "number": 42,
+        "slug": "command-center"
+      },
+      {
+        "number": 43,
+        "slug": "phoenix-ide"
+      },
+      {
+        "number": 44,
+        "slug": "paperclip"
+      }
+    ],
+    "source": "Authored public project directory; no company-derived records",
+    "tests": "Numeric and slug tails, dispatcher workflow, CLI, and actual WebKit suite",
+    "installedService": "Unchanged; no existing ticket migration"
+  },
+  "composition": {
+    "publicFunctions": [
+      "DRQS",
+      "HOST",
+      "SLOW"
+    ],
+    "publicBuild": "passed",
+    "publicNative": "30 passed",
+    "extension": "Opt-in source checkout; separate validation evidence belongs to that checkout",
+    "runtimeDeployment": "Installed service unchanged"
+  }
+}

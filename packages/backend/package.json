@@ -1,0 +1,11 @@
+{
+  "name": "@command-center/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./store": "./src/store.ts",
+    "./dispatcher": "./src/dispatcher.ts",
+    "./server": "./src/server.ts"
+  }
+}

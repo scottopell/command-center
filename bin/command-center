@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+COMMAND_CENTER_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec "$COMMAND_CENTER_ROOT/build/CommandCenter.app/Contents/Resources/runtime/node" "$COMMAND_CENTER_ROOT/build/CommandCenter.app/Contents/Resources/cli.mjs" "$@"

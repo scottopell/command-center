@@ -1,0 +1,223 @@
+-- allium: 3
+-- Requirements: REQ-BW-002, REQ-BW-003, REQ-BW-004, REQ-BW-005, REQ-BW-006,
+-- REQ-BW-007, REQ-BW-008, REQ-BW-009. UI lifetime is absent from admission
+-- and completion guards. These are logical requests, not a durable job queue.
+
+value StoreEntry {
+    key: String
+    value: Any
+}
+
+contract WorkerStore {
+    get: (key: String) -> Any?
+    put: (key: String, value: Any) -> Any
+    delete: (key: String) -> Any
+    list: (prefix: String) -> List<StoreEntry>
+    transaction: (work: Any) -> Any
+    @invariant FunctionScopedJsonValues
+        -- REQ-BW-005,012: the context is bound to the registered function's
+        -- namespace and persists JSON values. Missing differs from stored null.
+        -- put replaces a value, delete is idempotent, and list enumerates a prefix.
+        -- Engine handles and other namespaces are not part of this interface.
+    @invariant AtomicRelatedChanges
+        -- REQ-BW-006,012: related reads/writes can use one explicit transaction.
+        -- Its callback uses only the provided KV operations and pure computation,
+        -- runs at most once, and commits all changes together or rolls them back.
+        -- A standalone get followed by put is not an atomic update. No nesting or
+        -- automatic callback retry is part of this primitive.
+}
+
+enum RequestPhase { received | validated | admitted | succeeded | rejected | failed | uncertain }
+enum ReplyState { waiting | delivered | lost }
+
+entity OperationRequest {
+    function_name: String
+    operation_name: String
+    input: Any
+    known_operation: Boolean
+    valid_input: Boolean
+    phase: RequestPhase
+    reply: ReplyState
+    handler_calls: Integer
+    mutation: Boolean
+    committed: Boolean
+    outcome: Any
+    error: String?
+}
+
+rule InitializeIngressState {
+    when: request: OperationRequest.created
+    ensures:
+        request.phase = received
+        request.reply = waiting
+        request.handler_calls = 0
+        request.committed = false
+        request.outcome = null
+        request.error = null
+}
+
+rule ValidateKnownPayload {
+    when: ValidateRequest(request)
+    requires: request.phase = received
+    requires: request.known_operation
+    requires: request.valid_input
+    ensures: request.phase = validated
+}
+
+rule RejectUnknownOperation {
+    when: ValidateRequest(request)
+    requires: request.phase = received
+    requires: not request.known_operation
+    ensures:
+        request.phase = rejected
+        request.error = "Unknown function or operation"
+}
+
+rule RejectInvalidPayload {
+    when: ValidateRequest(request)
+    requires: request.phase = received
+    requires: request.known_operation
+    requires: not request.valid_input
+    ensures:
+        request.phase = rejected
+        request.error = "Invalid input"
+}
+
+rule AdmitOneHandlerCall {
+    when: AdmitRequest(request)
+    requires: request.phase = validated
+    requires: request.handler_calls = 0
+    ensures:
+        request.phase = admitted
+        request.handler_calls = 1
+}
+
+rule CompleteRead {
+    when: ReadCompleted(request, result)
+    requires: request.phase = admitted
+    requires: not request.mutation
+    ensures:
+        request.phase = succeeded
+        request.outcome = result
+}
+
+rule CompleteMutationAfterCommit {
+    when: MutationCommitted(request, result)
+    requires: request.phase = admitted
+    requires: request.mutation
+    ensures:
+        request.committed = true
+        request.phase = succeeded
+        request.outcome = result
+}
+
+rule RejectApplicationError {
+    when: ApplicationRejected(request, message)
+    requires: request.phase = admitted
+    requires: not request.committed
+    ensures:
+        request.phase = rejected
+        request.error = message
+}
+
+rule FailUncommittedOperation {
+    when: HandlerFailed(request)
+    requires: request.phase = admitted
+    requires: not request.committed
+    ensures:
+        request.phase = failed
+        request.error = "Operation failed before commit"
+}
+
+rule ReportUncertainMutationOutcome {
+    when: MutationOutcomeUncertain(request)
+    requires: request.phase = admitted
+    requires: request.mutation
+    ensures:
+        request.phase = uncertain
+        request.error = "Mutation outcome unknown; do not retry automatically"
+}
+
+rule DeliverReply {
+    when: ReplyDelivered(request)
+    requires: request.phase in {succeeded, rejected, failed, uncertain}
+    requires: request.reply = waiting
+    ensures: request.reply = delivered
+}
+
+rule LoseReplyWithoutRepeatingOperation {
+    when: ReplyLost(request)
+    requires: request.reply = waiting
+    ensures: request.reply = lost
+}
+
+invariant ValidateBeforeDispatch {
+    OperationRequests.all(r => r.handler_calls = 0 or (r.known_operation and r.valid_input))
+}
+
+invariant AtMostOneDispatchPerAcceptedEnvelope {
+    OperationRequests.all(r => r.handler_calls >= 0 and r.handler_calls <= 1)
+}
+
+invariant SuccessAcknowledgesPersistentMutation {
+    OperationRequests.all(r => r.phase != succeeded or not r.mutation or r.committed)
+}
+
+invariant NoCommitForRejectedOrFailedOperation {
+    OperationRequests.all(r => r.phase not in {rejected, failed} or not r.committed)
+}
+
+contract ApplicationOperation {
+    validate: (input: Any) -> Boolean
+    handle: (validated_input: Any) -> Any
+    @invariant PersistentAtomicResult
+        -- Related stored changes and their history are committed as a unit.
+        -- A response can be lost after that commit; this is not rollback.
+    @invariant NoImplicitRetry
+        -- REQ-BW-009: clients and the platform do not automatically resubmit a
+        -- mutating application request or reinvoke its handler after uncertainty.
+        -- This does not forbid deliberate retries of safe steps inside the worker
+        -- or safe lock acquisition before its storage transaction starts. Two
+        -- explicitly submitted envelopes can still create two application actions.
+}
+
+surface WorkerBoundary {
+    context request: OperationRequest
+    exposes:
+        request.function_name
+        request.operation_name
+        request.input
+        request.phase
+        request.outcome
+        request.error
+    provides:
+        ValidateRequest(request) when request.phase = received
+        AdmitRequest(request) when request.phase = validated
+        ReadCompleted(request, result) when request.phase = admitted and not request.mutation
+        MutationCommitted(request, result) when request.phase = admitted and request.mutation
+        ApplicationRejected(request, message) when request.phase = admitted and not request.committed
+        HandlerFailed(request) when request.phase = admitted and not request.committed
+        MutationOutcomeUncertain(request) when request.phase = admitted and request.mutation
+        ReplyDelivered(request) when request.phase in {succeeded, rejected, failed, uncertain} and request.reply = waiting
+        ReplyLost(request) when request.reply = waiting
+    contracts:
+        demands ApplicationOperation
+        fulfils WorkerStore
+    @guarantee NoViewLifetimeDependency
+        -- REQ-BW-007,008: UI retirement is not a precondition or failure event
+        -- for admitted work. No view reference is stored in a worker registration.
+    @guarantee TrustedIngress
+        -- Operation existence, payload validity and read/mutation classification
+        -- come from the authenticated transport, registered operation and schema.
+        -- Caller JSON cannot assert that validation occurred or classify a
+        -- mutating handler as a read to bypass transaction obligations.
+    @guarantee FailureRequiresKnownNonCommit
+        -- HandlerFailed is supplied only when storage establishes no commit.
+        -- A missing commit acknowledgement is not that evidence; for a mutation
+        -- it produces MutationOutcomeUncertain instead. The committed flag models
+        -- confirmed commit knowledge, not a proof that an uncertain write is absent.
+    @guarantee RestartDoesNotReplayRequests
+        -- REQ-BW-005,009: committed records survive restart. In-flight requests
+        -- are not durable jobs, and service restart does not reconstruct or replay
+        -- them. A disconnected caller may need an ordinary read to inspect state.
+}

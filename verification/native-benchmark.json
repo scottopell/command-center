@@ -1,0 +1,358 @@
+{
+  "allocatorRSSClaim" : "none",
+  "blobBytesPerCycle" : 33554432,
+  "largeBlobCycles" : 3,
+  "maximumVisualMs" : 2.424458391033113,
+  "profile" : {
+    "appActiveAtReport" : false,
+    "appVersion" : "0.1.0",
+    "architecture" : "arm64",
+    "backend" : "SLOW has no backend dependency",
+    "coldAppStartup" : "not measured",
+    "measurement" : "Command admission through NSWindow.displayIfNeeded native loading frame; compositor presentation is not directly instrumented",
+    "os" : "Version 26.6.2 (Build 25G83)",
+    "physicalMemoryBytes" : 68719476736,
+    "processors" : 18,
+    "windowVisible" : true
+  },
+  "rawFocusAndCancelMs" : [
+    2.5368334027007222,
+    1.7365416279062629,
+    1.8637499306350946,
+    1.6615834319964051,
+    1.5882500447332859,
+    1.6249583568423986,
+    1.5221249777823687,
+    1.5011667273938656,
+    1.7050832975655794,
+    1.8074583495035768,
+    1.6596666537225246,
+    1.6186250140890479,
+    1.7087082378566265,
+    1.5675834147259593,
+    1.7379999626427889,
+    1.6047917306423187,
+    1.7797083128243685,
+    1.5863749431446195,
+    1.5755416825413704,
+    1.6691667260602117,
+    1.6209166496992111,
+    1.7943333368748426,
+    1.6767916968092322,
+    1.5092917019501328,
+    1.6856666188687086,
+    2.0850832806900144,
+    1.7972500063478947,
+    1.7122916178777814,
+    1.7833750462159514,
+    1.8197917379438877
+  ],
+  "rawLaunches" : [
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "DD3422CE-12CF-460E-AC18-51C8E442FF55",
+      "interactiveMs" : 225.16008338425308,
+      "visualMs" : 2.424458391033113,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "DE28BF96-16E9-487E-9ED8-9BC3A2217E97",
+      "interactiveMs" : 80.078541650436819,
+      "visualMs" : 0.58233330491930246,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "19A6F530-CF20-4121-9AAA-63E7DD2AE8D0",
+      "interactiveMs" : 79.138416680507362,
+      "visualMs" : 0.56508334819227457,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "4DD6A2D6-F6F7-40D5-9458-0413295B342C",
+      "interactiveMs" : 77.90204172488302,
+      "visualMs" : 0.60195836704224348,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "DE2682CD-CB27-43E0-BBDE-B0BDFA51D7F8",
+      "interactiveMs" : 77.766250004060566,
+      "visualMs" : 0.53641665726900101,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "957A9D99-311B-4024-BE26-BE7FE8276937",
+      "interactiveMs" : 74.222583323717117,
+      "visualMs" : 0.47662504948675632,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "BE079E45-6A15-434F-B462-8632532103BE",
+      "interactiveMs" : 75.713791768066585,
+      "visualMs" : 0.59708335902541876,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "82E4E71E-1CCB-4926-87A4-674851702C36",
+      "interactiveMs" : 71.749833296053112,
+      "visualMs" : 0.520500005222857,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "0E3B567E-5471-4D66-AB5A-44444A32A7B8",
+      "interactiveMs" : 78.850083402357996,
+      "visualMs" : 0.54554175585508347,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "E66B90A2-8C58-4E1C-84D4-8250CA826A69",
+      "interactiveMs" : 78.701791702769697,
+      "visualMs" : 0.52962498739361763,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "0F565607-573E-44A5-AEAD-8AA1160D7B92",
+      "interactiveMs" : 74.201666633598506,
+      "visualMs" : 0.52033329848200083,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "327E510A-FF18-4AD9-BB78-0B4CA52B3B68",
+      "interactiveMs" : 72.156250011175871,
+      "visualMs" : 0.4742499440908432,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "DEA0FD46-2B9F-49DA-8320-CF9B2B969817",
+      "interactiveMs" : 77.841333346441388,
+      "visualMs" : 0.54491660557687283,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "BBD70420-3EAB-4B24-9D89-F9763B328FA9",
+      "interactiveMs" : 117.66420840285718,
+      "visualMs" : 0.60129165649414062,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "AD119DF5-CC0A-427B-BBB8-8E50D2CC885B",
+      "interactiveMs" : 78.640958410687745,
+      "visualMs" : 0.59066666290163994,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "1372F93D-4475-4BE6-9E3C-51F41D3D4E7D",
+      "interactiveMs" : 78.276999993249774,
+      "visualMs" : 0.57270831894129515,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "1F255206-001F-4EB8-9661-802A1BEFA3DC",
+      "interactiveMs" : 79.055374953895807,
+      "visualMs" : 0.5512916250154376,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "4F4B0DC4-EB64-4599-AD9F-B2772AB506C3",
+      "interactiveMs" : 100.8182083023712,
+      "visualMs" : 0.58833335060626268,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "8D861A6A-10C4-469C-8FD2-42ECCE3E6FD9",
+      "interactiveMs" : 83.628833293914795,
+      "visualMs" : 0.58899994473904371,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "806FDDB5-B55C-4EBD-8257-ADA9C7DBA04D",
+      "interactiveMs" : 76.754125067964196,
+      "visualMs" : 0.50320837181061506,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "5874A62A-7FFB-40A8-9AF6-065A9A4C80F8",
+      "interactiveMs" : 74.079416692256927,
+      "visualMs" : 0.51458331290632486,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "A85017C6-C508-46BE-A806-F4F4E6381341",
+      "interactiveMs" : 77.792500029318035,
+      "visualMs" : 0.46291667968034744,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "B19120A2-DE0E-4216-9DB0-6E91931F1091",
+      "interactiveMs" : 76.346458285115659,
+      "visualMs" : 0.55100000463426113,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "E95133E8-EA8E-4D38-A471-8AAA51488D13",
+      "interactiveMs" : 77.963541727513075,
+      "visualMs" : 0.54849998559802771,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "FE85D884-5AA7-431F-B83A-572B6D2C2B82",
+      "interactiveMs" : 77.758624916896224,
+      "visualMs" : 0.55012491066008806,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "45072FD5-483A-48C8-B908-A16672050B53",
+      "interactiveMs" : 81.050041597336531,
+      "visualMs" : 0.55066659115254879,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "39224FCF-C9E3-4639-8F67-A5B9F4C47633",
+      "interactiveMs" : 81.499541644006968,
+      "visualMs" : 0.71304163429886103,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "A57B0E73-AB67-4D7C-A12B-1BD0302B9077",
+      "interactiveMs" : 79.345083329826593,
+      "visualMs" : 0.62729162164032459,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "43A5EFDC-8700-449D-A739-20B749B8DF49",
+      "interactiveMs" : 78.135708346962929,
+      "visualMs" : 0.5496250232681632,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    },
+    {
+      "appActive" : false,
+      "function" : "SLOW",
+      "generation" : "090C1092-803B-483E-BA82-D3501F556D6C",
+      "interactiveMs" : 77.997541637159884,
+      "visualMs" : 0.52495836280286312,
+      "windowKey" : false,
+      "windowOcclusionVisible" : false,
+      "windowVisible" : true
+    }
+  ],
+  "releasedInvocationObjects" : 30,
+  "releasedWebViews" : 30,
+  "retainedActive" : 0,
+  "visualMisses" : [
+
+  ]
+}

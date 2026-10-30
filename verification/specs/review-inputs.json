@@ -1,0 +1,301 @@
+{
+  "purpose": "Content fingerprints of the specification artifacts reviewed at each round; not runtime verification.",
+  "stages": [
+    {
+      "stage": "draft",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "33b6028a79e169d56219d929a67a3ffc57b3a8fab5102eb5ecf7941f4cbebb12"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "a3cc5b2428ab49498a33067a186af83b4d0c26c61e98b6774720a321cf8f0daf"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "fb11752a58999cb59e4ce7193fa59b5d7550b9105504a14f211bae008635541a"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "1300681dc9d813608a560100903b67092869960d12078d42b9ea9808b936e115"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "0cf69f8525b4615828c30dd4519c4ae0000c3bc328672330be9427ae5e83b566"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "c1e675d117a2f2a50df94d032a31d57105138db78b296bd0f53c6d16aef7cb2f"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "f0602ba29bc1dc186f3bb224cb189aae9895a71540b3a71e711a566b513445d8"
+        }
+      ]
+    },
+    {
+      "stage": "round-one-revised",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "33b6028a79e169d56219d929a67a3ffc57b3a8fab5102eb5ecf7941f4cbebb12"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "a3cc5b2428ab49498a33067a186af83b4d0c26c61e98b6774720a321cf8f0daf"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "fb11752a58999cb59e4ce7193fa59b5d7550b9105504a14f211bae008635541a"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "62d2eabe008ed95e83a6ead550b2ccf8ec24ea9f3de9bcb2e7e1487a846fb4fb"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "0cf69f8525b4615828c30dd4519c4ae0000c3bc328672330be9427ae5e83b566"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "c07592b32fec9a88864e16cf67a11b3c7b159a707ab3c1f686330fa5c0603666"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "f0602ba29bc1dc186f3bb224cb189aae9895a71540b3a71e711a566b513445d8"
+        }
+      ]
+    },
+    {
+      "stage": "round-two-revised",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "e3b8007cb0187c1e5217e93942eaa429ee6a27a7e3e6708fa62e5d14eefbe66e"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "4e64fd5ae6b1db55a87120d260ad979827502b26b6e2b1e08c9f0e39fd9003e7"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "cc964a92864605319d2f6ff46ea1944baa95ab3258027602e1524ade591c86c0"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "ec6dfd53a15747bd9ffeab3b1d98d3ce1a2c8592c6722e5859ac909b0f246b9f"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "81c07b80180653a92d6139c6576258db9e4322dc7395dc6c08cf720d682d74ef"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "15a053e2f9b57bcec1067eddd5acbc121b716d61d4474f59728e214c1006ef91"
+        }
+      ]
+    },
+    {
+      "stage": "user-approved-input-scope",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "e3b8007cb0187c1e5217e93942eaa429ee6a27a7e3e6708fa62e5d14eefbe66e"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "c7a24ce6f26f9108772a495a93c33bdd13ed45eba6d6e56602a8efb7ad48f2a1"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "cc964a92864605319d2f6ff46ea1944baa95ab3258027602e1524ade591c86c0"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "ec6dfd53a15747bd9ffeab3b1d98d3ce1a2c8592c6722e5859ac909b0f246b9f"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "42674ed33d912b3dd4cfa2344a0e28ee92691f907f6bea467130a0c3c605725a"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "7de00498f7d444a2039cedeea2dd50f93408b760854377a21de993047d78a196"
+        }
+      ]
+    },
+    {
+      "stage": "before-unload-removal",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "e3b8007cb0187c1e5217e93942eaa429ee6a27a7e3e6708fa62e5d14eefbe66e"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "c7a24ce6f26f9108772a495a93c33bdd13ed45eba6d6e56602a8efb7ad48f2a1"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "cc964a92864605319d2f6ff46ea1944baa95ab3258027602e1524ade591c86c0"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "ec6dfd53a15747bd9ffeab3b1d98d3ce1a2c8592c6722e5859ac909b0f246b9f"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "42674ed33d912b3dd4cfa2344a0e28ee92691f907f6bea467130a0c3c605725a"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "7de00498f7d444a2039cedeea2dd50f93408b760854377a21de993047d78a196"
+        }
+      ]
+    },
+    {
+      "stage": "post-simplification-review-input",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "a64108d7db7d5196ae47c67ca6e094b1e1a6a4a2e6b8bf78753845a144fb5fcf"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "d9e46390a48f3333af349c0016dce1c91715f09fb7e833b86ca9d71a606d511b"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "cc964a92864605319d2f6ff46ea1944baa95ab3258027602e1524ade591c86c0"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "1d97e7888a66426e07d18c7a04a1b2ccc32747c49d67f07fa10a534c075a5cb1"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "11fc42acc2e8556e3a4dfcfc8c4ba18eb506a91db2959a7a4dd510d7351b2040"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "c61cd3d40153716d9ef52f8688c3d17f33804c05bad3baadd88108ab87971756"
+        }
+      ]
+    },
+    {
+      "stage": "post-simplification-reviewed",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "c9e7e6427fbf30cb4e8d561b9540586091419df30731cd4e6172169ec2b12a73"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "7ca4791413782b88ce75d85938ad3db8f9a96efbbb100f3a26cb3143b021a4c5"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "5c4d8d79ade5fee07b4c9ad593526d40b53f4029ac9dd4fabbf3e239253c48c2"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "1d97e7888a66426e07d18c7a04a1b2ccc32747c49d67f07fa10a534c075a5cb1"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "11fc42acc2e8556e3a4dfcfc8c4ba18eb506a91db2959a7a4dd510d7351b2040"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "dbefa9a59ba43e4241a4375ba0beb721da82fa3aaa9f945b59f06c1840838322"
+        }
+      ]
+    },
+    {
+      "stage": "focus-cancel-and-worker-context-clarification",
+      "artifacts": [
+        {
+          "file": "specs/drqs/requirements.md",
+          "sha256": "72700a82c4054a2b294e6d1cd89417ea564b783334d50c08c274b89cade72904"
+        },
+        {
+          "file": "specs/function-framework/function-contract.allium",
+          "sha256": "dfbe75e148d323f237aeabc3bb203eb3f147ad02f5a714cd847e063b06c2b567"
+        },
+        {
+          "file": "specs/function-framework/requirements.md",
+          "sha256": "77547b8322a406532477ba6dd9ec5791b92be515341e9d591d0486282e783fbd"
+        },
+        {
+          "file": "specs/function-workers/request-boundary.allium",
+          "sha256": "b9b1654d11c301a2e949f460a91fb7b40e15b0e9b8a2c58f35cc64c6c718d3c2"
+        },
+        {
+          "file": "specs/function-workers/requirements.md",
+          "sha256": "03dc79927038e41908933dbb4d7b67029ec264b83531e6c7bcee03e30db62ee7"
+        },
+        {
+          "file": "specs/host/requirements.md",
+          "sha256": "3b169d3989feb87985fc2e599f596b0df45c6bb767a22bc35ff95f743035faa9"
+        },
+        {
+          "file": "specs/shell/invocation.allium",
+          "sha256": "4ee463a89ba38392a2c594259ac9c28bfe2a7b0c9c7fdba6aa486cd6d8943f02"
+        },
+        {
+          "file": "specs/shell/requirements.md",
+          "sha256": "9e0d3dd5fa0e660de3c0abbc0d77aa5ee89041918efb478504a548be459f06f7"
+        }
+      ]
+    }
+  ]
+}

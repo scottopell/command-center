@@ -1,0 +1,1268 @@
+{
+  "generatedAt": "2026-10-30T19:45:00.394Z",
+  "scope": "Implementation-to-check mapping; not a claim that every possible interleaving was exhaustively explored",
+  "requirements": [
+    {
+      "id": "REQ-SH-001",
+      "title": "Use one consistent command-center window",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-002",
+      "title": "Launch functions with their tails intact",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-003",
+      "title": "Discover registered functions",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-004",
+      "title": "Return immediately to the command bar",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-005",
+      "title": "Start every invocation fresh",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-006",
+      "title": "See a destination within the visual latency budget",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-007",
+      "title": "Preserve input while a function initializes",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-008",
+      "title": "Hand input to the initialized destination",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-010",
+      "title": "Expose initialization and handoff failures",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-011",
+      "title": "Release retired invocation ownership",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-012",
+      "title": "Leave submitted work independent of the view",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-013",
+      "title": "Submit only after readiness",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-014",
+      "title": "Cancel a function from the command bar",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "native/CommandCenterTests/BenchmarkTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-FF-001",
+      "title": "Define a function with a narrow contract",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-002",
+      "title": "Resolve the initial view before presenting it",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-003",
+      "title": "Declare initial focus without a readiness callback",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-006",
+      "title": "Keep invocation data from escaping its lifetime",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-007",
+      "title": "Use ordinary application controls",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-008",
+      "title": "Share validated worker clients",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-009",
+      "title": "Exercise the lifecycle with SLOW",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-BW-001",
+      "title": "Reach function APIs without an open window",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-002",
+      "title": "Route messages to named application operations",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-003",
+      "title": "Validate requests before application mutation",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-004",
+      "title": "Return consistent results and errors",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-005",
+      "title": "Retain independent function data",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-006",
+      "title": "Commit related changes together",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-007",
+      "title": "Keep worker lifetime independent of views",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-008",
+      "title": "Finish accepted operations independently of UI retirement",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-009",
+      "title": "Avoid hidden write retries",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-010",
+      "title": "Keep local access local",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-011",
+      "title": "Keep human and agent workflows consistent",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-BW-012",
+      "title": "Persist worker data through a small scoped store",
+      "feature": "function-workers",
+      "code": [
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "packages/backend/src/dispatcher.ts",
+        "packages/backend/src/store.ts",
+        "packages/cli/src/main.ts",
+        "native/CommandCenter/Runtime.swift",
+        "scripts/service.mjs"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-001",
+      "title": "Choose stable routing groups",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-002",
+      "title": "Inspect and search request queues",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-003",
+      "title": "Navigate directly with tails",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-004",
+      "title": "File a request with predictable defaults",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-005",
+      "title": "Enter title and body without waiting",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-006",
+      "title": "Read a permanent report and its history",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-007",
+      "title": "Post findings and route work together",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-008",
+      "title": "Keep ownership distinct from routing",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-009",
+      "title": "Distinguish authors from requesters",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-DR-010",
+      "title": "Use ticket numbers through the local API",
+      "feature": "drqs",
+      "code": [
+        "functions/drqs/ui.tsx",
+        "functions/drqs/tail.ts",
+        "functions/drqs/worker.ts",
+        "data/groups.json"
+      ],
+      "tests": [
+        "tests/backend.test.ts",
+        "tests/tail.test.ts",
+        "tests/transport.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-001",
+      "title": "Identify the current host",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-002",
+      "title": "Inspect selected runtime settings",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-003",
+      "title": "Inspect configured services and user LaunchAgents",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-004",
+      "title": "Read selected service details",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-005",
+      "title": "Understand freshness and refresh observations",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-HO-006",
+      "title": "Inspect without changing host services",
+      "feature": "host",
+      "code": [
+        "functions/host/worker.ts",
+        "functions/host/ui.tsx"
+      ],
+      "tests": [
+        "tests/host.test.ts",
+        "native/CommandCenterTests/WebKitTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-SH-015",
+      "title": "Open sources outside the function document",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/Runtime.swift",
+        "native/CommandCenter/Shell.swift",
+        "packages/ui/src/framework.tsx"
+      ],
+      "tests": [
+        "native/CommandCenterTests/InvocationTests.swift",
+        "verification/screen-smoke.json"
+      ]
+    },
+    {
+      "id": "REQ-NV-001",
+      "title": "Declare typed destinations",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-002",
+      "title": "Bound navigation history",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-003",
+      "title": "Provide one Back behavior",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-004",
+      "title": "Retain ordinary React state",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-005",
+      "title": "Restore the operator's place",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-006",
+      "title": "Keep entry authority local",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-007",
+      "title": "Preserve native focus and handoff",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-008",
+      "title": "Expose bounded retention diagnostics",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-009",
+      "title": "Exercise navigation under failure and repetition",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/viewport.ts",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/InvocationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-001",
+      "title": "Use typed worker data operations",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-002",
+      "title": "Retain invocation query data",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-003",
+      "title": "Invalidate uniformly after committed writes",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-004",
+      "title": "Revalidate without resetting context",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-005",
+      "title": "Ignore superseded read deliveries",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-006",
+      "title": "Represent mutation uncertainty honestly",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-007",
+      "title": "Leave concurrency semantics with the owner",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-008",
+      "title": "Accept fresh-read snapshot races",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-QL-009",
+      "title": "Bound requests and verify cache lifetime",
+      "feature": "query-layer",
+      "code": [
+        "packages/ui/src/queries.tsx",
+        "packages/contracts/src/index.ts",
+        "packages/backend/src/server.ts",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/query-layer.test.ts",
+        "tests/types.tsx",
+        "tests/response-bounds.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-010",
+      "title": "Enforce supported application-data access",
+      "feature": "function-framework",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "packages/ui/src/queries.tsx",
+        "packages/ui/index.html",
+        "scripts/check-function-boundaries.mjs"
+      ],
+      "tests": [
+        "tests/types.tsx",
+        "tests/boundaries.test.ts",
+        "tests/query-layer.test.ts",
+        "native/CommandCenterTests/NavigationTests.swift",
+        "native/CommandCenterTests/WebKitTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-NV-010",
+      "title": "Browse a stable collection sequence",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/sequence.ts",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/SelectionAndSiblingTests.swift",
+        "tests/sequence.test.ts",
+        "tests/types.tsx"
+      ]
+    },
+    {
+      "id": "REQ-NV-011",
+      "title": "Replace detail when moving between siblings",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/sequence.ts",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/SelectionAndSiblingTests.swift",
+        "tests/sequence.test.ts",
+        "tests/types.tsx"
+      ]
+    },
+    {
+      "id": "REQ-NV-012",
+      "title": "Provide consistent sibling controls and shortcuts",
+      "feature": "navigation",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Runtime.swift",
+        "packages/ui/src/sequence.ts",
+        "native/CommandCenter/Invocation.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/SelectionAndSiblingTests.swift",
+        "tests/sequence.test.ts",
+        "tests/types.tsx"
+      ]
+    },
+    {
+      "id": "REQ-SH-016",
+      "title": "Copy intentionally selected display text",
+      "feature": "shell",
+      "code": [
+        "packages/ui/src/framework.tsx",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/SelectionAndSiblingTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-FF-011",
+      "title": "Compose functions at build time",
+      "feature": "function-framework",
+      "code": [
+        "scripts/configure.mjs",
+        "scripts/run.mjs",
+        "packages/contracts/src/core.ts",
+        "packages/contracts/src/index.ts",
+        "packages/ui/src/main.tsx",
+        "native/CommandCenter/Runtime.swift"
+      ],
+      "tests": [
+        "tests/composition.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/CommandBarTests.swift"
+      ]
+    }
+  ]
+}

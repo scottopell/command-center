@@ -1,0 +1,53 @@
+
+> command-center@0.1.0 check
+> npm run typecheck && npm run lint && npm test
+
+
+> command-center@0.1.0 typecheck
+> node scripts/run.mjs typecheck
+
+
+> command-center@0.1.0 lint
+> node scripts/run.mjs lint
+
+Function lifetime guards passed
+
+> command-center@0.1.0 test
+> node scripts/run.mjs test
+
+✔ KV namespaces, null, replacement, prefix listing, rollback and expired tx handles (12.691083ms)
+✔ DRQS complete workflow, concurrent numbers/comments, defaults, literal search and immutable original (32.468125ms)
+✔ invalid envelopes, agents without requesters and invalid groups leave data unchanged (4.544458ms)
+✔ storage faults roll back both counter/create and comment/routing changes (7.580791ms)
+✔ function source guard rejects retained mutable state and globals (5.855417ms)
+✔ build catalog matches UI and registered worker contracts (327.104084ms)
+✔ HOST joins by Label, retains declarations without files, and diagnoses duplicates (30.763667ms)
+✔ HOST retains complete observations across refresh failures and recovers (0.433291ms)
+✔ HOST initial partial inspection shows diagnostics without inventing a complete snapshot (0.185541ms)
+✔ HOST bounds retained payload and refresh diagnostics (1.463542ms)
+✔ HOST missing configuration is absence, not a failed refresh (0.128875ms)
+✔ HOST late earlier collections cannot regress the retained complete observation (0.20675ms)
+✔ validated read keys deduplicate, stay cached past five minutes, and release on dispose (3.455708ms)
+✔ cancelled reads remove their transport waiter and cannot overwrite a newer result (0.611875ms)
+✔ committed mutation cancels an old initial read before broad active invalidation (2.463125ms)
+✔ popped-origin write still invalidates parent, and failed refresh cannot fail committed mutation (0.841917ms)
+✔ pending/unknown attempts refuse duplicates; refresh never resets unknown (0.380875ms)
+✔ new explicit attempts work after success/rejection, but inactive entries cannot dispatch (0.407584ms)
+✔ dispose/relaunch starts a fresh snapshot without an old-mutation completion barrier (0.461125ms)
+✔ invalid mutation result becomes blocked unknown rather than a retryable format rejection (0.273667ms)
+✔ new entry revalidates a previously cached detail before admission without a second View fetch (0.53025ms)
+✔ serialized RPC cap bounds large reads and reports oversized committed write as unknown (151.900084ms)
+✔ sequence snapshots validate, detach and normalize destinations; movement never wraps (2.564ms)
+✔ sequence bounds reject duplicate/missing keys, bad destinations, non-JSON and oversized descriptors (4.709459ms)
+✔ DRQS tails select only navigation and reject extra operands (1.083667ms)
+✔ authorized transport, independent CLI complete workflow and backend restart (1394.717584ms)
+✔ lost mutation response reports outcome_unknown and never retries (6.71975ms)
+✔ a fault after a persistent commit is outcome_unknown, not definite failure (0.569667ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1622.092125

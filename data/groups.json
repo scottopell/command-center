@@ -1,0 +1,29 @@
+{
+  "description": "Authored project routing groups. Inbox is an explicit catch-all; numbers and slugs are stable identities.",
+  "groups": [
+    {
+      "number": 1,
+      "id": "inbox",
+      "name": "Inbox",
+      "products": []
+    },
+    {
+      "number": 42,
+      "id": "command-center",
+      "name": "CommandCenter",
+      "products": []
+    },
+    {
+      "number": 43,
+      "id": "phoenix-ide",
+      "name": "Phoenix IDE",
+      "products": []
+    },
+    {
+      "number": 44,
+      "id": "paperclip",
+      "name": "Paperclip",
+      "products": []
+    }
+  ]
+}

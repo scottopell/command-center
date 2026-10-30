@@ -1,0 +1,422 @@
+-- allium: 3
+-- Requirements: REQ-SH-004, REQ-SH-005, REQ-SH-006, REQ-SH-007, REQ-SH-008,
+-- REQ-SH-010, REQ-SH-011, REQ-SH-012, REQ-SH-013, REQ-SH-014, REQ-FF-002, REQ-FF-003,
+-- REQ-FF-006, REQ-FF-007, REQ-DR-005.
+-- Command/completion/input records and retired invocations are specification
+-- history, not a requirement to retain payloads or tombstones in production.
+-- InputCapture is the logical acceptance point in the shell's serialized input
+-- authority, not a delayed message arriving in the function's JavaScript realm.
+
+enum Phase { resolving | mounting | draining | interactive | error | retired }
+enum Screen { empty | loading | content | error }
+enum FocusOwner { command_bar | loading_capture | function_view }
+enum OperationState { pending | applied | discarded }
+enum InputKind { text | backspace | tab | unsupported | submit }
+
+entity CommandCenter {
+    generation: Integer
+    screen: Screen
+    focus_owner: FocusOwner
+    command_error: String?
+    input_notice: String?
+}
+
+entity Command {
+    mnemonic: String
+    tail: String
+    known: Boolean
+    handled: Boolean
+}
+
+entity Invocation {
+    command_center: CommandCenter
+    generation: Integer
+    mnemonic: String
+    tail: String
+    phase: Phase
+    accepted_count: Integer
+    delivered_count: Integer
+    abort_requested: Boolean
+    initial_focus_set: Boolean
+    failure: String?
+    operations: InputOperation with invocation = this
+    pending: operations where state = pending
+    current: generation = command_center.generation and phase != retired
+}
+
+entity Completion {
+    invocation: Invocation
+    success: Boolean
+    handled: Boolean
+}
+
+entity FocusResult {
+    invocation: Invocation
+    valid: Boolean
+    handled: Boolean
+}
+
+entity InputCapture {
+    invocation: Invocation
+    kind: InputKind
+    payload: Any
+    handled: Boolean
+}
+
+entity InputOperation {
+    invocation: Invocation
+    ordinal: Integer
+    kind: InputKind
+    payload: Any
+    state: OperationState
+}
+
+default CommandCenter shell = {
+    generation: 0,
+    screen: empty,
+    focus_owner: command_bar,
+    command_error: null,
+    input_notice: null
+}
+
+rule LaunchFresh {
+    when: command: Command.created
+    requires: command.known
+    requires: not command.handled
+    ensures:
+        for old in Invocations where phase != retired:
+            old.phase = retired
+            old.abort_requested = true
+            for operation in old.pending:
+                operation.state = discarded
+        shell.generation = shell.generation + 1
+        shell.screen = loading
+        shell.focus_owner = loading_capture
+        shell.command_error = null
+        shell.input_notice = null
+        Invocation.created(command_center: shell, generation: shell.generation,
+            mnemonic: command.mnemonic, tail: command.tail, phase: resolving,
+            accepted_count: 0, delivered_count: 0, abort_requested: false,
+            initial_focus_set: false, failure: null)
+        command.handled = true
+}
+
+rule RejectUnknown {
+    when: command: Command.created
+    requires: not command.known
+    requires: not command.handled
+    ensures:
+        shell.command_error = "Unknown function"
+        command.handled = true
+}
+
+rule EscapeReturnsCommandFocusWithoutCancel {
+    when: EscapePressed()
+    requires: shell.focus_owner != command_bar
+    ensures: shell.focus_owner = command_bar
+}
+
+rule EscapeInCommandBarCancels {
+    when: EscapePressed()
+    requires: shell.focus_owner = command_bar
+    ensures:
+        for old in Invocations where phase != retired:
+            old.phase = retired
+            old.abort_requested = true
+            for operation in old.pending:
+                operation.state = discarded
+        shell.screen = empty
+        shell.focus_owner = command_bar
+        shell.command_error = null
+        shell.input_notice = null
+}
+
+rule FocusCommandBar {
+    when: CommandBarFocused()
+    ensures: shell.focus_owner = command_bar
+}
+
+rule ResumeInitializingFunctionInput {
+    when: FunctionFocused(invocation)
+    requires: invocation.current
+    requires: invocation.phase in {resolving, mounting, draining}
+    requires: shell.focus_owner = command_bar
+    ensures: shell.focus_owner = loading_capture
+}
+
+rule ResumeReadyFunctionInput {
+    when: FunctionFocused(invocation)
+    requires: invocation.current
+    requires: invocation.phase in {interactive, error}
+    requires: shell.focus_owner = command_bar
+    ensures: shell.focus_owner = function_view
+}
+
+rule BeginMount {
+    when: completion: Completion.created
+    let invocation = completion.invocation
+    requires: invocation.current
+    requires: invocation.phase = resolving
+    requires: completion.success
+    requires: not completion.handled
+    ensures:
+        invocation.phase = mounting
+        completion.handled = true
+}
+
+rule ResolutionFails {
+    when: completion: Completion.created
+    let invocation = completion.invocation
+    requires: invocation.current
+    requires: invocation.phase = resolving
+    requires: not completion.success
+    requires: not completion.handled
+    ensures:
+        invocation.phase = error
+        invocation.failure = "Resolution failed"
+        shell.screen = error
+        for operation in invocation.pending:
+            operation.state = discarded
+        completion.handled = true
+}
+
+rule IgnoreRetiredCompletion {
+    when: completion: Completion.created
+    requires: not completion.invocation.current
+    requires: not completion.handled
+    ensures: completion.handled = true
+}
+
+rule IgnoreUnexpectedCompletion {
+    when: completion: Completion.created
+    requires: completion.invocation.current
+    requires: completion.invocation.phase != resolving
+    requires: not completion.handled
+    ensures: completion.handled = true
+}
+
+rule EstablishInitialFocus {
+    when: focus: FocusResult.created
+    let invocation = focus.invocation
+    requires: invocation.current
+    requires: invocation.phase = mounting
+    requires: focus.valid
+    requires: not focus.handled
+    ensures:
+        invocation.phase = draining
+        invocation.initial_focus_set = true
+        shell.screen = content
+        if shell.focus_owner != command_bar:
+            shell.focus_owner = function_view
+        focus.handled = true
+}
+
+rule FocusFailureStopsDelivery {
+    when: focus: FocusResult.created
+    let invocation = focus.invocation
+    requires: invocation.current
+    requires: invocation.phase = mounting
+    requires: not focus.valid
+    requires: not focus.handled
+    ensures:
+        invocation.phase = error
+        invocation.failure = "Invalid initial focus destination"
+        shell.screen = error
+        for operation in invocation.pending:
+            operation.state = discarded
+        focus.handled = true
+}
+
+rule IgnoreRetiredFocus {
+    when: focus: FocusResult.created
+    requires: not focus.invocation.current
+    requires: not focus.handled
+    ensures: focus.handled = true
+}
+
+rule IgnoreUnexpectedFocus {
+    when: focus: FocusResult.created
+    requires: focus.invocation.current
+    requires: focus.invocation.phase != mounting
+    requires: not focus.handled
+    ensures: focus.handled = true
+}
+
+rule RenderFailureStopsInitialization {
+    when: RenderFailed(invocation)
+    requires: invocation.current
+    requires: invocation.phase = mounting
+    ensures:
+        invocation.phase = error
+        invocation.failure = "Rendering failed"
+        shell.screen = error
+        for operation in invocation.pending:
+            operation.state = discarded
+}
+
+rule CaptureBeforeHandoff {
+    when: capture: InputCapture.created
+    let invocation = capture.invocation
+    requires: invocation.current
+    requires: invocation.phase in {resolving, mounting, draining}
+    requires: shell.focus_owner != command_bar
+    requires: capture.kind in {text, backspace, tab}
+    requires: not capture.handled
+    ensures:
+        invocation.accepted_count = invocation.accepted_count + 1
+        InputOperation.created(invocation: invocation,
+            ordinal: invocation.accepted_count, kind: capture.kind,
+            payload: capture.payload, state: pending)
+        capture.handled = true
+}
+
+rule RefuseUnsupportedInputBeforeHandoff {
+    when: capture: InputCapture.created
+    requires: capture.invocation.current
+    requires: capture.invocation.phase in {resolving, mounting, draining}
+    requires: shell.focus_owner != command_bar
+    requires: capture.kind in {unsupported, submit}
+    requires: not capture.handled
+    ensures:
+        shell.input_notice = "Available when the function is ready; input was not queued"
+        capture.handled = true
+}
+
+rule DiscardCaptureForRetiredInvocation {
+    when: capture: InputCapture.created
+    requires: not capture.invocation.current
+    requires: not capture.handled
+    ensures: capture.handled = true
+}
+
+rule DeliverOneInOrder {
+    when: DrainStep(invocation)
+    requires: invocation.current
+    requires: invocation.phase = draining
+    requires: shell.focus_owner != command_bar
+    requires: invocation.initial_focus_set
+    let operation = InputOperation{invocation: invocation, ordinal: invocation.delivered_count + 1}
+    requires: exists operation
+    requires: operation.state = pending
+    ensures:
+        operation.state = applied
+        invocation.delivered_count = invocation.delivered_count + 1
+}
+
+rule CompleteHandoff {
+    when: FinishHandoff(invocation)
+    requires: invocation.current
+    requires: invocation.phase = draining
+    requires: shell.focus_owner != command_bar
+    requires: invocation.delivered_count = invocation.accepted_count
+    ensures: invocation.phase = interactive
+}
+
+rule DeliveryFailureStopsHandoff {
+    when: DeliveryFailed(invocation)
+    requires: invocation.current
+    requires: invocation.phase = draining
+    ensures:
+        invocation.phase = error
+        invocation.failure = "Input delivery failed"
+        shell.screen = error
+        for operation in invocation.pending:
+            operation.state = discarded
+}
+
+invariant OneActiveInvocation {
+    (Invocations where phase != retired).count <= 1
+}
+
+invariant OnlyCurrentGenerationLives {
+    Invocations.all(i => i.phase = retired or i.generation = shell.generation)
+}
+
+invariant NoDuplicateOrUnacceptedDelivery {
+    Invocations.all(i => i.delivered_count >= 0 and i.delivered_count <= i.accepted_count)
+}
+
+invariant RetirementDiscardsPendingInput {
+    Invocations.all(i => i.phase != retired or (i.abort_requested and i.pending.count = 0))
+}
+
+invariant InputFollowsInitialFocus {
+    Invocations.all(i => i.delivered_count = 0 or i.initial_focus_set)
+}
+
+invariant OperationsMatchAcceptedCount {
+    Invocations.all(i => i.operations.count = i.accepted_count)
+}
+
+invariant EveryOperationHasAValidOrdinal {
+    InputOperations.all(o => o.ordinal >= 1 and o.ordinal <= o.invocation.accepted_count)
+}
+
+invariant AppliedOperationsAreExactlyTheDeliveredPrefix {
+    InputOperations.all(o => (o.state = applied) = (o.ordinal <= o.invocation.delivered_count))
+}
+
+invariant OperationOrdinalsAreUniqueWithinInvocation {
+    InputOperations.all(o => (o.invocation.operations where ordinal = o.ordinal).count = 1)
+}
+
+invariant BufferContainsOnlySupportedOperations {
+    InputOperations.all(o => o.kind in {text, backspace, tab})
+}
+
+surface ShellFunctionBoundary {
+    context invocation: Invocation
+    exposes:
+        invocation.generation
+        invocation.mnemonic
+        invocation.tail
+        invocation.phase
+        invocation.abort_requested
+    provides:
+        RenderFailed(invocation) when invocation.current and invocation.phase = mounting
+        DrainStep(invocation) when invocation.current and invocation.phase = draining and shell.focus_owner != command_bar
+        FinishHandoff(invocation) when invocation.current and invocation.phase = draining and shell.focus_owner != command_bar
+        DeliveryFailed(invocation) when invocation.current and invocation.phase = draining
+    @guarantee VisualBudget
+        -- REQ-SH-006: a destination view or named loading frame is visible within
+        -- 500 ms of command admission in the agreed running-app measurement profile.
+        -- This state model does not prove rendering or OS scheduling latency.
+    @guarantee OrderedControlEffects
+        -- REQ-SH-007,008,013: applied operations are committed text/paste,
+        -- Backspace within the current pending segment, and forward Tab through
+        -- ordinary text fields. Backspace does not cross a Tab boundary or remove
+        -- tail-prefilled values. Capture continues during drain; ordinary input
+        -- begins only after the final prefix has been applied. Submit, Return and
+        -- unsupported operations are visibly refused, never queued for later replay.
+        -- No raw synthetic-key technique is assumed by this guarantee.
+    @guarantee CancelPreemptsDelivery
+        -- REQ-SH-011,014: cancel prevents any not-yet-applied operation from
+        -- reaching a view. An already-applied operation is not rolled back.
+    @guarantee CommandFocusPausesWithoutRetiring
+        -- REQ-SH-004,007,008: focus-only Escape leaves the invocation and its
+        -- pending prefix intact. New typing edits the command bar. Resolver/commit
+        -- completion cannot steal that focus, and drain/cutover wait for function
+        -- focus to resume. Initialization may finish and show content meanwhile.
+    @guidance
+        -- Pending text can be stored as field segments with append/Backspace
+        -- already compacted. These operation records describe equivalent ordered
+        -- effects, not a runtime keystroke log, form model, or requirement to emit
+        -- one browser notification per buffered character. Refused keys never
+        -- join that history. No custom unload or preservation phase exists.
+}
+
+surface OperatorEscape {
+    provides:
+        EscapePressed()
+        CommandBarFocused()
+    @guarantee OneActionPerKeypress
+        -- The native owner samples focus once at Escape admission and consumes
+        -- the keypress. Moving focus to the command bar cannot redispatch that
+        -- same keypress as cancellation. This is not a double-Escape timer.
+}
+
+surface OperatorFunctionFocus {
+    context invocation: Invocation
+    provides:
+        FunctionFocused(invocation) when invocation.current and shell.focus_owner = command_bar
+}
