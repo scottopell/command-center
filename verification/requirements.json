@@ -1263,6 +1263,23 @@
         "tests/types.tsx",
         "native/CommandCenterTests/CommandBarTests.swift"
       ]
+    },
+    {
+      "id": "REQ-FF-012",
+      "title": "Verify a clean local build",
+      "feature": "function-framework",
+      "code": [
+        "scripts/toolchain.mjs",
+        "scripts/setup-native.mjs",
+        "scripts/doctor.mjs",
+        "scripts/smoke-service.mjs",
+        "package.json"
+      ],
+      "tests": [
+        "tests/toolchain.test.ts",
+        "scripts/smoke-service.mjs",
+        ".github/workflows/verify.yml"
+      ]
     }
   ]
 }

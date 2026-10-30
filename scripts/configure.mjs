@@ -1,10 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {assertRuntime} from './toolchain.mjs';
 
 export const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 // REQ-FF-011: composition is explicit build input; the public build discovers nothing.
 export function configure(){
+  assertRuntime();
   const extension=process.env.COMMAND_CENTER_EXTENSION?fs.realpathSync(process.env.COMMAND_CENTER_EXTENSION):undefined;
   const builtinCommands=[{mnemonic:'DRQS',title:'Development request system'},{mnemonic:'HOST',title:'Host and user service inspection'},{mnemonic:'SLOW',title:'Delayed lifecycle conformance'}];
   const extra=extension?JSON.parse(fs.readFileSync(path.join(extension,'extension.json'),'utf8')):{commands:[],localSourceOrigins:[]};

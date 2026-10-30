@@ -23,8 +23,9 @@ As a function author, I need a narrow lifecycle contract and ordinary web contro
 | **REQ-FF-009:** Exercise the lifecycle with SLOW | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
 | **REQ-FF-010:** Enforce supported application-data access | ✅ Complete | Actual WebKit outbound/resource refusal and typed bridge integration verified. |
 | **REQ-FF-011:** Compose functions at build time | ✅ Complete | Public/composed type, fixture, schema and native catalogs verified; private source remains outside the public tree. |
+| **REQ-FF-012:** Verify a clean local build | ✅ Complete | Pinned runtime/dependencies, verified native tool, preflight, packaged-worker smoke and native verification pass on arm64. |
 
-**Progress:** 9 of 9 active requirements complete; 2 deprecated requirements retained.
+**Progress:** 10 of 10 active requirements complete; 2 deprecated requirements retained.
 
 Implementation evidence: [code, tests and measurement scope](../../verification/README.md).
 

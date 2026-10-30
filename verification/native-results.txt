@@ -1,70 +1,70 @@
-Actual public XCTest/WebKit results; no live owner data or general clipboard writes. Full machine-local log excluded.
+Public XCTest/WebKit results from npm run verify; isolated stores only. Full machine-local log excluded.
 Test Case '-[CommandCenterTests.BenchmarkTests testWarmLaunchSamplesAndRepeatedDisposal]' started.
-Test Case '-[CommandCenterTests.BenchmarkTests testWarmLaunchSamplesAndRepeatedDisposal]' passed (3.195 seconds).
-	 Executed 1 test, with 0 failures (0 unexpected) in 3.195 (3.195) seconds
+Test Case '-[CommandCenterTests.BenchmarkTests testWarmLaunchSamplesAndRepeatedDisposal]' passed (3.296 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 3.296 (3.297) seconds
 Test Case '-[CommandCenterTests.CommandBarTests testInlineDiscoveryKeepsInvalidFeedbackUntilEditing]' started.
-Test Case '-[CommandCenterTests.CommandBarTests testInlineDiscoveryKeepsInvalidFeedbackUntilEditing]' passed (0.147 seconds).
+Test Case '-[CommandCenterTests.CommandBarTests testInlineDiscoveryKeepsInvalidFeedbackUntilEditing]' passed (0.132 seconds).
 Test Case '-[CommandCenterTests.CommandBarTests testRetainedCommandAndInlineDiscoveryPreserveFunctionInput]' started.
-Test Case '-[CommandCenterTests.CommandBarTests testRetainedCommandAndInlineDiscoveryPreserveFunctionInput]' passed (3.745 seconds).
-	 Executed 2 tests, with 0 failures (0 unexpected) in 3.892 (3.893) seconds
+Test Case '-[CommandCenterTests.CommandBarTests testRetainedCommandAndInlineDiscoveryPreserveFunctionInput]' passed (3.599 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 3.731 (3.731) seconds
 Test Case '-[CommandCenterTests.InvocationTests testBoundedInterleavingsKeepRetirementAndMutationGuard]' started.
 Test Case '-[CommandCenterTests.InvocationTests testBoundedInterleavingsKeepRetirementAndMutationGuard]' passed (0.001 seconds).
 Test Case '-[CommandCenterTests.InvocationTests testCommandTailAndFreshIdentity]' started.
 Test Case '-[CommandCenterTests.InvocationTests testCommandTailAndFreshIdentity]' passed (0.000 seconds).
 Test Case '-[CommandCenterTests.InvocationTests testEntryAdmissionBoundsIdentityAndRetiresPendingInput]' started.
-Test Case '-[CommandCenterTests.InvocationTests testEntryAdmissionBoundsIdentityAndRetiresPendingInput]' passed (0.000 seconds).
+Test Case '-[CommandCenterTests.InvocationTests testEntryAdmissionBoundsIdentityAndRetiresPendingInput]' passed (0.001 seconds).
 Test Case '-[CommandCenterTests.InvocationTests testExternalLinksStayOutsideTrustedDocuments]' started.
 Test Case '-[CommandCenterTests.InvocationTests testExternalLinksStayOutsideTrustedDocuments]' passed (0.000 seconds).
 Test Case '-[CommandCenterTests.InvocationTests testOversizedServiceResponsesPreserveMutationUncertainty]' started.
 Test Case '-[CommandCenterTests.InvocationTests testOversizedServiceResponsesPreserveMutationUncertainty]' passed (0.000 seconds).
 Test Case '-[CommandCenterTests.InvocationTests testTitleTabBody]' started.
 Test Case '-[CommandCenterTests.InvocationTests testTitleTabBody]' passed (0.000 seconds).
-	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.004) seconds
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
 Test Case '-[CommandCenterTests.NavigationTests testBackRetainsFieldsDefersFocusAndDiscardsChildInput]' started.
-Test Case '-[CommandCenterTests.NavigationTests testBackRetainsFieldsDefersFocusAndDiscardsChildInput]' passed (1.315 seconds).
+Test Case '-[CommandCenterTests.NavigationTests testBackRetainsFieldsDefersFocusAndDiscardsChildInput]' passed (1.323 seconds).
 Test Case '-[CommandCenterTests.NavigationTests testContentPolicyBlocksDirectNetworkFramesAndResources]' started.
-Test Case '-[CommandCenterTests.NavigationTests testContentPolicyBlocksDirectNetworkFramesAndResources]' passed (0.112 seconds).
+Test Case '-[CommandCenterTests.NavigationTests testContentPolicyBlocksDirectNetworkFramesAndResources]' passed (0.133 seconds).
 Test Case '-[CommandCenterTests.NavigationTests testFailureBackPointerResumeReplaceAndHistoryCeiling]' started.
-Test Case '-[CommandCenterTests.NavigationTests testFailureBackPointerResumeReplaceAndHistoryCeiling]' passed (2.326 seconds).
+Test Case '-[CommandCenterTests.NavigationTests testFailureBackPointerResumeReplaceAndHistoryCeiling]' passed (2.331 seconds).
 Test Case '-[CommandCenterTests.NavigationTests testPrimaryViewportAnchorAndFocusedRowReturnInWebKit]' started.
-Test Case '-[CommandCenterTests.NavigationTests testPrimaryViewportAnchorAndFocusedRowReturnInWebKit]' passed (0.651 seconds).
+Test Case '-[CommandCenterTests.NavigationTests testPrimaryViewportAnchorAndFocusedRowReturnInWebKit]' passed (0.632 seconds).
 Test Case '-[CommandCenterTests.NavigationTests testRetainedActivitySuspendsAndResumesOrdinaryEffects]' started.
-Test Case '-[CommandCenterTests.NavigationTests testRetainedActivitySuspendsAndResumesOrdinaryEffects]' passed (0.649 seconds).
+Test Case '-[CommandCenterTests.NavigationTests testRetainedActivitySuspendsAndResumesOrdinaryEffects]' passed (0.658 seconds).
 Test Case '-[CommandCenterTests.NavigationTests testTwoHundredPushPopTransitionsAndRepeatedCancelRelease]' started.
-Test Case '-[CommandCenterTests.NavigationTests testTwoHundredPushPopTransitionsAndRepeatedCancelRelease]' passed (16.192 seconds).
-	 Executed 6 tests, with 0 failures (0 unexpected) in 21.244 (21.246) seconds
+Test Case '-[CommandCenterTests.NavigationTests testTwoHundredPushPopTransitionsAndRepeatedCancelRelease]' passed (15.768 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 20.845 (20.846) seconds
 Test Case '-[CommandCenterTests.SelectionAndSiblingTests testActualWebKitPointerAndNativeSelectAllCopiesPlainText]' started.
-Test Case '-[CommandCenterTests.SelectionAndSiblingTests testActualWebKitPointerAndNativeSelectAllCopiesPlainText]' passed (0.435 seconds).
+Test Case '-[CommandCenterTests.SelectionAndSiblingTests testActualWebKitPointerAndNativeSelectAllCopiesPlainText]' passed (0.375 seconds).
 Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardBridgeRejectsStalePrematureAndOversizedText]' started.
-Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardBridgeRejectsStalePrematureAndOversizedText]' passed (0.444 seconds).
+Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardBridgeRejectsStalePrematureAndOversizedText]' passed (0.423 seconds).
 Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardWriteFailureIsVisibleAndPlainNativePasteboardWorks]' started.
-Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardWriteFailureIsVisibleAndPlainNativePasteboardWorks]' passed (0.284 seconds).
+Test Case '-[CommandCenterTests.SelectionAndSiblingTests testClipboardWriteFailureIsVisibleAndPlainNativePasteboardWorks]' passed (0.267 seconds).
 Test Case '-[CommandCenterTests.SelectionAndSiblingTests testLoadingStepsDoNotQueueAndFailureStillHasBack]' started.
-Test Case '-[CommandCenterTests.SelectionAndSiblingTests testLoadingStepsDoNotQueueAndFailureStillHasBack]' passed (1.377 seconds).
+Test Case '-[CommandCenterTests.SelectionAndSiblingTests testLoadingStepsDoNotQueueAndFailureStillHasBack]' passed (1.320 seconds).
 Test Case '-[CommandCenterTests.SelectionAndSiblingTests testProgrammaticAndEditableSelectionsNeverAutoCopy]' started.
-Test Case '-[CommandCenterTests.SelectionAndSiblingTests testProgrammaticAndEditableSelectionsNeverAutoCopy]' passed (0.311 seconds).
-	 Executed 5 tests, with 0 failures (0 unexpected) in 2.851 (2.852) seconds
+Test Case '-[CommandCenterTests.SelectionAndSiblingTests testProgrammaticAndEditableSelectionsNeverAutoCopy]' passed (0.336 seconds).
+	 Executed 5 tests, with 0 failures (0 unexpected) in 2.721 (2.722) seconds
 Test Case '-[CommandCenterTests.WebKitTests testAcceptedMutationSurvivesRetirementAndLateBridgeIsRefused]' started.
-Test Case '-[CommandCenterTests.WebKitTests testAcceptedMutationSurvivesRetirementAndLateBridgeIsRefused]' passed (0.390 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testAcceptedMutationSurvivesRetirementAndLateBridgeIsRefused]' passed (0.404 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testCommittedCompositionCannotFallBetweenBufferedAndDirectInput]' started.
-Test Case '-[CommandCenterTests.WebKitTests testCommittedCompositionCannotFallBetweenBufferedAndDirectInput]' passed (0.344 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testCommittedCompositionCannotFallBetweenBufferedAndDirectInput]' passed (0.345 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testDRQSAdd42SubmitHistoryAndRefreshKeepsDraft]' started.
-Test Case '-[CommandCenterTests.WebKitTests testDRQSAdd42SubmitHistoryAndRefreshKeepsDraft]' passed (0.624 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testDRQSAdd42SubmitHistoryAndRefreshKeepsDraft]' passed (0.657 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testEscapePausesLoadingThenResumeAndCancel]' started.
-Test Case '-[CommandCenterTests.WebKitTests testEscapePausesLoadingThenResumeAndCancel]' passed (0.336 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testEscapePausesLoadingThenResumeAndCancel]' passed (0.334 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testFocusFailuresAndUnsupportedTabAreExplicit]' started.
-Test Case '-[CommandCenterTests.WebKitTests testFocusFailuresAndUnsupportedTabAreExplicit]' passed (0.785 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testFocusFailuresAndUnsupportedTabAreExplicit]' passed (0.755 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testInputArrivingDuringDrainPausesAndResumesWithoutDuplicates]' started.
-Test Case '-[CommandCenterTests.WebKitTests testInputArrivingDuringDrainPausesAndResumesWithoutDuplicates]' passed (0.287 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testInputArrivingDuringDrainPausesAndResumesWithoutDuplicates]' passed (0.307 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testLateLaunchCannotClaimCurrentGenerationAndFreshState]' started.
-Test Case '-[CommandCenterTests.WebKitTests testLateLaunchCannotClaimCurrentGenerationAndFreshState]' passed (0.154 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testLateLaunchCannotClaimCurrentGenerationAndFreshState]' passed (0.147 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testPreReadyMutationRejectedBeforeBackendAdmission]' started.
-Test Case '-[CommandCenterTests.WebKitTests testPreReadyMutationRejectedBeforeBackendAdmission]' passed (0.165 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testPreReadyMutationRejectedBeforeBackendAdmission]' passed (0.150 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testReadOnlyHOSTAndUndeliverableText]' started.
-Test Case '-[CommandCenterTests.WebKitTests testReadOnlyHOSTAndUndeliverableText]' passed (2.776 seconds).
+Test Case '-[CommandCenterTests.WebKitTests testReadOnlyHOSTAndUndeliverableText]' passed (2.294 seconds).
 Test Case '-[CommandCenterTests.WebKitTests testRealWebKitBufferedSequenceAndSubmitRefusal]' started.
-Test Case '-[CommandCenterTests.WebKitTests testRealWebKitBufferedSequenceAndSubmitRefusal]' passed (0.373 seconds).
-	 Executed 10 tests, with 0 failures (0 unexpected) in 6.234 (6.236) seconds
-	 Executed 30 tests, with 0 failures (0 unexpected) in 37.418 (37.427) seconds
-	 Executed 30 tests, with 0 failures (0 unexpected) in 37.418 (37.428) seconds
+Test Case '-[CommandCenterTests.WebKitTests testRealWebKitBufferedSequenceAndSubmitRefusal]' passed (0.382 seconds).
+	 Executed 10 tests, with 0 failures (0 unexpected) in 5.775 (5.777) seconds
+	 Executed 30 tests, with 0 failures (0 unexpected) in 36.370 (36.378) seconds
+	 Executed 30 tests, with 0 failures (0 unexpected) in 36.370 (36.379) seconds
 ** TEST SUCCEEDED **

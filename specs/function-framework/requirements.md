@@ -99,6 +99,14 @@ THE SYSTEM SHALL NOT discover sibling repositories implicitly or require private
 
 **Rationale:** Private functions need the same framework guarantees without putting their implementation or application contracts into a public repository.
 
+### REQ-FF-012: Verify a clean local build
+
+THE SYSTEM SHALL document a clean-checkout setup using locked application dependencies and declared toolchain versions, with actionable diagnostics for missing or incompatible build tools.
+THE SYSTEM SHALL provide one verification command covering source checks, the native build, packaged worker and CLI operation, persistence across worker restart, and native conformance without installing a real service or using live application data.
+Optional specification-analysis tooling SHALL NOT be required to build or run the application.
+
+**Rationale:** A new Mac should not depend on undocumented tools, caches, login-shell settings, or private source checkouts.
+
 ## Deprecated requirements
 
 These records retain permanent IDs and their original text. They are historical obligations and are not part of the active contract.

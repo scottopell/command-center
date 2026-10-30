@@ -9,7 +9,7 @@ const help = `CommandCenter local agent client
   command-center drqs list [--group 42] [--state open|all|Q|A|N|W|R] [--search text] [--type BF]
   command-center drqs create --title text --body text --group 42 --requester employee:email [--actor name]
   command-center drqs get NUMBER
-  command-center drqs update NUMBER [--comment text] [--group 24] [--state N] [--owner email|--clear-owner]
+  command-center drqs update NUMBER [--comment text] [--group 44] [--state N] [--owner email|--clear-owner]
   command-center host
   command-center call FUNCTION OPERATION --json '{...}'
   command-center call FUNCTION OPERATION --input-file payload.json

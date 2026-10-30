@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {configure} from './configure.mjs';
+import {xcodegenPath} from './toolchain.mjs';
 configure();
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');process.chdir(root);
 await mkdir('dist/runtime',{recursive:true});
@@ -17,7 +18,7 @@ const temporary=path.join(root,'dist/contracts.mjs');await writeFile(temporary,m
 const {contracts}=await import(temporary);
 await writeFile('dist/operations.json',JSON.stringify(Object.fromEntries(Object.entries(contracts).map(([fn,operations])=>[fn,Object.fromEntries(Object.entries(operations).map(([op,definition])=>[op,definition.mutating]))])),null,2));
 execFileSync('npm',['run','build:web'],{stdio:'inherit'});
-execFileSync('xcodegen',['generate','--spec','project.generated.yml'],{cwd:path.join(root,'native'),stdio:'inherit'});
+execFileSync(xcodegenPath(),['generate','--spec','project.generated.yml'],{cwd:path.join(root,'native'),stdio:'inherit'});
 const derived=path.resolve(root,'.work/native');
 execFileSync('xcodebuild',['-project','native/CommandCenter.xcodeproj','-scheme','CommandCenter','-configuration','Debug','-derivedDataPath',derived,'build','CODE_SIGNING_ALLOWED=NO'],{stdio:'inherit'});
 await mkdir('build',{recursive:true});await rm('build/CommandCenter.app',{recursive:true,force:true});

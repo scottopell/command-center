@@ -2,21 +2,39 @@
 
 A single-window macOS workspace for inspecting and working with local coding agents. Native AppKit owns commands, Escape, loading feedback, and type-ahead. Disposable WebKit documents host ordinary React functions. A separate per-user service owns persistent Function Workers.
 
-## Run this build
+## First build on a Mac
 
-Open `build/CommandCenter.app`. The local service is installed separately and remains available when the window closes.
+Install full Xcode from Apple, open it once to complete setup, and select its Command Line Tools in **Xcode → Settings → Locations**. Command Line Tools alone cannot build or test this app.
 
-From this directory:
+Use [Node 26.12.0](https://nodejs.org/en/download/archive/v26.12.0), which includes npm 11.20.0. Both versions are pinned in this repository. If you already use nvm, run `nvm install && nvm use` after cloning; other version managers can read `.node-version`.
 
 ```sh
+mkdir -p ~/dev
+cd ~/dev
+git clone https://github.com/scottopell/command-center.git
+cd command-center
 npm ci
-npm run check
-npm run build
-npm run service:install
-open build/CommandCenter.app
+npm run setup:native
+npm run verify
 ```
 
-Requires macOS 14+, Xcode, XcodeGen, and Node 26.12.x. This is a local development build, without signing or notarization. Its Node launcher references the installed Node executable; it is not a standalone redistributable runtime. Rebuild/reinstall after moving or replacing that toolchain. `package-lock.json` pins JavaScript dependencies.
+- `npm ci` installs the exact dependency tree and integrity hashes in `package-lock.json`. Direct dependencies are exact versions too; use `ci`, rather than an unreviewed dependency update.
+- `setup:native` downloads the official XcodeGen **2.46.0** universal binary, verifies its pinned SHA-256, and installs it under ignored `.tools/`. It needs no Homebrew or sudo and runs on Apple Silicon, including M1.
+- `verify` checks prerequisites, runs source checks, builds the app, tests the packaged worker/CLI with a minimal PATH and a temporary store, then runs actual AppKit/WebKit tests. It does not install or replace a service or change live data. Native tests require a logged-in macOS desktop session.
+
+Initial setup needs internet access to npm and GitHub. No GitHub token, signing team, private checkout, toolkit configuration, or Allium installation is needed for this flow. macOS 14 is the native deployment target; CI exercises Apple Silicon on macOS 15 and 26 with the runners' selected Xcode versions. Run the same verification on the target Mac rather than treating the deployment target as proof of runtime compatibility on every OS release.
+
+After verification succeeds, start your local installation:
+
+```sh
+npm run service:install
+open build/CommandCenter.app
+bin/command-center drqs groups
+```
+
+The service remains available when the window closes. This is an unsigned local development build, without notarization. The packaged Node launcher references the Node executable selected during the build: build on the destination Mac, and rebuild/reinstall if that Node installation is moved or replaced. Copying an app built on a different Mac is not the supported installation method.
+
+Run `npm run doctor` for actionable tool/version diagnostics. Re-run `setup:native` to obtain the pinned generator if a different system XcodeGen is installed. Full Xcode and Apple's SDK are reported by preflight rather than downloaded by this project.
 
 ## Try it
 
@@ -81,10 +99,13 @@ Source buttons require a fresh human click after readiness. Native code opens HT
 
 ## Development and verification
 
+- `npm run verify`: the complete local acceptance check: doctor, source checks, build, isolated packaged service smoke, and native tests.
+- `npm run doctor`: Node/npm, OS, full Xcode selection, XcodeGen and lockfile diagnostics.
 - `npm run check`: TypeScript, function lifetime source guards, and backend/CLI/fixture tests.
 - `npm run build`: worker/CLI bundles, Vite assets, Xcode project and native app.
 - `npm run test:native`: XCTest against actual WebKit documents and isolated worker stores. Requires the desktop session; run after build.
-- `npm run check:specs`: requirements/ADR links and Allium validation (requires Allium CLI).
+- `npm run smoke:service`: packaged worker/CLI startup and persistence with isolated temporary data; run after build.
+- `npm run check:specs`: optional requirements/ADR and Allium validation (tested with Allium CLI 3.5.2 on PATH). This extra specification-maintenance tool is not part of `verify` and is not needed to run the app.
 
 Read [function authoring](FUNCTIONS.md), [architecture](ARCHITECTURE.md), and [verification evidence](verification/README.md). The canonical feature requirements are in `specs/`; no implementation statuses are embedded in requirements.
 

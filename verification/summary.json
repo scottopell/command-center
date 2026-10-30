@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-10-30T19:45:00.392Z",
+  "generatedAt": "2026-10-30T20:04:14.591Z",
   "project": "CommandCenter",
   "checks": {
     "typecheck": "passed",
     "functionSourceGuards": "passed",
     "backendCLITests": {
-      "passed": 28,
+      "passed": 29,
       "failed": 0
     },
     "nativeTests": {
@@ -18,7 +18,7 @@
   },
   "nativeMeasurements": {
     "samples": 30,
-    "maximumDisplayFlushMs": 2.424458391033113,
+    "maximumDisplayFlushMs": 2.240000059828162,
     "releasedWebViews": 30,
     "scope": "Native display flush; not compositor latency or an RSS reclamation deadline"
   },
@@ -77,5 +77,15 @@
     "publicNative": "30 passed",
     "extension": "Opt-in source checkout; separate validation evidence belongs to that checkout",
     "runtimeDeployment": "Installed service unchanged"
+  },
+  "portability": {
+    "node": "26.12.0",
+    "npm": "11.20.0",
+    "xcodegen": "2.46.0",
+    "nativeToolChecksum": "verified",
+    "architecture": "arm64",
+    "verify": "passed",
+    "packagedRuntime": "Minimal PATH; spaced temporary data path; ephemeral port; persisted request after restart",
+    "liveServiceChanges": "none"
   }
 }

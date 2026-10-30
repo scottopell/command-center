@@ -19,3 +19,4 @@ coverage/
 
 .generated/
 native/project.generated.yml
+.tools/

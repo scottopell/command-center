@@ -2,7 +2,7 @@
   "allocatorRSSClaim" : "none",
   "blobBytesPerCycle" : 33554432,
   "largeBlobCycles" : 3,
-  "maximumVisualMs" : 2.424458391033113,
+  "maximumVisualMs" : 2.2400000598281622,
   "profile" : {
     "appActiveAtReport" : false,
     "appVersion" : "0.1.0",
@@ -16,44 +16,44 @@
     "windowVisible" : true
   },
   "rawFocusAndCancelMs" : [
-    2.5368334027007222,
-    1.7365416279062629,
-    1.8637499306350946,
-    1.6615834319964051,
-    1.5882500447332859,
-    1.6249583568423986,
-    1.5221249777823687,
-    1.5011667273938656,
-    1.7050832975655794,
-    1.8074583495035768,
-    1.6596666537225246,
-    1.6186250140890479,
-    1.7087082378566265,
-    1.5675834147259593,
-    1.7379999626427889,
-    1.6047917306423187,
-    1.7797083128243685,
-    1.5863749431446195,
-    1.5755416825413704,
-    1.6691667260602117,
-    1.6209166496992111,
-    1.7943333368748426,
-    1.6767916968092322,
-    1.5092917019501328,
-    1.6856666188687086,
-    2.0850832806900144,
-    1.7972500063478947,
-    1.7122916178777814,
-    1.7833750462159514,
-    1.8197917379438877
+    2.23258335608989,
+    1.5451249200850725,
+    1.6289999475702643,
+    1.5995417488738894,
+    1.5525834169238806,
+    1.4533334178850055,
+    1.4928333694115281,
+    1.6415833961218596,
+    1.559208263643086,
+    1.6897500026971102,
+    1.6110832802951336,
+    1.5301667153835297,
+    1.4567499747499824,
+    1.4428333379328251,
+    1.4779582852497697,
+    1.4297084417194128,
+    1.5840833075344563,
+    1.5128332888707519,
+    2.4441250134259462,
+    1.6365000046789646,
+    1.5806250739842653,
+    1.555750030092895,
+    1.6034999862313271,
+    1.5921666054055095,
+    1.6927083488553762,
+    1.5256250044330955,
+    1.4424999244511127,
+    1.5502083115279675,
+    1.504249987192452,
+    1.5426665777340531
   ],
   "rawLaunches" : [
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "DD3422CE-12CF-460E-AC18-51C8E442FF55",
-      "interactiveMs" : 225.16008338425308,
-      "visualMs" : 2.424458391033113,
+      "generation" : "430EA045-F0C2-4C51-8999-D70E710269BA",
+      "interactiveMs" : 244.48958341963589,
+      "visualMs" : 2.2400000598281622,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -61,9 +61,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "DE28BF96-16E9-487E-9ED8-9BC3A2217E97",
-      "interactiveMs" : 80.078541650436819,
-      "visualMs" : 0.58233330491930246,
+      "generation" : "4F03E004-56CB-440E-A700-F9174B46C244",
+      "interactiveMs" : 85.379291675053537,
+      "visualMs" : 0.61487499624490738,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -71,9 +71,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "19A6F530-CF20-4121-9AAA-63E7DD2AE8D0",
-      "interactiveMs" : 79.138416680507362,
-      "visualMs" : 0.56508334819227457,
+      "generation" : "336BC7B6-34B2-40DA-A71C-C6E34A438B3A",
+      "interactiveMs" : 86.075124912895262,
+      "visualMs" : 0.57237490545958281,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -81,9 +81,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "4DD6A2D6-F6F7-40D5-9458-0413295B342C",
-      "interactiveMs" : 77.90204172488302,
-      "visualMs" : 0.60195836704224348,
+      "generation" : "51D03763-FCD2-47AB-AC1F-25AE5980DDA9",
+      "interactiveMs" : 84.102416643872857,
+      "visualMs" : 0.57737494353204966,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -91,9 +91,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "DE2682CD-CB27-43E0-BBDE-B0BDFA51D7F8",
-      "interactiveMs" : 77.766250004060566,
-      "visualMs" : 0.53641665726900101,
+      "generation" : "6D619A6B-4C81-49AF-BD34-534482294992",
+      "interactiveMs" : 83.284374908544123,
+      "visualMs" : 0.53999992087483406,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -101,9 +101,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "957A9D99-311B-4024-BE26-BE7FE8276937",
-      "interactiveMs" : 74.222583323717117,
-      "visualMs" : 0.47662504948675632,
+      "generation" : "8AEEBD71-156C-4869-AE91-55E1708465E3",
+      "interactiveMs" : 83.32420838996768,
+      "visualMs" : 0.53070834837853909,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -111,9 +111,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "BE079E45-6A15-434F-B462-8632532103BE",
-      "interactiveMs" : 75.713791768066585,
-      "visualMs" : 0.59708335902541876,
+      "generation" : "51501DDC-9816-42F5-BA0D-C65736E46BB4",
+      "interactiveMs" : 79.731416655704379,
+      "visualMs" : 0.52904163021594286,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -121,9 +121,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "82E4E71E-1CCB-4926-87A4-674851702C36",
-      "interactiveMs" : 71.749833296053112,
-      "visualMs" : 0.520500005222857,
+      "generation" : "E2A1FD26-47CC-477C-94B3-9A0525619300",
+      "interactiveMs" : 90.340499999001622,
+      "visualMs" : 0.53662504069507122,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -131,9 +131,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "0E3B567E-5471-4D66-AB5A-44444A32A7B8",
-      "interactiveMs" : 78.850083402357996,
-      "visualMs" : 0.54554175585508347,
+      "generation" : "591C52BE-A8A6-43D2-893B-31184AC8BF1A",
+      "interactiveMs" : 80.712291761301458,
+      "visualMs" : 0.47125003766268492,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -141,9 +141,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "E66B90A2-8C58-4E1C-84D4-8250CA826A69",
-      "interactiveMs" : 78.701791702769697,
-      "visualMs" : 0.52962498739361763,
+      "generation" : "0A261A70-D9F6-4109-B5A4-0BB71B683F2A",
+      "interactiveMs" : 83.614250062964857,
+      "visualMs" : 0.50916674081236124,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -151,9 +151,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "0F565607-573E-44A5-AEAD-8AA1160D7B92",
-      "interactiveMs" : 74.201666633598506,
-      "visualMs" : 0.52033329848200083,
+      "generation" : "3A720331-9E76-4AC4-ACE7-A81EAE5F2840",
+      "interactiveMs" : 86.169000016525388,
+      "visualMs" : 0.66999997943639755,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -161,9 +161,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "327E510A-FF18-4AD9-BB78-0B4CA52B3B68",
-      "interactiveMs" : 72.156250011175871,
-      "visualMs" : 0.4742499440908432,
+      "generation" : "65B3E109-6D31-42ED-80C1-9F3831310F9D",
+      "interactiveMs" : 82.16325007379055,
+      "visualMs" : 0.53470837883651257,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -171,9 +171,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "DEA0FD46-2B9F-49DA-8320-CF9B2B969817",
-      "interactiveMs" : 77.841333346441388,
-      "visualMs" : 0.54491660557687283,
+      "generation" : "51AC4C00-E370-482E-A013-61F1720EF7CA",
+      "interactiveMs" : 82.435458316467702,
+      "visualMs" : 0.52045832853764296,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -181,9 +181,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "BBD70420-3EAB-4B24-9D89-F9763B328FA9",
-      "interactiveMs" : 117.66420840285718,
-      "visualMs" : 0.60129165649414062,
+      "generation" : "5EEA8898-85B6-4160-9511-1CD5CED24741",
+      "interactiveMs" : 76.32791658397764,
+      "visualMs" : 0.45804167166352272,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -191,9 +191,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "AD119DF5-CC0A-427B-BBB8-8E50D2CC885B",
-      "interactiveMs" : 78.640958410687745,
-      "visualMs" : 0.59066666290163994,
+      "generation" : "ECC7EDBB-9C28-4612-B0A2-723DDE4E403B",
+      "interactiveMs" : 78.836458269506693,
+      "visualMs" : 0.47070824075490236,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -201,9 +201,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "1372F93D-4475-4BE6-9E3C-51F41D3D4E7D",
-      "interactiveMs" : 78.276999993249774,
-      "visualMs" : 0.57270831894129515,
+      "generation" : "8D220AD1-ABF8-473A-88E5-326926092496",
+      "interactiveMs" : 77.906708233058453,
+      "visualMs" : 0.47370826359838247,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -211,9 +211,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "1F255206-001F-4EB8-9661-802A1BEFA3DC",
-      "interactiveMs" : 79.055374953895807,
-      "visualMs" : 0.5512916250154376,
+      "generation" : "BAA88B41-F745-48A1-A014-465238C126CD",
+      "interactiveMs" : 86.75229165237397,
+      "visualMs" : 0.4765000194311142,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -221,9 +221,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "4F4B0DC4-EB64-4599-AD9F-B2772AB506C3",
-      "interactiveMs" : 100.8182083023712,
-      "visualMs" : 0.58833335060626268,
+      "generation" : "15F24203-48D1-4348-9C31-79309FFD846F",
+      "interactiveMs" : 80.412333249114454,
+      "visualMs" : 0.51779160276055336,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -231,9 +231,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "8D861A6A-10C4-469C-8FD2-42ECCE3E6FD9",
-      "interactiveMs" : 83.628833293914795,
-      "visualMs" : 0.58899994473904371,
+      "generation" : "E96ACEE2-20BE-4CD3-A5EA-69CDF03E8138",
+      "interactiveMs" : 84.369749994948506,
+      "visualMs" : 0.497999950312078,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -241,9 +241,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "806FDDB5-B55C-4EBD-8257-ADA9C7DBA04D",
-      "interactiveMs" : 76.754125067964196,
-      "visualMs" : 0.50320837181061506,
+      "generation" : "531990C5-9633-448B-A78B-D21F6F31A5CB",
+      "interactiveMs" : 143.97791668307036,
+      "visualMs" : 0.6318333325907588,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -251,9 +251,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "5874A62A-7FFB-40A8-9AF6-065A9A4C80F8",
-      "interactiveMs" : 74.079416692256927,
-      "visualMs" : 0.51458331290632486,
+      "generation" : "CCA6D966-BADA-4712-9A71-EE709A209091",
+      "interactiveMs" : 100.08133330848068,
+      "visualMs" : 0.6412499351426959,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -261,9 +261,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "A85017C6-C508-46BE-A806-F4F4E6381341",
-      "interactiveMs" : 77.792500029318035,
-      "visualMs" : 0.46291667968034744,
+      "generation" : "36F77189-B57C-45D9-8334-75FE7DEB7647",
+      "interactiveMs" : 81.283291685394943,
+      "visualMs" : 0.5415832856670022,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -271,9 +271,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "B19120A2-DE0E-4216-9DB0-6E91931F1091",
-      "interactiveMs" : 76.346458285115659,
-      "visualMs" : 0.55100000463426113,
+      "generation" : "D7A65CEF-55DC-4B60-97A9-FABFE877D215",
+      "interactiveMs" : 81.503499997779727,
+      "visualMs" : 0.53345831111073494,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -281,9 +281,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "E95133E8-EA8E-4D38-A471-8AAA51488D13",
-      "interactiveMs" : 77.963541727513075,
-      "visualMs" : 0.54849998559802771,
+      "generation" : "2A14DE9C-1063-40C6-B64B-217943BBF37B",
+      "interactiveMs" : 83.914041635580361,
+      "visualMs" : 0.54662500042468309,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -291,9 +291,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "FE85D884-5AA7-431F-B83A-572B6D2C2B82",
-      "interactiveMs" : 77.758624916896224,
-      "visualMs" : 0.55012491066008806,
+      "generation" : "26CC3285-21C4-44C8-A7E3-585D5D5F2596",
+      "interactiveMs" : 83.961666678078473,
+      "visualMs" : 0.61208335682749748,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -301,9 +301,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "45072FD5-483A-48C8-B908-A16672050B53",
-      "interactiveMs" : 81.050041597336531,
-      "visualMs" : 0.55066659115254879,
+      "generation" : "EC8452F9-090E-4196-8D76-EE0654E95A4E",
+      "interactiveMs" : 79.085125005804002,
+      "visualMs" : 0.5341250216588378,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -311,9 +311,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "39224FCF-C9E3-4639-8F67-A5B9F4C47633",
-      "interactiveMs" : 81.499541644006968,
-      "visualMs" : 0.71304163429886103,
+      "generation" : "44BBB377-7B43-4941-B9B2-FC28C2F9F41B",
+      "interactiveMs" : 78.592458390630782,
+      "visualMs" : 0.48358330968767405,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -321,9 +321,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "A57B0E73-AB67-4D7C-A12B-1BD0302B9077",
-      "interactiveMs" : 79.345083329826593,
-      "visualMs" : 0.62729162164032459,
+      "generation" : "8D6F3599-C12E-448B-BD17-E668AC473EA0",
+      "interactiveMs" : 88.950041681528091,
+      "visualMs" : 0.52283331751823425,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -331,9 +331,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "43A5EFDC-8700-449D-A739-20B749B8DF49",
-      "interactiveMs" : 78.135708346962929,
-      "visualMs" : 0.5496250232681632,
+      "generation" : "82204135-02AD-49EF-9DFA-A492F592C614",
+      "interactiveMs" : 83.99445831310004,
+      "visualMs" : 0.53220824338495731,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
@@ -341,9 +341,9 @@
     {
       "appActive" : false,
       "function" : "SLOW",
-      "generation" : "090C1092-803B-483E-BA82-D3501F556D6C",
-      "interactiveMs" : 77.997541637159884,
-      "visualMs" : 0.52495836280286312,
+      "generation" : "ACDEAAF2-B7B5-422B-A31C-7E180166A011",
+      "interactiveMs" : 84.238208248279989,
+      "visualMs" : 0.46891660895198584,
       "windowKey" : false,
       "windowOcclusionVisible" : false,
       "windowVisible" : true
