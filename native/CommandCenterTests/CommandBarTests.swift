@@ -7,9 +7,9 @@ import WebKit
     var shell:Shell!
     var opened=[URL]()
     override func setUpWithError() throws {
-        shell=Shell(backend:Backend(),externalOpener:{[weak self] url in self?.opened.append(url);return true})
+        shell=Shell(backend:isolatedBackend(),externalOpener:{[weak self] url in self?.opened.append(url);return true})
     }
-    override func tearDownWithError() throws {shell.cancel();shell.window.orderOut(nil);shell=nil;opened=[]}
+    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;opened=[]}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let limit=Date().addingTimeInterval(8)
         while !condition(){if Date()>limit{XCTFail("Timed out: \(shell.status.stringValue)");throw NSError(domain:"Timeout",code:1)};try await Task.sleep(nanoseconds:10_000_000)}

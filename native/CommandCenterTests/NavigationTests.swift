@@ -4,6 +4,7 @@ import AppKit
 @testable import CommandCenter
 
 final class NavigationFixtureBackend:Backend {
+    override init(directory:URL?=nil){super.init(directory:directory ?? FileManager.default.temporaryDirectory.appendingPathComponent("cc-navigation-"+UUID().uuidString))}
     var calls=0
     override func request(_ payload:[String:Any],mutation:Bool=false,completion:@escaping([String:Any])->Void){
         calls += 1;completion(["ok":false,"error":["code":"not_found","message":"No worker belongs to this conformance view"]])
@@ -15,7 +16,7 @@ final class NavigationFixtureBackend:Backend {
     var fixture:NavigationFixtureBackend!
     var context=""
     override func setUpWithError() throws {fixture=NavigationFixtureBackend();shell=Shell(backend:fixture,externalOpener:{_ in false})}
-    override func tearDownWithError() throws {shell.cancel();shell.window.orderOut(nil);shell=nil}
+    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:fixture.directory);shell.window.orderOut(nil);shell=nil}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let deadline=Date().addingTimeInterval(8)
         while !condition(){

@@ -1,37 +1,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {assertRuntime} from './toolchain.mjs';
-
+import {builtinContracts} from '../packages/contracts/src/builtins.ts';
+import {stragContract} from '../packages/contracts/src/diagnostics.ts';
 export const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-// REQ-FF-011: composition is explicit build input; the public build discovers nothing.
+export const builtinFunctions=[{id:'drqs',mnemonic:'DRQS',title:'Development request system',ui:'functions/drqs/ui.tsx',uiExport:'drqs'},{id:'host',mnemonic:'HOST',title:'Host and user services',ui:'functions/host/ui.tsx',uiExport:'host'},{id:'slow',mnemonic:'SLOW',title:'Lifecycle conformance',ui:'functions/slow/ui.tsx',uiExport:'slow'},{id:'strag',mnemonic:'STRAG',title:'Transition diagnostics',ui:'functions/strag/ui.tsx',uiExport:'strag'}];
 export function configure(){
   assertRuntime();
-  const extension=process.env.COMMAND_CENTER_EXTENSION?fs.realpathSync(process.env.COMMAND_CENTER_EXTENSION):undefined;
-  const builtinCommands=[{mnemonic:'DRQS',title:'Development request system'},{mnemonic:'HOST',title:'Host and user service inspection'},{mnemonic:'SLOW',title:'Delayed lifecycle conformance'}];
-  const extra=extension?JSON.parse(fs.readFileSync(path.join(extension,'extension.json'),'utf8')):{commands:[],localSourceOrigins:[]};
-  if(!Array.isArray(extra.commands)||!Array.isArray(extra.localSourceOrigins))throw new Error('Extension requires commands and localSourceOrigins arrays');
-  const commands=[...builtinCommands,...extra.commands];
-  if(commands.some(c=>!c||!/^[A-Z][A-Z0-9]{0,31}$/.test(c.mnemonic)||typeof c.title!=='string'||!c.title.length)||new Set(commands.map(c=>c.mnemonic)).size!==commands.length)throw new Error('Invalid or duplicate command metadata');
-  const localSourceOrigins=extra.localSourceOrigins.map(origin=>{
-    const url=new URL(origin);
-    if(url.protocol!=='http:'||!['127.0.0.1','localhost'].includes(url.hostname)||url.username||url.password||url.origin!==origin)throw new Error('Source origins must be exact loopback HTTP origins');
-    return origin;
-  });
+  if(process.env.COMMAND_CENTER_EXTENSION)throw new Error('Build-time source composition is retired. Add the private folder using CommandCenter → Manage Functions.');
+  const hash=createHash('sha256');
+  function scan(directory){for(const file of fs.readdirSync(path.join(root,directory),{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const p=path.join(directory,file.name);if(file.isDirectory())scan(p);else if(/\.(?:ts|tsx|css|json)$/.test(file.name))hash.update(p).update(fs.readFileSync(path.join(root,p)));}}
+  for(const directory of ['packages','functions','data'])scan(directory);hash.update(fs.readFileSync(path.join(root,'package-lock.json')));
+  const definitions={...builtinContracts,STRAG:stragContract.operations};
+  const system={id:'cc.system',sdkVersion:'1.0.0',revision:hash.digest('hex'),worker:'worker-runtime.mjs',functions:builtinFunctions.map(f=>({id:f.id,mnemonic:f.mnemonic,title:f.title,uiDirectory:`functions/${f.id}/web`,operations:Object.fromEntries(Object.entries(definitions[f.mnemonic]??{}).map(([key,d])=>[key,d.mutating]))})),localSourceOrigins:[]};
   const generated=path.join(root,'.generated');fs.mkdirSync(generated,{recursive:true});
   const write=(name,value)=>{const target=path.join(generated,name);if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==value)fs.writeFileSync(target,value);};
-  const relative=file=>JSON.stringify('./'+path.relative(generated,file).split(path.sep).join('/'));
-  if(extension)for(const file of ['contracts.ts','ui.ts','workers.ts'])if(!fs.statSync(path.join(extension,file)).isFile())throw new Error(`Missing extension entry: ${file}`);
-  write('contracts.ts',`import {builtinContracts} from '../packages/contracts/src/builtins.ts';\n${extension?`import {privateContracts} from ${relative(path.join(extension,'contracts.ts'))};\nif(Object.keys(privateContracts).some(key=>Object.hasOwn(builtinContracts,key)))throw new Error('Duplicate worker contract');`:''}\nexport const contracts={...builtinContracts${extension?',...privateContracts':''}} as const;\n`);
-  write('ui.ts',`import {drqs} from '../functions/drqs/ui.tsx';\nimport {host} from '../functions/host/ui.tsx';\nimport {slow} from '../functions/slow/ui.tsx';\n${extension?`import {privateFunctions} from ${relative(path.join(extension,'ui.ts'))};\nif(Object.keys(privateFunctions).some(key=>['DRQS','HOST','SLOW'].includes(key)))throw new Error('Duplicate function view');`:''}\nexport const functions={DRQS:drqs,HOST:host,SLOW:slow${extension?',...privateFunctions':''}};\n`);
-  write('workers.ts',extension?`export {createWorkers as extensionWorkers} from ${relative(path.join(extension,'workers.ts'))};\n`:'export function extensionWorkers(){return {};}\n');
-  write('catalog.json',JSON.stringify({commands,localSourceOrigins},null,2)+'\n');
-  const config={extension,functionRoots:[path.join(root,'functions'),...(extension?[path.join(extension,'functions')]:[])],testRoots:[path.join(root,'tests'),...(extension?[path.join(extension,'tests')]:[])]};
-  write('config.json',JSON.stringify(config,null,2)+'\n');
-  write('tsconfig.json',JSON.stringify({extends:'../tsconfig.json',include:[...['packages','functions','tests','vite.config.ts'].map(p=>path.join(root,p)),...(extension?[path.join(extension,'functions'),path.join(extension,'tests'),path.join(extension,'contracts.ts'),path.join(extension,'workers.ts'),path.join(extension,'ui.ts')]:[])]},null,2)+'\n');
-  let project=fs.readFileSync(path.join(root,'native/project.yml'),'utf8');
-  if(extension)project=project.replace('sources: [CommandCenterTests]',`sources:\n      - path: CommandCenterTests\n      - path: ${JSON.stringify(path.join(extension,'native'))}`);
-  fs.writeFileSync(path.join(root,'native/project.generated.yml'),project);
-  return config;
+  write('catalog.json',JSON.stringify({commands:system.functions.map(f=>({...f,packId:system.id,revision:system.revision})),localSourceOrigins:[],system},null,2)+'\n');
+  write('ui.ts',builtinFunctions.map(f=>`import {${f.uiExport}} from '../${f.ui}';`).join('\n')+'\nexport const functions={'+builtinFunctions.map(f=>`${f.mnemonic}:${f.uiExport}`).join(',')+'};\n');
+  const config={functionRoots:[path.join(root,'functions')],testRoots:[path.join(root,'tests')]};
+  write('config.json',JSON.stringify(config,null,2)+'\n');write('tsconfig.json',JSON.stringify({extends:'../tsconfig.json',include:[...['packages','functions','tests'].map(p=>path.join(root,p))]},null,2)+'\n');
+  fs.writeFileSync(path.join(root,'native/project.generated.yml'),fs.readFileSync(path.join(root,'native/project.yml'),'utf8'));return config;
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const config=configure();console.log(config.extension?'Configured composed build':'Configured public build');}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){configure();console.log('Configured public runtime-pack host');}

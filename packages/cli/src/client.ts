@@ -10,12 +10,14 @@ export async function call<F extends FunctionName, K extends OperationName<F>>(f
   catch { throw new AppError('unavailable','Local service is not installed or has not started. Run npm run service:install.'); }
   if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(connection.url)) throw new AppError('unavailable','Invalid local service address');
   const definition = lookupOperation(fn,operation);
+  let metadata:any;try{const catalog=JSON.parse(await readFile(path.join(directory,'packs/catalog.json'),'utf8'));metadata=catalog.commands?.find((item:any)=>item.mnemonic===fn);}catch{}
+  const mutation=metadata?.operations?.[operation]??definition?.mutating??true;
   let response: Response;
   try {
-    response = await fetch(`${connection.url}/rpc`,{method:'POST',headers:{Authorization:`Bearer ${connection.token}`,'Content-Type':'application/json'},body:JSON.stringify({function:fn,operation,input}),signal:AbortSignal.timeout(30000),redirect:'error'});
-  } catch { throw new AppError(definition?.mutating ? 'outcome_unknown' : 'unavailable', definition?.mutating ? 'The response was lost. The operation may have committed; inspect the records before retrying.' : 'The local service could not be reached.'); }
+    response = await fetch(`${connection.url}/rpc`,{method:'POST',headers:{Authorization:`Bearer ${connection.token}`,'Content-Type':'application/json'},body:JSON.stringify({function:fn,operation,input,...(metadata?.revision?{revision:metadata.revision}:{})}),signal:AbortSignal.timeout(30000),redirect:'error'});
+  } catch { throw new AppError(mutation ? 'outcome_unknown' : 'unavailable', mutation ? 'The response was lost. The operation may have committed; inspect the records before retrying.' : 'The local service could not be reached.'); }
   let body: any;
-  try { body = await response.json(); } catch { throw new AppError(definition?.mutating ? 'outcome_unknown' : 'unavailable','The service response could not be read; no retry was attempted.'); }
+  try { body = await response.json(); } catch { throw new AppError(mutation ? 'outcome_unknown' : 'unavailable','The service response could not be read; no retry was attempted.'); }
   if (!response.ok || !body.ok) throw new AppError(body.error?.code ?? 'internal', body.error?.message ?? 'Local request failed', body.error?.details);
   return body.result;
 }

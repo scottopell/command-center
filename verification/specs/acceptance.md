@@ -143,3 +143,17 @@ The input operation records are abstract specification history, not a requiremen
 | Replace command | Escape selects the unchanged launch command for typing a replacement. An edited draft keeps its text; focus alone does not open autocomplete. | REQ-SH-004 |
 | Explicit discovery with tail | Click inline discovery while SLOW 0 NAV is displayed. All functions appear without changing the text. Selecting HOST launches HOST without inheriting the old tail. | REQ-SH-002, REQ-SH-003 |
 | Invalid correction | Unknown command clears and retains visible inline error feedback. Discovery does not erase it; editing clears the feedback and restores ordinary matching. Cancel leaves an empty field without examples. | REQ-SH-001, REQ-SH-002, REQ-SH-003 |
+
+## Runtime packs and transition diagnostics
+
+| Scenario | Required observation | Requirements |
+| --- | --- | --- |
+| Independent build | Add NOTES folder, validate with the packaged compiler, apply, then move the source. Installed UI and worker continue working. | REQ-PK-001, REQ-PK-002, REQ-PK-003 |
+| Identity isolation | Reject a conflicting mnemonic, remove one pack, install another with the same mnemonic, and observe separate KV records. Reinstall the original to recover its records. | REQ-PK-004, REQ-PK-009 |
+| Manual activation | Edit source, observe a ready candidate while the old function remains active, then Apply. An affected function restarts without tail, draft or navigation; an unrelated invocation retains its identity. | REQ-PK-005, REQ-PK-008 |
+| Maintenance boundary | Disconnect a caller while its write runs. New calls are refused during maintenance. Timeout reopens old admission; eventual handler completion remains tracked. | REQ-PK-006 |
+| Failed activation | Inject candidate startup failure. Exact previous runtime identity and catalog remain usable; stale revisions are refused before admission. | REQ-PK-007 |
+| System provenance | Folder packs cannot claim the system identity. Only the built-in STRAG factory receives the diagnostics reader. | REQ-PK-010 |
+| Responsive without focus theft | Keep command focus while a destination mounts. Its transition measurement completes without focus transfer or buffer drainage. | REQ-ST-001 |
+| Forced straggler | Block SLOW for 600 ms. Record one straggler, keep loading and deliver buffered input; STRAG lists and opens the record. | REQ-ST-002, REQ-ST-004 |
+| Collector bounds | Repeated updates use one trace identity; terminal outcomes attach to it. Local reader bounds malformed/oversize files and supports offline CLI history. | REQ-ST-003, REQ-ST-004 |

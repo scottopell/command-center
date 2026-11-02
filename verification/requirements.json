@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T19:45:00.394Z",
+  "generatedAt": "2026-11-02T21:46:57.253Z",
   "scope": "Implementation-to-check mapping; not a claim that every possible interleaving was exhaustively explored",
   "requirements": [
     {
@@ -10,7 +10,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -27,7 +27,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -44,7 +44,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -61,7 +61,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -78,7 +78,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -89,13 +89,13 @@
     },
     {
       "id": "REQ-SH-006",
-      "title": "See a destination within the visual latency budget",
+      "title": "Respond promptly to command admission",
       "feature": "shell",
       "code": [
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -112,7 +112,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -129,7 +129,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -146,7 +146,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -163,7 +163,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -180,7 +180,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -197,7 +197,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -214,7 +214,7 @@
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -228,9 +228,8 @@
       "title": "Define a function with a narrow contract",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -243,12 +242,11 @@
     },
     {
       "id": "REQ-FF-002",
-      "title": "Resolve the initial view before presenting it",
+      "title": "Prepare the screen without waiting for application data",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -264,9 +262,8 @@
       "title": "Declare initial focus without a readiness callback",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -282,9 +279,8 @@
       "title": "Keep invocation data from escaping its lifetime",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -300,9 +296,8 @@
       "title": "Use ordinary application controls",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -318,9 +313,8 @@
       "title": "Share validated worker clients",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -336,9 +330,8 @@
       "title": "Exercise the lifecycle with SLOW",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -860,7 +853,7 @@
       "code": [
         "native/CommandCenter/Runtime.swift",
         "native/CommandCenter/Shell.swift",
-        "packages/ui/src/framework.tsx"
+        "packages/sdk/src/framework.tsx"
       ],
       "tests": [
         "native/CommandCenterTests/InvocationTests.swift",
@@ -872,8 +865,8 @@
       "title": "Declare typed destinations",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -888,8 +881,8 @@
       "title": "Bound navigation history",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -904,8 +897,8 @@
       "title": "Provide one Back behavior",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -920,8 +913,8 @@
       "title": "Retain ordinary React state",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -936,8 +929,8 @@
       "title": "Restore the operator's place",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -952,8 +945,8 @@
       "title": "Keep entry authority local",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -968,8 +961,8 @@
       "title": "Preserve native focus and handoff",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -984,8 +977,8 @@
       "title": "Expose bounded retention diagnostics",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -1000,8 +993,8 @@
       "title": "Exercise navigation under failure and repetition",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/viewport.ts",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/viewport.ts",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Invocation.swift"
       ],
@@ -1016,7 +1009,7 @@
       "title": "Use typed worker data operations",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1033,7 +1026,7 @@
       "title": "Retain invocation query data",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1050,7 +1043,7 @@
       "title": "Invalidate uniformly after committed writes",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1067,7 +1060,7 @@
       "title": "Revalidate without resetting context",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1084,7 +1077,7 @@
       "title": "Ignore superseded read deliveries",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1101,7 +1094,7 @@
       "title": "Represent mutation uncertainty honestly",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1118,7 +1111,7 @@
       "title": "Leave concurrency semantics with the owner",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1135,7 +1128,7 @@
       "title": "Accept fresh-read snapshot races",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1152,7 +1145,7 @@
       "title": "Bound requests and verify cache lifetime",
       "feature": "query-layer",
       "code": [
-        "packages/ui/src/queries.tsx",
+        "packages/sdk/src/queries.tsx",
         "packages/contracts/src/index.ts",
         "packages/backend/src/server.ts",
         "native/CommandCenter/Runtime.swift"
@@ -1169,9 +1162,8 @@
       "title": "Enforce supported application-data access",
       "feature": "function-framework",
       "code": [
-        "packages/ui/src/framework.tsx",
-        "packages/ui/src/queries.tsx",
-        "packages/ui/index.html",
+        "packages/sdk/src/framework.tsx",
+        "packages/sdk/src/queries.tsx",
         "scripts/check-function-boundaries.mjs"
       ],
       "tests": [
@@ -1187,10 +1179,10 @@
       "title": "Browse a stable collection sequence",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
+        "packages/sdk/src/framework.tsx",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/sequence.ts",
+        "packages/sdk/src/sequence.ts",
         "native/CommandCenter/Invocation.swift"
       ],
       "tests": [
@@ -1204,10 +1196,10 @@
       "title": "Replace detail when moving between siblings",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
+        "packages/sdk/src/framework.tsx",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/sequence.ts",
+        "packages/sdk/src/sequence.ts",
         "native/CommandCenter/Invocation.swift"
       ],
       "tests": [
@@ -1221,10 +1213,10 @@
       "title": "Provide consistent sibling controls and shortcuts",
       "feature": "navigation",
       "code": [
-        "packages/ui/src/framework.tsx",
+        "packages/sdk/src/framework.tsx",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Runtime.swift",
-        "packages/ui/src/sequence.ts",
+        "packages/sdk/src/sequence.ts",
         "native/CommandCenter/Invocation.swift"
       ],
       "tests": [
@@ -1238,7 +1230,7 @@
       "title": "Copy intentionally selected display text",
       "feature": "shell",
       "code": [
-        "packages/ui/src/framework.tsx",
+        "packages/sdk/src/framework.tsx",
         "native/CommandCenter/Shell.swift",
         "native/CommandCenter/Runtime.swift"
       ],
@@ -1251,18 +1243,10 @@
       "title": "Compose functions at build time",
       "feature": "function-framework",
       "code": [
-        "scripts/configure.mjs",
-        "scripts/run.mjs",
-        "packages/contracts/src/core.ts",
-        "packages/contracts/src/index.ts",
-        "packages/ui/src/main.tsx",
-        "native/CommandCenter/Runtime.swift"
+        "specs/adrs/017_runtime-packs-and-transition-diagnostics.md"
       ],
-      "tests": [
-        "tests/composition.test.ts",
-        "tests/types.tsx",
-        "native/CommandCenterTests/CommandBarTests.swift"
-      ]
+      "tests": [],
+      "status": "deprecated"
     },
     {
       "id": "REQ-FF-012",
@@ -1279,6 +1263,283 @@
         "tests/toolchain.test.ts",
         "scripts/smoke-service.mjs",
         ".github/workflows/verify.yml"
+      ]
+    },
+    {
+      "id": "REQ-FF-004",
+      "title": "Request per-invocation unload cleanup",
+      "feature": "function-framework",
+      "code": [],
+      "tests": []
+    },
+    {
+      "id": "REQ-FF-005",
+      "title": "Bound temporary preservation",
+      "feature": "function-framework",
+      "code": [],
+      "tests": []
+    },
+    {
+      "id": "REQ-PK-001",
+      "title": "Add an existing source folder",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-002",
+      "title": "Build independent installed artifacts",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-003",
+      "title": "Own the supported SDK and toolchain",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-004",
+      "title": "Reject identity and mnemonic conflicts",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-005",
+      "title": "Build changes and apply manually",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-006",
+      "title": "Apply as a bounded maintenance operation",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-007",
+      "title": "Activate matching code and contracts",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-008",
+      "title": "Relaunch an affected open function",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-009",
+      "title": "Remove code while retaining data",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-010",
+      "title": "Keep system dependencies explicit",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/manifest.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "tests/types.tsx",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-SH-009",
+      "title": "Keep early actions attached to their invocation",
+      "feature": "shell",
+      "code": [],
+      "tests": []
+    },
+    {
+      "id": "REQ-ST-001",
+      "title": "Measure a framework-owned responsiveness checkpoint",
+      "feature": "stragglers",
+      "code": [
+        "native/CommandCenter/Diagnostics.swift",
+        "native/CommandCenter/Shell.swift",
+        "packages/sdk/src/framework.tsx",
+        "packages/backend/src/diagnostics.ts",
+        "functions/strag/ui.tsx",
+        "functions/strag/worker.ts",
+        "packages/cli/src/main.ts"
+      ],
+      "tests": [
+        "tests/diagnostics.test.ts",
+        "native/CommandCenterTests/StragglerTests.swift",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-ST-002",
+      "title": "Detect stragglers without canceling",
+      "feature": "stragglers",
+      "code": [
+        "native/CommandCenter/Diagnostics.swift",
+        "native/CommandCenter/Shell.swift",
+        "packages/sdk/src/framework.tsx",
+        "packages/backend/src/diagnostics.ts",
+        "functions/strag/ui.tsx",
+        "functions/strag/worker.ts",
+        "packages/cli/src/main.ts"
+      ],
+      "tests": [
+        "tests/diagnostics.test.ts",
+        "native/CommandCenterTests/StragglerTests.swift",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-ST-003",
+      "title": "Persist bounded diagnostic evidence",
+      "feature": "stragglers",
+      "code": [
+        "native/CommandCenter/Diagnostics.swift",
+        "native/CommandCenter/Shell.swift",
+        "packages/sdk/src/framework.tsx",
+        "packages/backend/src/diagnostics.ts",
+        "functions/strag/ui.tsx",
+        "functions/strag/worker.ts",
+        "packages/cli/src/main.ts"
+      ],
+      "tests": [
+        "tests/diagnostics.test.ts",
+        "native/CommandCenterTests/StragglerTests.swift",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-ST-004",
+      "title": "Inspect history through a normal function",
+      "feature": "stragglers",
+      "code": [
+        "native/CommandCenter/Diagnostics.swift",
+        "native/CommandCenter/Shell.swift",
+        "packages/sdk/src/framework.tsx",
+        "packages/backend/src/diagnostics.ts",
+        "functions/strag/ui.tsx",
+        "functions/strag/worker.ts",
+        "packages/cli/src/main.ts"
+      ],
+      "tests": [
+        "tests/diagnostics.test.ts",
+        "native/CommandCenterTests/StragglerTests.swift",
+        "native/CommandCenterTests/PackTests.swift"
       ]
     }
   ]

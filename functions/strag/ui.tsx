@@ -1,0 +1,21 @@
+import {useState} from 'react';
+import {z} from 'zod';
+import {defineFunction,defineScreen,defineScreens,useNavigation} from '../../packages/sdk/src/framework.tsx';
+import {useWorkerQuery} from '../../packages/sdk/src/queries.tsx';
+import {stragContract} from '../../packages/contracts/src/diagnostics.ts';
+
+function Detail({id}:{id:string}){
+  const query=useWorkerQuery(stragContract,'get',{id}),r=query.data;
+  return <div className="function" data-initial-focus tabIndex={0}><header className="function-header"><strong>STRAG</strong><span>Transition detail</span></header><main>{query.error&&<p role="alert" className="error">{query.error.message}</p>}{r?<><h2>{r.mnemonic} · {r.kind} · {Math.round(r.elapsedMs)} ms</h2><p>{r.startedAt} · {r.outcome} · {r.straggler?'Straggler detected':'Within budget'}</p><dl>{Object.entries({command:r.command,pack:r.packId,function:r.functionId,revision:r.revision,...r.phases,...r.context}).map(([key,value])=><div key={key}><dt>{key}</dt><dd className="literal">{String(value)}</dd></div>)}</dl><h2>Worker operations</h2><table><thead><tr><th>Function</th><th>Operation</th><th>Duration</th><th>Outcome</th></tr></thead><tbody>{r.operations.map((op,i)=><tr key={i}><td>{op.function}</td><td>{op.operation}</td><td>{Math.round(op.durationMs)} ms</td><td>{op.outcome}</td></tr>)}</tbody></table></>:!query.error&&<p>Reading transition…</p>}</main></div>;
+}
+const screens=defineScreens({detail:defineScreen({params:z.strictObject({id:z.string()}),View:Detail})});
+function StragView(){
+  const [filter,setFilter]=useState({since:new Date(Date.now()-7*86400000).toISOString(),mnemonic:'',onlyStragglers:true}),navigation=useNavigation(screens);
+  const query=useWorkerQuery(stragContract,'list',{...filter,mnemonic:filter.mnemonic||undefined}),data=query.data;
+  return <div className="function"><header className="function-header"><strong>STRAG</strong><span>CommandCenter transition diagnostics · local history</span></header><main><form className="queue-filters" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);setFilter({since:new Date(String(f.get('since'))).toISOString(),mnemonic:String(f.get('mnemonic')).toUpperCase(),onlyStragglers:f.get('only')==='on'});}}><label>Since<input name="since" type="date" defaultValue={filter.since.slice(0,10)}/></label><label>Function<input name="mnemonic" data-initial-focus placeholder="All functions"/></label><label><input name="only" type="checkbox" defaultChecked/>Stragglers only</label><button>Filter</button><button type="button" onClick={()=>void query.refetch()}>Refresh</button></form>
+  {query.error&&<p role="alert" className="error">{data?'Retained observations. ':''}{query.error.message}</p>}
+  <div className="section-heading">TRANSITIONS <span>{data?.summary.stragglers??0} stragglers / {data?.summary.transitions??0} transitions · 500 ms budget</span></div>
+  <table><thead><tr><th>Started</th><th>Function</th><th>Transition</th><th>Elapsed</th><th>Outcome</th></tr></thead><tbody>{data?.items.map(r=><tr key={r.id} data-nav-item={r.id}><td><button className="link" onClick={()=>navigation.push('detail',{id:r.id})}>{new Date(r.startedAt).toLocaleString()}</button></td><td>{r.mnemonic}</td><td>{r.kind}</td><td className={r.straggler?'error':''}>{Math.round(r.elapsedMs)} ms</td><td>{r.outcome}</td></tr>)}</tbody></table>{query.isPending&&<p>Reading local diagnostics…</p>}{data&&!data.items.length&&<p>No transitions match this filter.</p>}{data?.truncated&&<p className="notice">Showing the first 100 matches. Narrow the date or function filter.</p>}
+  <h2>By function</h2><table><thead><tr><th>Function</th><th>Transitions</th><th>Stragglers</th><th>Maximum</th></tr></thead><tbody>{data?.summary.byFunction.map(g=><tr key={g.mnemonic}><td>{g.mnemonic}</td><td>{g.transitions}</td><td>{g.stragglers}</td><td>{Math.round(g.maximumMs)} ms</td></tr>)}</tbody></table></main><footer>30 days · At most 10000 records · No buffered text or worker payloads</footer></div>;
+}
+export const strag=defineFunction({mnemonic:'STRAG',title:'Transition diagnostics',screens,prepare({tail}){if(tail.trim())throw new Error('STRAG takes no tail arguments');return {};},View:StragView});

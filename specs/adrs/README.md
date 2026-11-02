@@ -18,8 +18,10 @@ All feature specs share this one chain. Accepted records explain agreed decision
 | [ADR-012](012_selection-copy-and-sibling-browsing.md) | Accepted | Display selection copy and stable sibling replacement without restoration |
 | [ADR-013](013_command-display-and-inline-discovery.md) | Accepted | Retain launch command, remove examples, add inline discovery |
 | [ADR-014](014_public-project-groups.md) | Accepted | Authored project routing groups and an explicit Inbox |
-| [ADR-015](015_build-time-function-composition.md) | Accepted | Explicit build-time function composition from an optional local checkout |
+| [ADR-015](015_build-time-function-composition.md) | Superseded by ADR-017 | Explicit build-time function composition from an optional local checkout |
 | [ADR-016](016_reproducible-local-verification.md) | Accepted | Pinned build inputs, preflight and isolated packaged-runtime verification |
+
+| [ADR-017](017_runtime-packs-and-transition-diagnostics.md) | Accepted | Runtime local packs, safe shared-worker activation and transition diagnostics |
 
 ## Task routing
 

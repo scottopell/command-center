@@ -10,9 +10,9 @@ import WebKit
     var context=""
     let viewport="document.querySelector('.entry-viewport:not([inert])')"
     override func setUpWithError() throws {
-        shell=Shell(backend:Backend(),clipboardWriter:{[weak self] text in self?.copied.append(text);return true},externalOpener:{_ in false})
+        shell=Shell(backend:isolatedBackend(),clipboardWriter:{[weak self] text in self?.copied.append(text);return true},externalOpener:{_ in false})
     }
-    override func tearDownWithError() throws {shell.cancel();shell.window.orderOut(nil);shell=nil;copied=[]}
+    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;copied=[]}
     func js(_ code:String) async throws->Any? {try await shell.web!.evaluateJavaScript(code)}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let deadline=Date().addingTimeInterval(8)
@@ -115,12 +115,12 @@ import WebKit
         shell.cancel();shell.window.orderOut(nil)
         let pasteboard=NSPasteboard.withUniqueName()
         defer{pasteboard.releaseGlobally()}
-        shell=Shell(backend:Backend(),clipboardWriter:{value in pasteboard.clearContents();return pasteboard.setString(value,forType:.string)})
+        shell=Shell(backend:isolatedBackend(),clipboardWriter:{value in pasteboard.clearContents();return pasteboard.setString(value,forType:.string)})
         try await launch("SLOW 0")
         shell.message(["kind":"copySelection","entryId":"root","text":"Native Ω fixture"],generation:shell.active!.id)
         XCTAssertEqual(pasteboard.string(forType:.string),"Native Ω fixture");XCTAssertTrue(pasteboard.types?.contains(.string)==true);XCTAssertNil(pasteboard.data(forType:.html));XCTAssertNil(pasteboard.data(forType:.rtf))
         shell.cancel();shell.window.orderOut(nil)
-        shell=Shell(backend:Backend(),clipboardWriter:{_ in false});try await launch("SLOW 0")
+        shell=Shell(backend:isolatedBackend(),clipboardWriter:{_ in false});try await launch("SLOW 0")
         shell.message(["kind":"copySelection","entryId":"root","text":"fixture"],generation:shell.active!.id)
         XCTAssertTrue(shell.status.stringValue.contains("Could not copy"))
     }

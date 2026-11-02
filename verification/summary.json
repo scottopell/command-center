@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-10-30T20:04:14.591Z",
+  "generatedAt": "2026-11-02T21:52:35.836Z",
   "project": "CommandCenter",
   "checks": {
     "typecheck": "passed",
     "functionSourceGuards": "passed",
     "backendCLITests": {
-      "passed": 29,
+      "passed": 34,
       "failed": 0
     },
     "nativeTests": {
-      "passed": 30,
+      "passed": 35,
       "failed": 0
     },
-    "specificationModels": 5,
+    "specificationModels": 7,
     "build": "passed",
     "installedService": "passed"
   },
   "nativeMeasurements": {
     "samples": 30,
-    "maximumDisplayFlushMs": 2.240000059828162,
+    "maximumDisplayFlushMs": 2.8769166656275047,
     "releasedWebViews": 30,
     "scope": "Native display flush; not compositor latency or an RSS reclamation deadline"
   },
@@ -68,15 +68,13 @@
     "installedService": "Unchanged; no existing ticket migration"
   },
   "composition": {
+    "status": "retired; superseded by runtime local-folder packs",
     "publicFunctions": [
       "DRQS",
       "HOST",
-      "SLOW"
-    ],
-    "publicBuild": "passed",
-    "publicNative": "30 passed",
-    "extension": "Opt-in source checkout; separate validation evidence belongs to that checkout",
-    "runtimeDeployment": "Installed service unchanged"
+      "SLOW",
+      "STRAG"
+    ]
   },
   "portability": {
     "node": "26.12.0",
@@ -86,6 +84,22 @@
     "architecture": "arm64",
     "verify": "passed",
     "packagedRuntime": "Minimal PATH; spaced temporary data path; ephemeral port; persisted request after restart",
-    "liveServiceChanges": "none"
+    "liveServiceChanges": "Host runtime upgraded; local records preserved"
+  },
+  "runtimePacks": {
+    "sdk": "1.0.0",
+    "source": "explicit existing folder",
+    "activation": "manual Apply; fresh bare-mnemonic relaunch",
+    "build": "host-owned per-function frontend and shared worker artifacts",
+    "maintenance": "drain admitted handlers; deadline postpones activation",
+    "tests": "real compiler, missing source, conflicts, storage isolation, startup fallback, stale revisions, disconnected callers, native Apply"
+  },
+  "stragglers": {
+    "thresholdMs": 500,
+    "endpoint": "framework responsiveness checkpoint, independent of input ownership and data loading",
+    "retentionDays": 30,
+    "recordsMax": 10000,
+    "presentationGuarantee": false,
+    "tests": "deterministic deadline policy, offline CLI, actual WebKit forced straggler and STRAG viewer"
   }
 }

@@ -79,6 +79,7 @@ import WebKit
     func testReadOnlyHOSTAndUndeliverableText() async throws {
         try await readyService();launch("HOST");try await waitFor({self.shell.active?.phase == .interactive},seconds:15)
         try await assertJS("document.activeElement.classList.contains('host')",true)
+        for _ in 0..<500 {if (try await js("!!document.querySelector('.service-layout .link')") as? Bool)==true{break};try await Task.sleep(nanoseconds:20_000_000)}
         _=try await js("document.querySelector('.service-layout .link').click();document.querySelector('.function-header button').focus();document.querySelector('.function-header button').click()")
         var refreshed=false
         for _ in 0..<500 {refreshed=(try await js("document.querySelector('.host').getAttribute('aria-busy')==='false'") as? Bool)==true;if refreshed{break};try await Task.sleep(nanoseconds:20_000_000)}

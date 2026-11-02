@@ -1,6 +1,6 @@
 # CommandCenter
 
-A single-window macOS workspace for inspecting and working with local coding agents. Native AppKit owns commands, Escape, loading feedback, and type-ahead. Disposable WebKit documents host ordinary React functions. A separate per-user service owns persistent Function Workers.
+A single-window macOS workspace for inspecting and working with local coding agents. Native AppKit owns commands, Escape, loading feedback, and type-ahead. Disposable WebKit documents host ordinary React functions. A separate per-user service owns persistent Function Workers. Add local function packs without rebuilding Swift.
 
 ## First build on a Mac
 
@@ -43,8 +43,9 @@ Run `npm run doctor` for actionable tool/version diagnostics. Re-run `setup:nati
 - `DRQS S bazinator`: literal case-insensitive search across all states.
 - `DRQS 1`: ticket detail, permanent original report, comments and routing history.
 - `HOST`: machine basics, allowlisted **backend** environment, toolkit declarations, user LaunchAgents and independent launchd runtime observations.
-- `SLOW 5000`: delayed form for typing Title → Tab → Body before readiness.
-- `SLOW 500 FAIL`: deliberate resolver failure. Use `SLOW 0 NAV` to exercise retained child screens, Back and the four-entry limit. Other conformance modes: `READONLY`, `RENDERFAIL`, `NOFOCUS`, `TWOFOCUS`, `HIDDEN`, `DISABLED`.
+- `STRAG`: inspect slow screen transitions, filter the last week, and open detailed timing records.
+- `SLOW 5000`: deliberately blocked form for typing Title → Tab → Body before readiness.
+- `SLOW 500 FAIL`: deliberate initialization failure. Use `SLOW 0 NAV` to exercise retained child screens, Back and the four-entry limit. Other conformance modes: `READONLY`, `RENDERFAIL`, `NOFOCUS`, `TWOFOCUS`, `HIDDEN`, `DISABLED`.
 
 Functions can expose framework Previous/Next and **⌘⌥↑ / ⌘⌥↓** over an explicitly supplied collection. Movement follows its captured order and replaces the detail with fresh data. Back returns to the retained list. Shortcuts leave editable fields and command input alone.
 
@@ -84,11 +85,13 @@ bin/command-center call DRQS list --json '{"state":"all","search":"bazinator"}'
 
 Creation by an agent requires explicit employee/customer requesters. Repeat `--requester`; use `customer:reference` for customers. `--human` uses the configured local identity. `--input-file` supports larger generic RPC payloads. `--data-dir` targets a separate already-running test service.
 
-The HTTP boundary is `POST http://127.0.0.1:19287/rpc` with `{function,operation,input}`. Intended local clients read a private credential from Application Support. Native code proxies requests; the credential never enters function props or JavaScript. Requests with an Origin header are rejected. Missing/lost mutation responses are **outcome_unknown** and never cause automatic redispatch. Inspect records before choosing to retry.
+The HTTP boundary is `POST http://127.0.0.1:19287/rpc` with `{function,operation,input}` and an optional installed revision. UI requests include their revision so stale contracts are rejected before admission. Intended local clients read a private credential from Application Support. Native code proxies requests; the credential never enters function props or JavaScript. Requests with an Origin header are rejected. Missing/lost mutation responses are **outcome_unknown** and never cause automatic redispatch. Inspect records before choosing to retry.
 
 ## Local service and data
 
 The installer manages only `com.scottopell.command-center` in the current user's LaunchAgents. It installs the worker payload under `~/Library/Application Support/CommandCenter/service`, independently of the application window. It uses an always-running launchd service; no socket activation, durable queue or generic job scheduler is included.
+
+It also installs a managed `~/.local/bin/command-center` launcher using that service payload. Add `~/.local/bin` to PATH to use `command-center` from function repositories; the checkout's `bin/command-center` remains available directly. The installer refuses to overwrite an unrelated command with that name.
 
 Data: `~/Library/Application Support/CommandCenter/data.sqlite`; private credentials and connection metadata live beside it. Logs: `logs/worker.log` and `logs/worker-error.log`. `npm run service:stop` unloads this service while retaining data; `npm run service:install` starts or updates it. Availability is within the awake logged-in user session. The app reports service unavailability instead of silently spawning competing backends.
 
@@ -102,7 +105,7 @@ Source buttons require a fresh human click after readiness. Native code opens HT
 - `npm run verify`: the complete local acceptance check: doctor, source checks, build, isolated packaged service smoke, and native tests.
 - `npm run doctor`: Node/npm, OS, full Xcode selection, XcodeGen and lockfile diagnostics.
 - `npm run check`: TypeScript, function lifetime source guards, and backend/CLI/fixture tests.
-- `npm run build`: worker/CLI bundles, Vite assets, Xcode project and native app.
+- `npm run build`: worker/CLI bundles, independent function assets and the installed SDK/compiler, Xcode project and native app.
 - `npm run test:native`: XCTest against actual WebKit documents and isolated worker stores. Requires the desktop session; run after build.
 - `npm run smoke:service`: packaged worker/CLI startup and persistence with isolated temporary data; run after build.
 - `npm run check:specs`: optional requirements/ADR and Allium validation (tested with Allium CLI 3.5.2 on PATH). This extra specification-maintenance tool is not part of `verify` and is not needed to run the app.
@@ -113,4 +116,10 @@ The [specification index](docs/specifications.md) links requirements, decisions 
 
 ## Optional local functions
 
-The public build contains DRQS, HOST, and SLOW. Trusted local source extensions can join the same typed build without entering this repository. See [build-time composition](COMPOSITION.md) for registration, checks, and output boundaries.
+The public host contains DRQS, HOST, SLOW and STRAG. Choose **CommandCenter → Manage Functions… → Add Folder…**, select a folder containing `command-center.json`, then Apply its successful build. Try the included [NOTES pack](examples/notes-pack/command-center.json). Git is optional; clone or unzip source yourself and add the resulting folder.
+
+The host snapshots source, supplies its pinned SDK/compiler and stores completed builds under its own data directory. Moving the source folder does not break the installed version. Saved edits build automatically; the Functions button announces ready or failed candidates. Apply remains manual. Applying an open function's pack discards its draft/navigation and relaunches the bare mnemonic, without tail arguments. A brief shared-worker maintenance pause can reject unrelated requests; admitted handlers finish or the update is postponed. Removing a pack retains its data; explicit deletion is only in native management.
+
+See [function authoring](FUNCTIONS.md) for the narrow SDK and pack format. Check a pack with `bin/command-center pack check /path/to/pack`; include its fixture tests with `bin/command-center pack test /path/to/pack`. Platform-only packs need neither a private npm install nor a native build. Keep private source outside this public repository.
+
+Transitions that exceed 500 ms produce a transient **Straggler detected** notice and bounded local history. This measures a responsive destination, independently of ordinary application-data latency and actual input cutover; it does not measure exact presented pixels. `STRAG` is the normal viewer. `bin/command-center strag list` or `strag get ID` reads history even while the service is unavailable. History retains at most 30 days and 10000 records; buffered typing and worker payloads are excluded.

@@ -1,3 +1,4 @@
+import {systemNamespace} from '../packages/backend/src/dispatcher.ts';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
@@ -16,7 +17,7 @@ test('serialized RPC cap bounds large reads and reports oversized committed writ
     const key=`ticket/${String(ticket.number).padStart(16,'0')}`;
     // Stored historical data may exceed today's input limits; no app/database outside this fixture is used.
     const large:Ticket={...ticket,body:'界'.repeat(Math.ceil(MAX_RPC_RESPONSE_BYTES/3))};
-    await service.store.scoped('DRQS').put(key,large as unknown as JsonValue);
+    await service.store.scoped(systemNamespace('drqs')).put(key,large as unknown as JsonValue);
     const rpc=async(operation:string,input:unknown)=>{
       const response=await fetch(service.connection.url+'/rpc',{method:'POST',headers:{Authorization:`Bearer ${service.connection.token}`,'Content-Type':'application/json'},body:JSON.stringify({function:'DRQS',operation,input})});
       const text=await response.text();assert.ok(Buffer.byteLength(text)<1024);return {status:response.status,body:JSON.parse(text)};
@@ -25,10 +26,10 @@ test('serialized RPC cap bounds large reads and reports oversized committed writ
     assert.equal((await call('DRQS','list',{},directory)).length,1); // Its small projected summary still works.
     const write=await rpc('update',{number:ticket.number,comment:'Exactly one committed comment'});
     assert.equal(write.status,500);assert.equal(write.body.error.code,'outcome_unknown');assert.match(write.body.error.message,/No retry/);
-    const persisted=await service.store.scoped('DRQS').get(key) as unknown as Ticket;
+    const persisted=await service.store.scoped(systemNamespace('drqs')).get(key) as unknown as Ticket;
     assert.equal(persisted.events.length,1);assert.equal(persisted.events[0].comment,'Exactly one committed comment');
     await assert.rejects(call('DRQS','get',{number:ticket.number},directory),(error:any)=>error.code==='response_too_large');
-    await service.store.scoped('DRQS').put(key,{...persisted,title:large.body} as unknown as JsonValue);
+    await service.store.scoped(systemNamespace('drqs')).put(key,{...persisted,title:large.body} as unknown as JsonValue);
     const list=await rpc('list',{});assert.equal(list.body.error.code,'response_too_large');
   } finally {await service.close();await rm(directory,{recursive:true,force:true});}
 });

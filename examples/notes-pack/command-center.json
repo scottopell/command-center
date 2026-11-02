@@ -1,0 +1,7 @@
+{
+  "id": "example.notes",
+  "sdkVersion": "1.0.0",
+  "functions": [
+    {"id":"notes","mnemonic":"NOTES","title":"Independent pack example","ui":"ui.tsx","uiExport":"notes","worker":"worker.ts","workerExport":"notesWorker"}
+  ]
+}

@@ -1,3 +1,4 @@
+import {drqsContract} from '../../packages/contracts/src/builtins.ts';
 import { userInfo } from 'node:os';
 import directory from '../../data/groups.json' with { type: 'json' };
 import { AppError, contracts, defineWorker, ticketSchema, type Actor, type Group, type JsonValue, type Ticket, type WorkerContext } from '../../packages/contracts/src/index.ts';
@@ -16,7 +17,7 @@ async function actorFor(ctx: WorkerContext, input?: Actor): Promise<Actor> {
 }
 
 // REQ-DR-001..010: fresh domain implementation; no Quick SDK or browser storage.
-export const drqsWorker = defineWorker(contracts.DRQS, {
+export const drqsWorker = defineWorker(drqsContract, {
   groups: async () => groups,
   identity: localIdentity,
   setIdentity: async (ctx, input) => { await ctx.kv.put('settings/identity', input); return input; },

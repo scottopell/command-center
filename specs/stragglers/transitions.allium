@@ -1,0 +1,110 @@
+-- allium: 3
+-- REQ-ST-001, REQ-ST-002, REQ-ST-003, REQ-ST-004
+
+enum TransitionOutcome { pending | ready | error | canceled | superseded }
+
+entity ScreenTransition {
+    identity: String
+    elapsed_ms: Integer
+    outcome: TransitionOutcome
+    straggler: Boolean
+    notice_count: Integer
+    current: Boolean
+    checkpoint_valid: Boolean
+}
+
+rule InitializeTransition {
+    when: transition: ScreenTransition.created
+    ensures:
+        transition.elapsed_ms = 0
+        transition.outcome = pending
+        transition.straggler = false
+        transition.notice_count = 0
+}
+
+rule DetectDeadlineMiss {
+    when: CheckDeadline(transition)
+    requires: transition.outcome = pending
+    requires: transition.elapsed_ms > 500
+    requires: not transition.straggler
+    ensures:
+        transition.straggler = true
+        transition.notice_count = 1
+}
+
+rule AcceptCheckpoint {
+    when: CheckpointReceived(transition)
+    requires: transition.current
+    requires: transition.checkpoint_valid
+    requires: transition.outcome = pending
+    ensures:
+        transition.outcome = ready
+        if transition.elapsed_ms > 500:
+            transition.straggler = true
+            transition.notice_count = 1
+}
+
+rule CancelTransition {
+    when: TransitionCanceled(transition)
+    requires: transition.outcome = pending
+    ensures:
+        transition.outcome = canceled
+        if transition.elapsed_ms > 500:
+            transition.straggler = true
+            transition.notice_count = 1
+}
+
+rule FailTransition {
+    when: TransitionFailed(transition)
+    requires: transition.outcome = pending
+    ensures:
+        transition.outcome = error
+        if transition.elapsed_ms > 500:
+            transition.straggler = true
+            transition.notice_count = 1
+}
+
+rule SupersedeTransition {
+    when: TransitionSuperseded(transition)
+    requires: transition.outcome = pending
+    ensures:
+        transition.outcome = superseded
+        transition.current = false
+        if transition.elapsed_ms > 500:
+            transition.straggler = true
+            transition.notice_count = 1
+}
+
+invariant OneNoticePerTransition {
+    ScreenTransitions.all(t => t.notice_count >= 0 and t.notice_count <= 1)
+}
+
+contract ResponsivenessCheckpoint {
+    @invariant IndependentOfOperatorInput
+        -- Destination commit, interaction-surface validation and a separately
+        -- queued page acknowledgment determine readiness. Buffer drainage, IME
+        -- completion and actual focus ownership do not gate this checkpoint.
+        -- A throttled rendering callback uses a tagged fallback. No exact
+        -- compositor presentation guarantee or arbitrary-action proof is made.
+    @invariant DiagnosticNotCancellation
+        -- Detection preserves the pending transition and input capture. One
+        -- bounded record receives its final outcome; typed input and request
+        -- payloads never become diagnostic fields. STRAG is only a reader.
+}
+
+surface TransitionObserver {
+    context transition: ScreenTransition
+    exposes:
+        transition.identity
+        transition.elapsed_ms
+        transition.outcome
+        transition.straggler
+    provides:
+        CheckDeadline(transition) when transition.outcome = pending
+        CheckpointReceived(transition) when transition.outcome = pending and transition.current
+        TransitionCanceled(transition) when transition.outcome = pending
+        TransitionFailed(transition) when transition.outcome = pending
+        TransitionSuperseded(transition) when transition.outcome = pending
+    contracts:
+        fulfils ResponsivenessCheckpoint
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@command-center/sdk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./contracts": "./src/contracts.ts",
+    "./worker": "./src/contracts.ts",
+    "./framework": "./src/framework.tsx",
+    "./queries": "./src/queries.tsx",
+    "./runtime": "./src/framework.tsx"
+  },
+  "peerDependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "@tanstack/react-query": "5.105.0",
+    "zod": "4.6.7"
+  }
+}

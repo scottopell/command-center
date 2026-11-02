@@ -21,7 +21,13 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     let backend: Backend
     let externalOpener: (URL)->Bool
     let clipboardWriter: (String)->Bool
-    let entries = FunctionCatalog.current.commands.map{($0.mnemonic,$0.title)}
+    var catalog = FunctionCatalog.current
+    var entries = [(String,String)]()
+    let collector:DiagnosticsCollector
+    let stragglerNotice=NSTextField(labelWithString:"")
+    let packsButton=NSButton(title:"Functions…",target:nil,action:nil)
+    var packsTimer:Timer?
+    var management:PackManagement?
     var active: Invocation?
     var web: FunctionWebView?
     var eventMonitor: Any?
@@ -39,6 +45,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
 
     init(backend: Backend = Backend(), clipboardWriter: @escaping (String)->Bool = { value in NSPasteboard.general.clearContents();return NSPasteboard.general.setString(value,forType:.string) }, externalOpener: @escaping (URL)->Bool = { NSWorkspace.shared.open($0) }) {
         self.backend = backend
+        self.collector=DiagnosticsCollector(directory:backend.directory)
         self.externalOpener = externalOpener
         self.clipboardWriter = clipboardWriter
         window = CommandCenterWindow(contentRect:NSRect(x:0,y:0,width:1280,height:850),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
@@ -46,6 +53,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         window.title = "CommandCenter"; window.minSize = NSSize(width:930,height:620); window.center()
         window.backgroundColor = NSColor(calibratedWhite:0.04,alpha:1)
         if let url = Bundle.main.url(forResource:"operations",withExtension:"json"), let data = try? Data(contentsOf:url), let registry = try? JSONSerialization.jsonObject(with:data) as? [String:[String:Bool]] { operationMetadata = registry }
+        reloadCatalog()
         build()
         window.functionArea=content
         window.selectionCompleted = { [weak self] in
@@ -79,8 +87,9 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             return event
         }
         showEmpty(); focusCommand(); window.makeKeyAndOrderFront(nil)
+        packsTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in self?.refreshPackBadge()}
     }
-    deinit {if let monitor=eventMonitor{NSEvent.removeMonitor(monitor)};if let monitor=clickMonitor{NSEvent.removeMonitor(monitor)} }
+    deinit {packsTimer?.invalidate();if let monitor=eventMonitor{NSEvent.removeMonitor(monitor)};if let monitor=clickMonitor{NSEvent.removeMonitor(monitor)} }
     func escape() { if commandFocused { cancel();hideSuggestions() } else { focusCommand() } }
     func build() {
         let base=window.contentView!; base.wantsLayer=true
@@ -117,6 +126,9 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         }
         siblingPosition.font = .monospacedSystemFont(ofSize:11,weight:.regular);siblingPosition.textColor=amber
         content.addSubview(siblingPosition);siblingPosition.translatesAutoresizingMaskIntoConstraints=false
+        packsButton.target=self;packsButton.action=#selector(showPackManagement);packsButton.refusesFirstResponder=true
+        stragglerNotice.font = .monospacedSystemFont(ofSize:11,weight:.medium);stragglerNotice.textColor=commandOrange
+        for view in [packsButton,stragglerNotice]{content.addSubview(view);view.translatesAutoresizingMaskIntoConstraints=false}
         commandFrame.addSubview(command);command.translatesAutoresizingMaskIntoConstraints=false
         autocompleteButton.image=NSImage(systemSymbolName:"chevron.down",accessibilityDescription:"Show functions")
         autocompleteButton.setAccessibilityLabel("Show functions");autocompleteButton.toolTip="Browse functions"
@@ -134,6 +146,8 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             content.topAnchor.constraint(equalTo:bar.bottomAnchor),content.leadingAnchor.constraint(equalTo:base.leadingAnchor),content.trailingAnchor.constraint(equalTo:base.trailingAnchor),content.bottomAnchor.constraint(equalTo:status.topAnchor,constant:-5),
             status.leadingAnchor.constraint(equalTo:base.leadingAnchor,constant:12),status.trailingAnchor.constraint(equalTo:base.trailingAnchor,constant:-12),status.bottomAnchor.constraint(equalTo:base.bottomAnchor,constant:-7),
             overlay.centerXAnchor.constraint(equalTo:content.centerXAnchor),overlay.centerYAnchor.constraint(equalTo:content.centerYAnchor),overlay.widthAnchor.constraint(lessThanOrEqualTo:content.widthAnchor,constant:-70),
+            packsButton.trailingAnchor.constraint(equalTo:content.trailingAnchor,constant:-12),packsButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
+            stragglerNotice.trailingAnchor.constraint(equalTo:packsButton.leadingAnchor,constant:-12),stragglerNotice.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
             backButton.topAnchor.constraint(equalTo:content.topAnchor,constant:5),backButton.leadingAnchor.constraint(equalTo:content.leadingAnchor,constant:12),backButton.heightAnchor.constraint(equalToConstant:26),
             previousButton.leadingAnchor.constraint(equalTo:backButton.trailingAnchor,constant:12),previousButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
             nextButton.leadingAnchor.constraint(equalTo:previousButton.trailingAnchor,constant:5),nextButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
@@ -245,12 +259,15 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     }
     @objc func selectSuggestion(_ sender:NSButton) { clearCommandError();command.stringValue=sender.identifier!.rawValue;focusCommand();execute() }
     @objc func execute() {
+        let acceptedAt=ProcessInfo.processInfo.systemUptime
+        reloadCatalog()
         normalizeCommand()
         guard let parsed=Command(command.stringValue) else { focusCommand();return }
         guard entries.contains(where:{$0.0==parsed.mnemonic}) else { showCommandError(parsed.mnemonic);return }
         clearCommandError()
         let submitted=command.stringValue.trimmingCharacters(in:.whitespacesAndNewlines)
-        retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted);active=invocation;launched+=1
+        retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted,started:acceptedAt);active=invocation;launched+=1
+        beginMeasurement(invocation,kind:"launch",started:acceptedAt)
         updateBackControl()
         command.stringValue=submitted;hideSuggestions();overlay.stringValue="\(parsed.mnemonic) · Loading…";overlay.isHidden=false
         status.stringValue="\(parsed.mnemonic) · Capturing text + Tab · Return/actions refused until ready"
@@ -259,7 +276,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         window.displayIfNeeded();let milliseconds=(ProcessInfo.processInfo.systemUptime-invocation.started)*1000
         samples.append(["generation":invocation.id,"function":invocation.mnemonic,"visualMs":milliseconds])
         if samples.count>200 { samples.removeFirst(samples.count-200) }
-        let configuration=WKWebViewConfiguration();configuration.setURLSchemeHandler(Assets(directory:Bundle.main.resourceURL!.appendingPathComponent("web")),forURLScheme:"commandcenter")
+        let configuration=WKWebViewConfiguration();configuration.setURLSchemeHandler(Assets(directory:catalog.commands.first{$0.mnemonic==parsed.mnemonic}!.directory()),forURLScheme:"commandcenter")
         configuration.userContentController.add(Bridge(self,invocation.id),name:"commandCenter")
         let view=FunctionWebView(frame:content.bounds,configuration:configuration);view.autoresizingMask=[.width,.height];view.navigationDelegate=self;view.underPageBackgroundColor=NSColor(calibratedWhite:0.035,alpha:1);web=view
         view.translatesAutoresizingMaskIntoConstraints=false
@@ -338,7 +355,8 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         if kind == "entryRequest" {
             guard let entry=message["entryId"] as? String,let source=message["fromEntryId"] as? String,
                   let depth=message["depth"] as? Int,let intent=message["intent"] as? String else{return}
-            admitEntry(i,entry:entry,source:source,depth:depth,intent:intent);return
+            guard let token=message["transitionToken"] as? String,!token.isEmpty,token.utf8.count<=128 else{return}
+            admitEntry(i,entry:entry,source:source,depth:depth,intent:intent,token:token,kind:message["transitionKind"] as? String);return
         }
         if kind == "rpc" {
             guard let entry=message["entryId"] as? String,!entry.isEmpty,entry.utf8.count<=128,
@@ -349,7 +367,13 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             if mutation && (entry != i.entryID || !i.allowsMutation) {
                 reply(id,["ok":false,"error":["code":"not_ready","message":"Mutations require the active interactive screen."]],generation);return
             }
-            backend.request(["function":fn,"operation":op,"input":message["input"] ?? [:]], mutation:mutation) { [weak self] body in self?.reply(id,body,generation) }
+            let started=ProcessInfo.processInfo.systemUptime,measurement=i.measurement
+            var payload:[String:Any]=["function":fn,"operation":op,"input":message["input"] ?? [:]]
+            if let revision=catalog.commands.first(where:{$0.mnemonic==fn})?.revision{payload["revision"]=revision}
+            backend.request(payload, mutation:mutation) { [weak self] body in
+                measurement?.operation(function:fn,operation:op,durationMs:(ProcessInfo.processInfo.systemUptime-started)*1000,outcome:(body["ok"] as? Bool)==true ? "success" : ((body["error"] as? [String:Any])?["code"] as? String ?? "error"))
+                self?.reply(id,body,generation)
+            }
             return
         }
         guard message["entryId"] as? String == i.entryID else {
@@ -371,17 +395,24 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         case "openExternal":
             guard let id=message["id"] as? Int else{return}
             guard i.allowsMutation else{reply(id,["ok":false,"error":["code":"not_ready","message":"Open links after the function is interactive."]],generation);return}
-            guard let raw=message["url"] as? String,let url=ExternalLinks.allowed(raw) else{reply(id,["ok":false,"error":["code":"invalid_url","message":"Only HTTPS sources and registered local sources can be opened."]],generation);return}
+            guard let raw=message["url"] as? String,let url=ExternalLinks.allowed(raw,localOrigins:catalog.localSourceOrigins) else{reply(id,["ok":false,"error":["code":"invalid_url","message":"Only HTTPS sources and registered local sources can be opened."]],generation);return}
             let opened=externalOpener(url)
             reply(id,opened ? ["ok":true,"result":NSNull()] : ["ok":false,"error":["code":"unavailable","message":"The system could not open this link."]],generation)
-        case "viewReady": guard i.phase == .resolving,!i.viewReady else{return};i.viewReady=true;overlay.isHidden=true;presentFunction();drain(i)
-        case "error": guard i.phase == .resolving || i.phase == .draining else{return};fail(message["message"] as? String ?? "Function failed",i)
+        case "viewReady":
+            guard i.phase == .resolving,!i.viewReady,message["transitionToken"] as? String == i.transitionToken else{return}
+            var phases=message["phases"] as? [String:Double] ?? [:];phases["nativeReadyMs"]=i.measurement?.elapsedMs ?? 0
+            i.measurement?.context(["appActive":NSApp.isActive,"windowVisible":window.isVisible,"windowOcclusionVisible":window.occlusionState.contains(.visible),"renderOpportunity":message["renderOpportunity"] as? String ?? "unknown","documentVisibility":message["visibility"] as? String ?? "unknown"])
+            i.measurement?.finish("ready",phases:phases)
+            if let index=samples.firstIndex(where:{$0["generation"] as? String==i.id}){samples[index]["readyMs"]=phases["nativeReadyMs"]}
+            i.viewReady=true;overlay.isHidden=true;presentFunction();drain(i)
+        case "error": guard i.phase != .error && i.phase != .retired else{return};fail(message["message"] as? String ?? "Function failed",i)
         case "refused": refuse(message["message"] as? String ?? "Action refused while loading")
         default: break
         }
     }
-    func admitEntry(_ i:Invocation,entry:String,source:String,depth:Int,intent:String) {
+    func admitEntry(_ i:Invocation,entry:String,source:String,depth:Int,intent:String,token:String="root",kind:String?=nil) {
         guard active === i,i.admitEntry(entry,from:source,depth:depth,kind:intent) else {refuse("Navigation refused: inactive entry or history limit.");return}
+        i.transitionToken=token;beginMeasurement(i,kind:kind == "sibling" ? "sibling" : intent)
         window.functionCanOwnFocus=false;web?.keyboardAllowed=false
         capture.inputContext?.discardMarkedText();capture.unmarkText();capture.string=""
         web?.isHidden=false;overlay.stringValue="\(i.mnemonic) · Loading…";overlay.isHidden=false
@@ -439,7 +470,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         // Even ordinary anchors cannot replace trusted function content or open popups.
         decisionHandler(webView === web && ExternalLinks.bundled(navigationAction.request.url) && navigationAction.targetFrame?.isMainFrame == true ? .allow : .cancel)
     }
-    func fail(_ message:String,_ i:Invocation) { guard active === i else{return};i.phase = .error;window.functionCanOwnFocus=false;web?.keyboardAllowed=false;web?.isHidden=true;overlay.stringValue="\(i.mnemonic) · ERROR\n\n\(message)";overlay.isHidden=false;updateBackControl();status.stringValue="Escape → command · Escape in command → cancel";if i.ownsInput{window.makeFirstResponder(capture)} }
+    func fail(_ message:String,_ i:Invocation) { guard active === i else{return};i.measurement?.finish("error");i.phase = .error;window.functionCanOwnFocus=false;web?.keyboardAllowed=false;web?.isHidden=true;overlay.stringValue="\(i.mnemonic) · ERROR\n\n\(message)";overlay.isHidden=false;updateBackControl();status.stringValue="Escape → command · Escape in command → cancel";if i.ownsInput{window.makeFirstResponder(capture)} }
     func webView(_ webView:WKWebView,didFailProvisionalNavigation navigation:WKNavigation!,withError error:Error) { if webView === web,let i=active{fail(error.localizedDescription,i)} }
     func webViewWebContentProcessDidTerminate(_ webView:WKWebView) {if webView === web,let i=active{fail("Function web process terminated. Relaunch the command.",i)}}
     func retire() {

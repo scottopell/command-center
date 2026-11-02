@@ -1,8 +1,9 @@
 import {z} from 'zod';
 import type {Operation} from './core.ts';
-export * from './core.ts';
+export {operation,defineWorker,defineContract,AppError,envelopeSchema,operationFor} from './core.ts';
+export type {JsonValue,KVOperations,WorkerKV,WorkerContext,Operation,WorkerHandlers,WorkerContract,OperationInput,OperationOutput,ReadOperation,WriteOperation} from './core.ts';
 export * from './builtins.ts';
-import {contracts} from '../../../.generated/contracts.ts';
+import {builtinContracts as contracts} from './builtins.ts';
 export {contracts};
 export type FunctionName = keyof typeof contracts;
 export type OperationName<F extends FunctionName> = keyof typeof contracts[F] & string;

@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(withTitle: "About CommandCenter", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
         let identity = appMenu.addItem(withTitle: "Local Identity…", action: #selector(Shell.setIdentity), keyEquivalent: "")
         identity.target = commandCenter
+        let packs=appMenu.addItem(withTitle:"Manage Functions…",action:#selector(Shell.showPackManagement),keyEquivalent:"");packs.target=commandCenter
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Quit CommandCenter", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appItem.submenu = appMenu

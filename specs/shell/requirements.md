@@ -64,12 +64,11 @@ THE SYSTEM SHALL discard the retired invocation’s unsent input, draft UI state
 
 ---
 
-### REQ-SH-006: See a destination within the visual latency budget
+### REQ-SH-006: Respond promptly to command admission
 
-WHEN a valid command is executed in the running, foreground application, THE SYSTEM SHALL display that invocation’s destination view or a destination-specific loading state within 500 milliseconds.
-THE SYSTEM SHALL own post-command input continuously from command admission without waiting for resolution, mounting, or destination data.
+WHEN a valid command is admitted, THE SYSTEM SHALL immediately show the function loading state and capture input independently of web startup. THE SYSTEM SHALL measure screen responsiveness and record nonfatal 500 ms misses under REQ-ST-001 and REQ-ST-002 rather than treating a native loading label as completion.
 
-**Rationale:** The operator needs immediate visual feedback and uninterrupted typing.
+**Rationale:** Responsiveness means reaching a usable destination while preserving immediate type-ahead.
 
 ---
 

@@ -31,7 +31,7 @@ export class Store {
     this.tail = current.catch(() => undefined); return current;
   }
   scoped(namespace: string, committed: () => void = () => {}): WorkerKV {
-    if (!/^[A-Z][A-Z0-9_-]{0,31}$/.test(namespace)) throw new Error('Invalid worker namespace');
+    if (!/^[A-Za-z0-9._-]{1,128}$/.test(namespace)) throw new Error('Invalid worker namespace');
     const ops = (valid: () => void, wrote: () => void): KVOperations => ({
       get: async key => { valid(); const row = this.db.prepare('SELECT value FROM kv WHERE namespace=? AND key=?').get(namespace, key) as { value: string } | undefined; return row ? JSON.parse(row.value) : undefined; },
       put: async (key, value) => { valid(); if (!key || key.length > 1024) throw new AppError('validation', 'Invalid store key'); const encoded = json(value); this.db.prepare('INSERT INTO kv VALUES (?,?,?) ON CONFLICT(namespace,key) DO UPDATE SET value=excluded.value').run(namespace, key, encoded); wrote(); },
@@ -54,5 +54,14 @@ export class Store {
       }),
     });
   }
+  // REQ-PK-004: only the host maps its historic built-in namespaces once.
+  migrateLegacyNamespace(legacy:string,identity:string){
+    const count=this.db.prepare('SELECT COUNT(*) AS n FROM kv WHERE namespace=?').get(legacy) as {n:number};
+    if(!count.n)return;
+    const target=this.db.prepare('SELECT COUNT(*) AS n FROM kv WHERE namespace=?').get(identity) as {n:number};
+    if(target.n)throw new Error('Both legacy and identity storage exist; explicit recovery is required');
+    this.db.prepare('UPDATE kv SET namespace=? WHERE namespace=?').run(identity,legacy);
+  }
+  deleteNamespace(namespace:string){this.db.prepare('DELETE FROM kv WHERE namespace=?').run(namespace);}
   close() { this.db.close(); }
 }

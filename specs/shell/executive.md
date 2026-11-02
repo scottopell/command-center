@@ -17,10 +17,10 @@ The shell owns command admission, invocation identity, buffered input, and visua
 | **REQ-SH-003:** Discover registered functions | ✅ Complete | Inline all-functions discovery preserves current text; automatic matching and tail rules verified. |
 | **REQ-SH-004:** Return immediately to the command bar | ✅ Complete | Unchanged launch text selected on command return; Tab resumes function; edited drafts preserved. |
 | **REQ-SH-005:** Start every invocation fresh | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
-| **REQ-SH-006:** See a destination within the visual latency budget | ✅ Complete | Native loading frame plus screen-level upper bounds below 500 ms on the recorded local profile; see measurement limits. |
+| **REQ-SH-006:** Respond promptly to command admission | ✅ Complete | Native loading frame plus screen-level upper bounds below 500 ms on the recorded local profile; see measurement limits. |
 | **REQ-SH-007:** Preserve input while a function initializes | ✅ Complete | Forced in-flight drain/pause/resume test, exact title/body sequence, committed IME input. |
 | **REQ-SH-008:** Hand input to the initialized destination | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
-| **REQ-SH-009:** Keep early actions attached to their invocation | N/A | Deprecated by ADR-004; replaced by REQ-SH-013. |
+| **REQ-SH-009:** Keep early actions attached to their invocation | N/A | Deprecated; historical obligation retained. |
 | **REQ-SH-010:** Expose initialization and handoff failures | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
 | **REQ-SH-011:** Release retired invocation ownership | ✅ Complete | 30 disposal cycles; weak native references released, handlers detached; no immediate RSS claim. |
 | **REQ-SH-012:** Leave submitted work independent of the view | ✅ Complete | Implemented; code and checks are mapped in the verification record. |

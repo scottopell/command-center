@@ -1,3 +1,4 @@
+import {hostContract} from '../../packages/contracts/src/builtins.ts';
 import { homedir, hostname, arch, uptime } from 'node:os';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -121,7 +122,7 @@ function boundedSnapshot(snapshot:Snapshot):Snapshot{
 // REQ-HO-005: one service-owned, bounded plain-data observation; no view/cache callbacks.
 export function createHostWorker(deps:HostWorkerDependencies={}){
   let lastComplete:Snapshot|undefined,lastCompleteRequest=0,requestSequence=0;
-  return defineWorker(contracts.HOST,{
+  return defineWorker(hostContract,{
     snapshot:async()=>{
       const request=++requestSequence,snapshot=await (deps.collect??collectServices)();
       const failures=snapshot.sources.filter(source=>source.state==='unavailable'||source.state==='discovery error');

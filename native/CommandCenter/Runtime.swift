@@ -76,13 +76,16 @@ class Backend {
         } else { self.directory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/CommandCenter") }
     }
     func request(_ payload: [String: Any], mutation: Bool = false, completion: @escaping ([String:Any])->Void) {
+        endpoint("/rpc",payload:payload,mutation:mutation,completion:completion)
+    }
+    func endpoint(_ route:String,payload:[String:Any]?=nil,mutation:Bool=false,completion:@escaping([String:Any])->Void){
         func failure(_ code: String, _ message: String) { DispatchQueue.main.async { completion(["ok":false,"error":["code":code,"message":message]]) } }
         do {
             let connection = try JSONDecoder().decode(Connection.self, from: Data(contentsOf: directory.appendingPathComponent("connection.json")))
-            guard let base = URL(string: connection.url), base.scheme == "http", base.host == "127.0.0.1", let endpoint = URL(string: connection.url + "/rpc") else { throw NSError(domain:"Connection",code:1) }
-            var request = URLRequest(url: endpoint); request.httpMethod = "POST"; request.timeoutInterval = 30
+            guard let base = URL(string: connection.url), base.scheme == "http", base.host == "127.0.0.1", let endpoint = URL(string: connection.url + route) else { throw NSError(domain:"Connection",code:1) }
+            var request = URLRequest(url: endpoint); request.httpMethod = payload == nil ? "GET" : "POST"; request.timeoutInterval = route == "/management/packs" ? 200 : 30
             request.setValue("Bearer " + connection.token, forHTTPHeaderField:"Authorization"); request.setValue("application/json", forHTTPHeaderField:"Content-Type")
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            if let payload=payload{request.httpBody = try JSONSerialization.data(withJSONObject: payload)}
             // REQ-BW-008/009: no view cancellation token and no retry after uncertain writes.
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let data=data,let(code,message)=Backend.oversizedResponse(data.count,mutation:mutation) {failure(code,message);return}
@@ -96,7 +99,15 @@ class Backend {
 }
 // REQ-FF-011: the shell consumes the same build catalog as the function registries.
 struct FunctionCatalog: Decodable {
-    struct Command: Decodable { let mnemonic:String;let title:String }
+    struct Command: Decodable {
+        let mnemonic:String;let title:String
+        let id:String?;let packId:String?;let revision:String?
+        let uiDirectory:String?;let webDirectory:String?;let operations:[String:Bool]?
+        func directory()->URL {
+            if let directory=webDirectory{return URL(fileURLWithPath:directory)}
+            return Bundle.main.resourceURL!.appendingPathComponent(uiDirectory ?? "functions/\(mnemonic.lowercased())/web")
+        }
+    }
     let commands:[Command]
     let localSourceOrigins:[String]
     static let current:FunctionCatalog = {
@@ -106,6 +117,19 @@ struct FunctionCatalog: Decodable {
         }
         return catalog
     }()
+    // REQ-PK-001/007: external catalog entries only refer to host-owned builds.
+    static func installed(in directory:URL)->FunctionCatalog {
+        let file=directory.appendingPathComponent("packs/catalog.json")
+        guard let data=try? Data(contentsOf:file),let installed=try? JSONDecoder().decode(FunctionCatalog.self,from:data) else{return current}
+        let buildRoot=directory.appendingPathComponent("packs/builds").resolvingSymlinksInPath().path+"/"
+        let external=installed.commands.filter{command in
+            guard command.packId != "cc.system",let path=command.webDirectory else{return false}
+            return URL(fileURLWithPath:path).resolvingSymlinksInPath().path.hasPrefix(buildRoot)
+        }
+        let commands=current.commands+external
+        guard Set(commands.map{$0.mnemonic}).count==commands.count else{return current}
+        return FunctionCatalog(commands:commands,localSourceOrigins:Array(Set(current.localSourceOrigins+installed.localSourceOrigins)))
+    }
 }
 // REQ-SH-015: external URLs never become documents with access to the function bridge.
 enum ExternalLinks {

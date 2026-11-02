@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-30T20:03:36.601Z",
+  "generatedAt": "2026-11-02T21:52:41.337Z",
   "scope": "Specification structure and Allium analysis; application runtime evidence is maintained separately",
-  "featureCount": 7,
-  "requirementCount": 77,
-  "activeRequirementCount": 74,
-  "deprecatedRequirementCount": 3,
-  "modelCount": 5,
-  "adrCount": 16,
+  "featureCount": 9,
+  "requirementCount": 91,
+  "activeRequirementCount": 87,
+  "deprecatedRequirementCount": 4,
+  "modelCount": 7,
+  "adrCount": 17,
   "errors": [],
   "allium": [
     {
@@ -17,7 +17,19 @@
           "command": "check",
           "diagnostics": [],
           "findings": [],
+          "spec_file": "specs/function-packs/activation.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
           "spec_file": "specs/shell/invocation.allium"
+        },
+        {
+          "command": "check",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/stragglers/transitions.allium"
         },
         {
           "command": "check",
@@ -53,7 +65,19 @@
           "command": "analyse",
           "diagnostics": [],
           "findings": [],
+          "spec_file": "specs/function-packs/activation.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
           "spec_file": "specs/shell/invocation.allium"
+        },
+        {
+          "command": "analyse",
+          "diagnostics": [],
+          "findings": [],
+          "spec_file": "specs/stragglers/transitions.allium"
         },
         {
           "command": "analyse",

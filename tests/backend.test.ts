@@ -1,3 +1,4 @@
+import {systemNamespace} from '../packages/backend/src/dispatcher.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -5,6 +6,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { Store } from '../packages/backend/src/store.ts';
 import { createDispatcher } from '../packages/backend/src/dispatcher.ts';
+import {z} from 'zod';
+import {defineContract,defineWorker,operation} from '../packages/sdk/src/contracts.ts';
 
 async function fixture() {
   const dir = await mkdtemp(path.join(tmpdir(), 'command-center-test-'));
@@ -14,6 +17,14 @@ async function fixture() {
 }
 const agent = { kind: 'agent', id: 'test-agent', name: 'Test agent' };
 const input = { title: 'Finding', body: 'Evidence', group: 42, actor: agent, requesters: [{ kind: 'employee', id: 'test@example.com', name: 'Test requester' }] };
+
+// REQ-BW-004/009: serialization after handler success cannot establish non-commit.
+test('non-JSON mutation results preserve uncertainty without repeating the handler',async()=>{
+  const store=new Store(':memory:');let calls=0;
+  const contract=defineContract('WIRE',{write:operation(z.strictObject({}),z.bigint(),true)});
+  const worker=defineWorker(contract,{write:async()=>{calls++;return 1n;}}),dispatch=createDispatcher(store,{WIRE:worker});
+  try{await assert.rejects(dispatch({function:'WIRE',operation:'write',input:{}}),(e:any)=>e.code==='outcome_unknown');assert.equal(calls,1);}finally{store.close();}
+});
 
 // REQ-BW-005, REQ-BW-006, REQ-BW-012: test the real store, not a mocked transaction.
 test('KV namespaces, null, replacement, prefix listing, rollback and expired tx handles', async () => {
@@ -75,7 +86,7 @@ test('storage faults roll back both counter/create and comment/routing changes',
   function faultOn(){f.store.scoped=(namespace,committed)=>{const kv=original(namespace,committed);return {...kv,transaction:work=>kv.transaction(tx=>work({...tx,put:async(key,value)=>{await tx.put(key,value);if(key.startsWith('ticket/'))throw new Error('injected storage fault');}}))};};}
   const call=(operation:string,input:unknown)=>f.dispatch({function:'DRQS',operation,input});
   try{
-    faultOn();await assert.rejects(call('create',input));assert.equal(await original('DRQS').get('next-ticket'),undefined);assert.deepEqual(await original('DRQS').list('ticket/'),[]);
+    faultOn();await assert.rejects(call('create',input));assert.equal(await original(systemNamespace('drqs')).get('next-ticket'),undefined);assert.deepEqual(await original(systemNamespace('drqs')).list('ticket/'),[]);
     f.store.scoped=original;const ticket:any=await call('create',input);assert.equal(ticket.number,1);
     faultOn();await assert.rejects(call('update',{number:1,group:44,state:'N',comment:'must roll back'}));f.store.scoped=original;
     assert.deepEqual(await call('get',{number:1}),ticket);

@@ -6,7 +6,7 @@ import {configure} from './configure.mjs';
 import {xcodegenPath} from './toolchain.mjs';
 configure();
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');process.chdir(root);
-if(readFileSync('.generated/catalog.json','utf8')!==readFileSync('dist/catalog.json','utf8'))throw new Error('Build this source composition with npm run build before native tests.');
+if(readFileSync('.generated/catalog.json','utf8')!==readFileSync('dist/catalog.json','utf8'))throw new Error('Build the current host with npm run build before native tests.');
 mkdirSync('verification',{recursive:true});
 execFileSync(xcodegenPath(),['generate','--spec','native/project.generated.yml'],{stdio:'inherit'});
 execFileSync('xcodebuild',['-project','native/CommandCenter.xcodeproj','-scheme','CommandCenter','-derivedDataPath',path.resolve(root,'.work/native'),'test','CODE_SIGNING_ALLOWED=NO'],{stdio:'inherit'});

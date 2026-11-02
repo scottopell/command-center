@@ -15,7 +15,7 @@ targets:
     platform: macOS
     sources:
       - path: CommandCenter
-      - path: ../dist/web
+      - path: ../dist/functions
         type: folder
         buildPhase: resources
       - path: ../dist/operations.json
@@ -23,6 +23,11 @@ targets:
       - path: ../dist/catalog.json
         buildPhase: resources
       - path: ../dist/backend.mjs
+        buildPhase: resources
+      - path: ../dist/worker-runtime.mjs
+        buildPhase: resources
+      - path: ../dist/toolchain
+        type: folder
         buildPhase: resources
       - path: ../dist/cli.mjs
         buildPhase: resources

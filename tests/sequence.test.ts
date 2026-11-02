@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {z} from 'zod';
-import {snapshotSequence,adjacent} from '../packages/ui/src/sequence.ts';
+import {snapshotSequence,adjacent} from '../packages/sdk/src/sequence.ts';
 const schema=z.strictObject({id:z.number().int().positive(),label:z.string().default('detail')});
 // REQ-NV-010/011: snapshot order/parameters outlive source mutation without owning any records or views.
 test('sequence snapshots validate, detach and normalize destinations; movement never wraps',()=>{

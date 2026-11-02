@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {operation} from './core.ts';
+import {operation,defineContract} from './core.ts';
 export const actorSchema = z.strictObject({ kind: z.enum(['human', 'agent']), id: z.string().trim().min(1).max(254), name: z.string().trim().max(254).optional() });
 export type Actor = z.infer<typeof actorSchema>;
 export const requesterSchema = z.strictObject({ kind: z.enum(['employee', 'customer']), id: z.string().trim().min(1).max(254), name: z.string().trim().max(254).optional() }).refine(r => r.kind !== 'employee' || z.email().safeParse(r.id).success, { message: 'Employee requester must be an email reference', path: ['id'] });
@@ -31,3 +31,6 @@ export const builtinContracts = {
   },
   HOST: { snapshot: operation(empty, z.strictObject({ machine: z.record(z.string(), z.unknown()), environment: z.record(z.string(), z.string().nullable()), services: z.array(z.record(z.string(), z.unknown())), sources: z.array(z.record(z.string(), z.unknown())), observedAt: z.string() })) },
 } as const;
+
+export const drqsContract=defineContract('DRQS',builtinContracts.DRQS);
+export const hostContract=defineContract('HOST',builtinContracts.HOST);

@@ -1,3 +1,4 @@
+import {systemNamespace} from '../packages/backend/src/dispatcher.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, rm, stat, writeFile } from 'node:fs/promises';
@@ -55,5 +56,5 @@ test('a fault after a persistent commit is outcome_unknown, not definite failure
   const store=new Store(':memory:');const scoped=store.scoped.bind(store);
   store.scoped=(namespace,committed)=>{const kv=scoped(namespace,committed);return {...kv,put:async(key,value)=>{await kv.put(key,value);throw new Error('fault after commit');}};};
   const dispatch=createDispatcher(store);
-  try{await assert.rejects(dispatch({function:'DRQS',operation:'setIdentity',input:{id:'saved@example.com',name:'Saved'}}),(e:any)=>e.code==='outcome_unknown');assert.equal((await scoped('DRQS').get('settings/identity') as any).id,'saved@example.com');}finally{store.close();}
+  try{await assert.rejects(dispatch({function:'DRQS',operation:'setIdentity',input:{id:'saved@example.com',name:'Saved'}}),(e:any)=>e.code==='outcome_unknown');assert.equal((await scoped(systemNamespace('drqs')).get('settings/identity') as any).id,'saved@example.com');}finally{store.close();}
 });

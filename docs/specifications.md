@@ -13,6 +13,8 @@ A requirements-first specification set for a single-window Mac command-center, r
 | HOST local machine and service inspection | [Requirements](../specs/host/requirements.md) | [Executive](../specs/host/executive.md) |
 | Function navigation | [Requirements](../specs/navigation/requirements.md) | [Executive](../specs/navigation/executive.md) |
 | Worker query integration | [Requirements](../specs/query-layer/requirements.md) | [Executive](../specs/query-layer/executive.md) |
+| Runtime local function packs | [Requirements](../specs/function-packs/requirements.md) | [Executive](../specs/function-packs/executive.md) |
+| Transition diagnostics and STRAG | [Requirements](../specs/stragglers/requirements.md) | [Executive](../specs/stragglers/executive.md) |
 
 The [shared ADR chain](../specs/adrs/README.md) records the selected mechanisms and their evidence. Requirements and Allium are normative. ADRs explain decisions; executive documents carry implementation status. The [local implementation](../README.md) and [verification evidence](../verification/README.md) now accompany this set. Validation of the Allium models is separate from runtime verification.
 
@@ -23,6 +25,8 @@ The [shared ADR chain](../specs/adrs/README.md) records the selected mechanisms 
 - [UI/worker lifetime boundary](../specs/function-workers/request-boundary.allium).
 - [Retained entry stack](../specs/navigation/entry-stack.allium).
 - [Query and mutation lifetime](../specs/query-layer/query-lifecycle.allium).
+- [Pack activation and admission](../specs/function-packs/activation.allium).
+- [Transition measurement](../specs/stragglers/transitions.allium).
 
 ## Review and validation
 

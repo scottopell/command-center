@@ -8,19 +8,17 @@ As a function author, I need a narrow lifecycle contract and ordinary web contro
 
 ### REQ-FF-001: Define a function with a narrow contract
 
-THE SYSTEM SHALL let an author register a mnemonic, title, asynchronous tail resolver, and view whose props are inferred from the resolver result.
-THE SYSTEM SHALL reject incompatible resolver-to-view prop types during type checking.
+THE SYSTEM SHALL let an author register a mnemonic, title, synchronous syntax-only command preparation, and view whose props are inferred from its result.
+THE SYSTEM SHALL reject incompatible preparation-to-view prop types during type checking.
 THE SYSTEM SHALL support registered child screen definitions and typed navigation while preserving a single-root form for functions without child screens.
 
 **Rationale:** An author should define application behavior without duplicating data types or a shell protocol.
 
 ---
 
-### REQ-FF-002: Resolve the initial view before presenting it
+### REQ-FF-002: Prepare the screen without waiting for application data
 
-WHEN a function is invoked, THE SYSTEM SHALL provide its tail and cancellation signal to the resolver, await its result, and pass that result to a fresh view.
-THE SYSTEM SHALL require the resolver to prepare navigation and initial data without performing application mutations.
-Required initial reads SHALL use the shared invocation query integration; unresolved required data SHALL keep that entry in loading rather than admit its resolved focus target prematurely.
+WHEN a function is invoked, THE SYSTEM SHALL prepare its route and parameters synchronously from command syntax and mount a fresh view without awaiting application queries. Preparation SHALL NOT receive a worker client or perform application mutations. Views SHALL use non-suspending query hooks for pending application data and keep their real initial interaction surface mounted. Query arrival SHALL NOT reset drafts or replace the marked input surface.
 
 **Rationale:** The initial screen must agree with the command, while navigation alone must not submit work.
 
@@ -29,7 +27,7 @@ Required initial reads SHALL use the shared invocation query integration; unreso
 ### REQ-FF-003: Declare initial focus without a readiness callback
 
 THE SYSTEM SHALL let a view declare one initial focus destination, including a focusable content container for a read-only view.
-WHEN the resolved view first commits, THE SYSTEM SHALL validate that destination and establish initial focus and initiate input handoff automatically only while the invocation owns function input.
+WHEN the destination view first commits, THE SYSTEM SHALL validate that destination and establish initial focus and initiate input handoff automatically only while the invocation owns function input.
 WHILE the operator has returned focus to the command bar, THE SYSTEM SHALL keep that focus and defer function input handoff until the operator returns to the function.
 THE SYSTEM SHALL report absent, ambiguous, detached, disabled, or hidden initial focus destinations as contract errors.
 The validation scope SHALL be the active entry; covered entries' retained focus markers SHALL NOT create competing destinations.
@@ -64,10 +62,10 @@ THE SYSTEM SHALL support the loading-time type-ahead path through ordinary text 
 ### REQ-FF-008: Share validated worker clients
 
 THE SYSTEM SHALL provide function views with typed access to registered Function Worker operations.
-The supported application-data API SHALL be the shared query/mutation integration, including cached resolver reads; raw transport SHALL remain internal to that integration.
+The supported application-data API SHALL be the shared query/mutation integration, without requiring pre-mount reads; raw transport SHALL remain internal to that integration.
 THE SYSTEM SHALL keep backend credentials and persistence handles outside disposable view state.
 WHEN an invocation retires, THE SYSTEM SHALL refuse new worker calls through that invocation's bridge while leaving already admitted worker operations independent of retirement.
-WHILE initial input handoff is incomplete, THE SYSTEM SHALL reject mutating worker calls from that UI invocation before worker admission while permitting the read operations needed by its resolver.
+WHILE initial input handoff is incomplete, THE SYSTEM SHALL reject mutating worker calls from that UI invocation before worker admission while permitting the read operations needed by its mounted view.
 
 **Rationale:** UI and agent paths should agree without exposing storage internals to the view.
 
@@ -77,7 +75,7 @@ WHILE initial input handoff is incomplete, THE SYSTEM SHALL reject mutating work
 
 ### REQ-FF-009: Exercise the lifecycle with SLOW
 
-THE SYSTEM SHALL provide a SLOW conformance function with controllable asynchronous resolution delay, initialization failure, and ordinary title/body form fields.
+THE SYSTEM SHALL provide a SLOW conformance function with controllable transition blocking, delayed application data, initialization failure, and ordinary title/body form fields.
 THE SYSTEM SHALL exercise cancellation, rapid relaunch, delayed results, input ordering, and initial focus against the function contract.
 
 **Rationale:** A deliberately delayed function makes race conditions reproducible before real applications depend on the framework.
@@ -89,15 +87,6 @@ THE SYSTEM SHALL keep the authenticated native bridge available to the registere
 THE SYSTEM SHALL report policy violations as development diagnostics without claiming a comprehensive sandbox for arbitrary third-party code.
 
 **Rationale:** A uniform data path must be enforced beyond author convention without adding another credential or network proxy API.
-
-### REQ-FF-011: Compose functions at build time
-
-THE SYSTEM SHALL build the public application independently from its public source checkout.
-WHEN an explicit local extension checkout is supplied at build time, THE SYSTEM SHALL compose its function views, worker contracts, workers, command metadata, and permitted local source origins into the same application.
-THE SYSTEM SHALL preserve schema-derived client types and runtime validation for composed operations, reject duplicate command identifiers, and apply function-source guards to composed views.
-THE SYSTEM SHALL NOT discover sibling repositories implicitly or require private source for a public build.
-
-**Rationale:** Private functions need the same framework guarantees without putting their implementation or application contracts into a public repository.
 
 ### REQ-FF-012: Verify a clean local build
 
@@ -131,3 +120,14 @@ THE SYSTEM SHALL reject temporary saves arriving after that invocation’s clean
 IF cleanup fails, THE SYSTEM SHALL complete retirement and expose a diagnostic.
 
 **Rationale:** Optional draft preservation must never trap the operator or become an implicit durable-work guarantee.
+
+### REQ-FF-011: Compose functions at build time
+
+**DEPRECATED:** Superseded by REQ-PK-001..010 and [ADR-017](../adrs/017_runtime-packs-and-transition-diagnostics.md). Original obligations retained below.
+
+THE SYSTEM SHALL build the public application independently from its public source checkout.
+WHEN an explicit local extension checkout is supplied at build time, THE SYSTEM SHALL compose its function views, worker contracts, workers, command metadata, and permitted local source origins into the same application.
+THE SYSTEM SHALL preserve schema-derived client types and runtime validation for composed operations, reject duplicate command identifiers, and apply function-source guards to composed views.
+THE SYSTEM SHALL NOT discover sibling repositories implicitly or require private source for a public build.
+
+**Rationale:** Private functions need the same framework guarantees without putting their implementation or application contracts into a public repository.

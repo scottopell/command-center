@@ -18,7 +18,9 @@ final class Invocation {
     let mnemonic: String
     let tail: String
     let commandText: String
-    let started = ProcessInfo.processInfo.systemUptime
+    let started:Double
+    var transitionToken="root"
+    var measurement:TransitionMeasurement?
     var phase = Phase.resolving
     var ownsInput = true
     var viewReady = false
@@ -29,8 +31,8 @@ final class Invocation {
     private(set) var entryStack = ["root"]
     var entryID: String { entryStack.last! }
     var entryDepth: Int { entryStack.count }
-    init(_ mnemonic: String, _ tail: String, commandText:String? = nil) { self.mnemonic = mnemonic; self.tail = tail;self.commandText=commandText ?? (mnemonic + (tail.isEmpty ? "" : " " + tail)) }
-    func retire() { phase = .retired; ownsInput = false; pending = PendingText() }
+    init(_ mnemonic: String, _ tail: String, commandText:String? = nil,started:Double=ProcessInfo.processInfo.systemUptime) { self.mnemonic = mnemonic; self.tail = tail;self.started=started;self.commandText=commandText ?? (mnemonic + (tail.isEmpty ? "" : " " + tail)) }
+    func retire() { measurement?.finish("canceled");phase = .retired; ownsInput = false; pending = PendingText() }
     var allowsMutation: Bool { phase == .interactive && ownsInput }
     // REQ-NV-002/006/007: admission replaces UI/capture authority before JS loads.
     @discardableResult func admitEntry(_ id:String, from:String, depth:Int, kind:String) -> Bool {

@@ -15,7 +15,7 @@
     "typecheck": "node scripts/run.mjs typecheck",
     "lint": "node scripts/run.mjs lint",
     "test": "node scripts/run.mjs test",
-    "build:web": "node scripts/run.mjs web",
+    "build:web": "node scripts/build-web.mjs",
     "build": "node scripts/build.mjs",
     "service:install": "node scripts/service.mjs install",
     "service:stop": "node scripts/service.mjs stop",
@@ -28,7 +28,8 @@
     "doctor": "node scripts/doctor.mjs",
     "setup:native": "node scripts/setup-native.mjs",
     "smoke:service": "node scripts/smoke-service.mjs",
-    "verify": "npm run doctor && npm run check && npm run build && npm run smoke:service && npm run test:native"
+    "verify": "npm run doctor && npm run check && npm run build && npm run smoke:service && npm run test:native",
+    "build:toolchain": "node scripts/build-toolchain.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "5.105.0",
@@ -41,10 +42,8 @@
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@vitejs/plugin-react": "6.1.2",
     "esbuild": "0.28.2",
-    "typescript": "6.0.3",
-    "vite": "8.3.5"
+    "typescript": "6.0.3"
   },
   "packageManager": "npm@11.20.0"
 }

@@ -5,11 +5,12 @@ use "../shell/invocation.allium" as lifecycle
 -- Programmatic contracts are not UI controls.
 
 contract ResolveInitialView {
-    resolve: (tail: String) -> Any
+    prepare: (tail: String) -> Any
     @invariant ReadOnlyPreparation
         -- The result selects the initial view and supplies its complete initial
         -- props, including tail-prefilled values. Resolution performs no mutation.
-        -- Required query preparation completes before the resolved View commits;
+        -- Command preparation is synchronous and the initial interaction surface
+        -- mounts independently of application queries;
         -- query-refresh failure later does not revoke existing entry readiness.
     @invariant PropsMatchView
         -- The view consumes exactly the loader result type; it does not invent
@@ -51,7 +52,7 @@ surface FunctionAuthorBoundary {
         fulfils DisposableOwnership
     @guarantee FrameworkOwnsHandoff
         -- REQ-FF-003: the author never calls a public ready function. The
-        -- framework waits for resolution and the first view commit, validates
+        -- framework waits for synchronous preparation and the first view commit, validates
         -- initial focus, and hands over only the active generation's input while
         -- function input ownership is active. Command focus is never stolen.
     @guarantee DisposalIsNotBackendCancellation

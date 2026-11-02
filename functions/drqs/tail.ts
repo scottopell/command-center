@@ -1,7 +1,8 @@
+import seedGroups from '../../data/groups.json' with {type:'json'};
 import type { Group } from '../../packages/contracts/src/index.ts';
 export type Route = { kind:'queue'; group?:number; search?:string } | { kind:'add'; group?:number } | { kind:'ticket'; number:number };
 // REQ-DR-003: only S consumes an arbitrary literal remainder.
-export function parseTail(tail: string, groups: Group[]): Route {
+export function parseTail(tail: string, groups: Group[]=seedGroups.groups): Route {
   const value = tail.trim();
   if (!value) return {kind:'queue'};
   if (/^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value))) return {kind:'ticket',number:Number(value)};

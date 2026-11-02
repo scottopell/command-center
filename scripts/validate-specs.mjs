@@ -15,8 +15,7 @@ function walk(dir) {
   }
 }
 walk(base);
-const composition=configure();
-if(composition.extension)walk(composition.extension);
+configure();
 const errors = [];
 const definitions = new Map();
 let deprecatedRequirementCount = 0;
@@ -133,7 +132,7 @@ const report = {
   allium: analyses,
   runtimeVerification: 'See verification/README.md for application tests, measurements and their limits',
 };
-const reportRoot=composition.extension??base;
+const reportRoot=base;
 fs.mkdirSync(path.join(reportRoot,'verification/specs'),{recursive:true});
 fs.writeFileSync(path.join(reportRoot, 'verification/specs/validation.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({ ...report, allium: analyses.map(a=>({command:a.command,exitCode:a.exitCode,models:a.reports.length,diagnostics:a.reports.reduce((n,r)=>n+r.diagnostics.length,0),findings:a.reports.reduce((n,r)=>n+r.findings.length,0)})) }, null, 2));

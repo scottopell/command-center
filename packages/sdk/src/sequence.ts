@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {AppError} from '../../contracts/src/index.ts';
+import {AppError} from './contracts.ts';
 
 export interface SequenceInput<P> {items:ReadonlyArray<{key:string;params:P}>;selectedKey:string}
 export interface SiblingSequence {screen:string;items:ReadonlyArray<{key:string;params:unknown}>;index:number}

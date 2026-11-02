@@ -1,19 +1,22 @@
 import React, { Activity, Component, createContext, useContext, useEffect, useLayoutEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { z } from 'zod';
-import { AppError } from '../../contracts/src/index.ts';
+import { AppError } from './contracts.ts';
 import { InvocationQueries, InvocationQueryProvider, EntryQueryProvider, type ReadClient, type QueryTransportOptions } from './queries.tsx';
 import { capturePosition, restorePosition, type ReturnPosition } from './viewport.ts';
 import {snapshotSequence,adjacent,type SequenceInput,type SiblingSequence} from './sequence.ts';
 
 export interface Client extends ReadClient { openExternal(url:string):Promise<void> }
-export interface ResolveContext {tail:string;signal:AbortSignal;client:Client}
-export interface FunctionDefinition<P> {mnemonic:string;title:string;resolve(ctx:ResolveContext):Promise<P>;View:React.ComponentType<NoInfer<P>>;screens?:ScreenRegistry}
-export interface ScreenDefinition<P=any,I extends z.ZodType=z.ZodType> {params:I;resolve(ctx:ResolveContext&{params:z.output<I>}):Promise<P>;View:React.ComponentType<P>}
+export interface CommandContext {tail:string}
+export interface ResolveContext extends CommandContext {signal:AbortSignal;client:Client}
+export interface FunctionDefinition<P> {mnemonic:string;title:string;prepare(ctx:CommandContext):P;View:React.ComponentType<NoInfer<P>>;screens?:ScreenRegistry}
+export interface ScreenDefinition<P=any,I extends z.ZodType=z.ZodType> {params:I;View:React.ComponentType<P>}
 export type ScreenRegistry=Record<string,ScreenDefinition<any,any>>;
 // REQ-FF-001, REQ-NV-001: inference comes from resolution; typed destinations are immutable metadata.
-export function defineFunction<R extends(ctx:ResolveContext)=>Promise<any>,S extends ScreenRegistry={}>(definition:{mnemonic:string;title:string;resolve:R;View:React.ComponentType<NoInfer<Awaited<ReturnType<R>>>>;screens?:S}){return definition;}
-export function defineScreen<I extends z.ZodType,P>(definition:{params:I;resolve(ctx:ResolveContext&{params:z.output<I>}):Promise<P>;View:React.ComponentType<NoInfer<P>>}):ScreenDefinition<P,I>{return Object.freeze(definition);}
+export function defineFunction<R extends(ctx:CommandContext)=>any,S extends ScreenRegistry={}>(definition:{mnemonic:string;title:string;prepare:R & (ReturnType<R> extends PromiseLike<unknown>?never:unknown);View:React.ComponentType<NoInfer<ReturnType<R>>>;screens?:S}){return definition;}
+export function defineScreen<I extends z.ZodType>(definition:{params:I;View:React.ComponentType<z.output<I>>}):ScreenDefinition<z.output<I>,I>{return Object.freeze(definition);}
+const OpenExternalContext=createContext<((url:string)=>Promise<void>)|null>(null);
+export function useOpenExternal(){const open=useContext(OpenExternalContext);if(!open)throw new Error('Source links require an active entry');return open;}
 export function defineScreens<S extends ScreenRegistry>(screens:S):Readonly<S>{return Object.freeze(screens);}
 type NavigationIntent='push'|'replace'|'collection';
 type Navigation<S extends ScreenRegistry>={pushSequence<K extends keyof S&string>(screen:K,sequence:SequenceInput<z.input<S[K]['params']>>):void;push<K extends keyof S&string>(screen:K,params:z.input<S[K]['params']>):void;replace<K extends keyof S&string>(screen:K,params:z.input<S[K]['params']>):void};
@@ -27,12 +30,12 @@ interface Host {
   admitEntry(entryId:string):void;back():void;step(direction:-1|1):void;selectAllDisplay(entryId:string):void;diagnostics():unknown;
 }
 declare global {interface Window {webkit?:{messageHandlers:{commandCenter:{postMessage(message:unknown):void}}};commandCenterHost:Host}}
-type Entry={createdAt:number;transitionAt:number;preparedAt:number|null;interactiveAt:number|null;id:string;name:string;params:unknown;siblings?:SiblingSequence;screen?:ScreenDefinition<any,any>;controller:AbortController;phase:'resolving'|'prepared'|'interactive'|'error'|'retired';props?:any;error?:string;viewport:HTMLElement|null;target:HTMLElement|null;position:ReturnPosition|null;restoring:boolean;needsRevalidation:boolean;preparedSent:boolean;notice:string;onQueryCommit:()=>void;navigate:(registry:ScreenRegistry,intent:NavigationIntent,name:string,params:unknown)=>void};
+type Entry={transitionToken:string;createdAt:number;transitionAt:number;preparedAt:number|null;interactiveAt:number|null;id:string;name:string;params:unknown;siblings?:SiblingSequence;screen?:ScreenDefinition<any,any>;controller:AbortController;phase:'resolving'|'prepared'|'interactive'|'error'|'retired';props?:any;error?:string;viewport:HTMLElement|null;target:HTMLElement|null;position:ReturnPosition|null;restoring:boolean;needsRevalidation:boolean;preparedSent:boolean;notice:string;onQueryCommit:()=>void;navigate:(registry:ScreenRegistry,intent:NavigationIntent,name:string,params:unknown)=>void};
 
 // This runtime is private to one disposable document. Screen lifetime is framework-owned.
 export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
   const rootElement=document.getElementById('root')!,root=createRoot(rootElement);
-  let disposed=false,interactive=false,sourceGesture=false,sequence=0,entrySequence=0,revision=0;
+  let disposed=false,interactive=false,sourceGesture=false,sequence=0,entrySequence=0,transitionSequence=0,revision=0;
   let entries:Entry[]=[];
   let pendingNavigation:{entryId:string;intent:'push'|'replace'|'back';next?:Entry}|null=null;
   const pending=new Map<number,{resolve:(v:any)=>void;reject:(e:Error)=>void;cleanup:()=>void}>();
@@ -77,12 +80,22 @@ export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
       entry.target=initial(entry);
       if(entry.restoring)correct(entry,false);
       entry.phase='prepared';entry.preparedAt=performance.now();entry.preparedSent=true;
-      send({kind:'viewReady',entryId:entry.id});publishSiblings();
+      const token=entry.transitionToken;let acknowledged=false,frame=0;
+      const checkpoint=(mode:'frame'|'throttled')=>{
+        if(acknowledged)return;acknowledged=true;clearTimeout(fallback);cancelAnimationFrame(frame);
+        setTimeout(()=>{
+          if(disposed||current()!==entry||entry.transitionToken!==token||entry.phase==='retired'||entry.phase==='error')return;
+          try{const destination=initial(entry);if(entry.restoring)correct(entry,false);else entry.target=destination;send({kind:'viewReady',entryId:entry.id,transitionToken:token,renderOpportunity:mode,visibility:document.visibilityState,phases:{preparedMs:Math.round(entry.preparedAt!-entry.transitionAt),checkpointMs:Math.round(performance.now()-entry.transitionAt)}});publishSiblings();}catch(error){fail(error,entry);}
+        },0);
+      };
+      // WKWebView can throttle rAF when occluded; a separately queued probe still tests responsiveness.
+      const fallback=setTimeout(()=>checkpoint('throttled'),100);
+      frame=requestAnimationFrame(()=>checkpoint('frame'));
     }catch(error){fail(error,entry);}
   }
   function makeEntry(name:string,params:unknown,screen?:ScreenDefinition<any,any>):Entry {
     const id=screen?`entry-${++entrySequence}`:'root';
-    return {createdAt:performance.now(),transitionAt:performance.now(),preparedAt:null,interactiveAt:null,id,name,params,screen,controller:new AbortController(),phase:'resolving',viewport:null,target:null,position:null,restoring:false,needsRevalidation:false,preparedSent:false,notice:'',
+    return {transitionToken:screen?`transition-${++transitionSequence}`:'root',createdAt:performance.now(),transitionAt:performance.now(),preparedAt:null,interactiveAt:null,id,name,params,screen,controller:new AbortController(),phase:'resolving',viewport:null,target:null,position:null,restoring:false,needsRevalidation:false,preparedSent:false,notice:'',
       onQueryCommit:()=>{const entry=entries.find(e=>e.id===id);if(entry&&current()===entry&&(entry.phase==='interactive'||entry.phase==='prepared'))try{correct(entry,owned(id));}catch(error){notice(error instanceof Error?error.message:String(error),entry);}},
       navigate:(registry,intent,destination,input)=>navigate(id,registry,intent,destination,input)};
   }
@@ -94,11 +107,11 @@ export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
     })};
   }
   function resolveEntry(entry:Entry) {
-    const client=clientFor(entry),ctx={tail,signal:entry.controller.signal,client};
-    Promise.resolve().then(()=>entry.screen?entry.screen.resolve({...ctx,params:entry.params}):definition.resolve(ctx)).then(props=>{
-      if(disposed||entry.phase==='retired'||!entries.includes(entry))return;
+    try{
+      const props=entry.screen?entry.params:definition.prepare({tail});
+      if(!props||typeof props!=='object'||'then' in props)throw new Error('Command preparation must return synchronous view props');
       entry.props=props;render();
-    },error=>fail(error,entry));
+    }catch(error){fail(error,entry);}
   }
   function retireEntry(entry:Entry) {
     entry.phase='retired';entry.controller.abort();entry.siblings=undefined;entry.viewport=null;entry.target=null;entry.position=null;entry.props=undefined;entry.error=undefined;entry.notice='';
@@ -108,8 +121,9 @@ export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
     if(intent==='push'&&entries.length>=4){notice('Navigation limit reached (4 screens). Go Back before opening another nested screen.',from);return;}
     if(intent==='back'&&entries.length===1)return;
     const target=intent==='back'?entries[entries.length-2]:next!;
+    if(intent==='back')target.transitionToken=`transition-${++transitionSequence}`;
     pendingNavigation={entryId:target.id,intent,next};interactive=false;sourceGesture=false;
-    send({kind:'entryRequest',entryId:target.id,fromEntryId:from.id,depth:entries.length+(intent==='push'?1:intent==='back'?-1:0),intent});
+    send({kind:'entryRequest',entryId:target.id,fromEntryId:from.id,depth:entries.length+(intent==='push'?1:intent==='back'?-1:0),intent,transitionToken:target.transitionToken,transitionKind:intent==='replace'&&target.siblings?'sibling':intent});
   }
   function navigate(origin:string,registry:ScreenRegistry,intent:NavigationIntent,name:string,input:unknown) {
     if(!owned(origin))return;
@@ -146,7 +160,7 @@ export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
   }
   function RuntimeRoot(_props:{revision:number}) {
     return <InvocationQueryProvider session={data}>{entries.map(entry=><Activity key={entry.id} mode={current()===entry?'visible':'hidden'}>
-      <NavigationContext.Provider value={entry.navigate}><EntryQueryProvider entryId={entry.id} onQueryCommit={entry.onQueryCommit}><EntryHost entry={entry} visible={current()===entry}/></EntryQueryProvider></NavigationContext.Provider>
+      <NavigationContext.Provider value={entry.navigate}><EntryQueryProvider entryId={entry.id} onQueryCommit={entry.onQueryCommit}><OpenExternalContext.Provider value={clientFor(entry).openExternal}><EntryHost entry={entry} visible={current()===entry}/></OpenExternalContext.Provider></EntryQueryProvider></NavigationContext.Provider>
     </Activity>)}</InvocationQueryProvider>;
   }
   const isText=(el:Element|null):el is HTMLInputElement|HTMLTextAreaElement=>el instanceof HTMLTextAreaElement||(el instanceof HTMLInputElement&&['text','search','email','url','tel','password'].includes(el.type));

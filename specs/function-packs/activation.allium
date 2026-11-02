@@ -1,0 +1,134 @@
+-- allium: 3
+-- REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009
+
+entity FunctionPack {
+    identity: String
+    active_revision: String?
+    candidate_revision: String?
+    candidate_valid: Boolean
+    retained_data: Boolean
+    removed: Boolean
+}
+
+entity WorkerService {
+    admission_open: Boolean
+    active_handlers: Integer
+    installation_identity: String
+}
+
+enum ActivationPhase { draining | starting | applied | postponed | failed }
+
+entity Activation {
+    pack: FunctionPack
+    service: WorkerService
+    phase: ActivationPhase
+    previous_revision: String?
+    candidate_revision: String
+    expected_identity: String
+}
+
+rule RequestActivation {
+    when: ApplyRequested(pack, service, candidate_identity)
+    requires: service.admission_open
+    requires: pack.candidate_valid
+    requires: pack.candidate_revision != null
+    requires: not pack.removed
+    ensures:
+        service.admission_open = false
+        Activation.created(pack: pack, service: service, phase: draining,
+            previous_revision: pack.active_revision,
+            candidate_revision: pack.candidate_revision,
+            expected_identity: candidate_identity)
+}
+
+rule FinishDraining {
+    when: DrainingCompleted(activation)
+    requires: activation.phase = draining
+    requires: activation.service.active_handlers = 0
+    ensures: activation.phase = starting
+}
+
+rule PostponeBusyUpdate {
+    when: DrainDeadlineReached(activation)
+    requires: activation.phase = draining
+    requires: activation.service.active_handlers > 0
+    ensures:
+        activation.phase = postponed
+        activation.service.admission_open = true
+}
+
+rule PublishMatchingInstallation {
+    when: RuntimeStarted(activation, reported_identity)
+    requires: activation.phase = starting
+    requires: reported_identity = activation.expected_identity
+    ensures:
+        activation.pack.active_revision = activation.candidate_revision
+        activation.service.installation_identity = reported_identity
+        activation.service.admission_open = true
+        activation.phase = applied
+}
+
+rule RejectFailedCandidate {
+    when: CandidateStartupFailed(activation)
+    requires: activation.phase = starting
+    ensures:
+        activation.phase = failed
+        activation.pack.active_revision = activation.previous_revision
+}
+
+rule RecoverPreviousRuntime {
+    when: PreviousRuntimeRestored(activation)
+    requires: activation.phase = failed
+    ensures: activation.service.admission_open = true
+}
+
+rule RemovePackCode {
+    when: PackRemoved(pack)
+    ensures:
+        pack.removed = true
+        pack.active_revision = null
+}
+
+contract PackBoundary {
+    @invariant IndependentOwnership
+        -- Mnemonics are unique labels. Persistent data is owned by stable pack
+        -- and function identity; removing code does not delete retained records.
+    @invariant DrainMeansHandlerCompletion
+        -- Client disconnection does not complete a handler. Requests rejected
+        -- during maintenance are not queued, admitted or automatically replayed.
+        -- Handlers cannot detach application work beyond their return promise.
+    @invariant NoDataRollback
+        -- Worker initialization does not write application data. Code fallback
+        -- is allowed only before candidate application-request admission. Data
+        -- migrations and rollback of accepted writes are outside the contract.
+}
+
+surface RegisteredPack {
+    context pack: FunctionPack
+    exposes:
+        pack.identity
+        pack.active_revision
+        pack.candidate_revision
+        pack.retained_data
+        pack.removed
+    provides:
+        ApplyRequested(pack, service, candidate_identity) when pack.candidate_valid and not pack.removed
+        PackRemoved(pack) when not pack.removed
+    contracts:
+        fulfils PackBoundary
+}
+
+surface ActivationBoundary {
+    context activation: Activation
+    exposes:
+        activation.phase
+        activation.service.active_handlers
+        activation.service.admission_open
+        activation.service.installation_identity
+    provides:
+        DrainingCompleted(activation) when activation.phase = draining and activation.service.active_handlers = 0
+        DrainDeadlineReached(activation) when activation.phase = draining
+        RuntimeStarted(activation, reported_identity) when activation.phase = starting
+        CandidateStartupFailed(activation) when activation.phase = starting
+        PreviousRuntimeRestored(activation) when activation.phase = failed
+}

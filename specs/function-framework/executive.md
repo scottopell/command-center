@@ -13,23 +13,23 @@ As a function author, I need a narrow lifecycle contract and ordinary web contro
 | Requirement | Status | Notes |
 | --- | --- | --- |
 | **REQ-FF-001:** Define a function with a narrow contract | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
-| **REQ-FF-002:** Resolve the initial view before presenting it | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
+| **REQ-FF-002:** Prepare the screen without waiting for application data | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
 | **REQ-FF-003:** Declare initial focus without a readiness callback | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
-| **REQ-FF-004:** Request per-invocation unload cleanup | N/A | Deprecated by ADR-005; no custom unload hook. |
-| **REQ-FF-005:** Bound temporary preservation | N/A | Deprecated by ADR-005; no exit-data persistence. |
+| **REQ-FF-004:** Request per-invocation unload cleanup | N/A | Deprecated; historical obligation retained. |
+| **REQ-FF-005:** Bound temporary preservation | N/A | Deprecated; historical obligation retained. |
 | **REQ-FF-006:** Keep invocation data from escaping its lifetime | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
 | **REQ-FF-007:** Use ordinary application controls | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
 | **REQ-FF-008:** Share validated worker clients | ✅ Complete | Entry-scoped lifecycle/query integration and native handoff verified. |
 | **REQ-FF-009:** Exercise the lifecycle with SLOW | ✅ Complete | Implemented; code and checks are mapped in the verification record. |
 | **REQ-FF-010:** Enforce supported application-data access | ✅ Complete | Actual WebKit outbound/resource refusal and typed bridge integration verified. |
-| **REQ-FF-011:** Compose functions at build time | ✅ Complete | Public/composed type, fixture, schema and native catalogs verified; private source remains outside the public tree. |
+| **REQ-FF-011:** Compose functions at build time | N/A | Deprecated; historical obligation retained. |
 | **REQ-FF-012:** Verify a clean local build | ✅ Complete | Pinned runtime/dependencies, verified native tool, preflight, packaged-worker smoke and native verification pass on arm64. |
 
-**Progress:** 10 of 10 active requirements complete; 2 deprecated requirements retained.
+**Progress:** 9 of 9 active requirements complete; 3 deprecated requirements retained.
 
 Implementation evidence: [code, tests and measurement scope](../../verification/README.md).
 
 ## Open questions & future directions
 
-- Extracting a separately published framework package is deferred until the built-in functions establish a useful shared boundary.
-- External plugin installation, hot reload, cross-version plugin compatibility, and arbitrary embedded web apps are outside scope.
+- The standalone SDK is distributed with the host toolchain; publishing it separately remains optional.
+- Local folder packs use SDK 1.0.0. Cross-version negotiation and arbitrary embedded web apps remain deferred.

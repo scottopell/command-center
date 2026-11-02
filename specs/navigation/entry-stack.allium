@@ -17,8 +17,8 @@ contract EntryPreparation {
     validate_destination: (screen: String, parameters: Any) -> Boolean
     resolve: (screen: String, parameters: Any) -> Any
     @invariant RequiredReadsBeforeResolvedCommit
-        -- EntryResolved below means required queries have completed successfully.
-        -- A resolved View is not admitted to commit/handoff before those reads.
+        -- EntryResolved below means synchronous screen parameters are prepared.
+        -- Application query latency does not gate View commit or readiness.
         -- A prepared entry has a committed resolved View and one usable initial
         -- focus destination; interactive additionally requires native handoff.
     @invariant PerEntryNativeInput

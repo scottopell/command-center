@@ -13,11 +13,11 @@ await Promise.all(['backend','cli'].map(name=>build({entryPoints:[name==='backen
 // This local build uses the installed Node toolchain, preserving its dynamic-library paths.
 // Distribution/notarization and a redistributable runtime are outside this local deliverable.
 await rm('dist/runtime/node',{force:true});await writeFile('dist/runtime/node',`#!/bin/sh\nexec '${process.execPath.replaceAll("'","'\\''")}' "$@"\n`,{mode:0o755});
-const metadata=await build({entryPoints:['packages/contracts/src/index.ts'],bundle:true,platform:'node',format:'esm',write:false});
-const temporary=path.join(root,'dist/contracts.mjs');await writeFile(temporary,metadata.outputFiles[0].text);
-const {contracts}=await import(temporary);
-await writeFile('dist/operations.json',JSON.stringify(Object.fromEntries(Object.entries(contracts).map(([fn,operations])=>[fn,Object.fromEntries(Object.entries(operations).map(([op,definition])=>[op,definition.mutating]))])),null,2));
 execFileSync('npm',['run','build:web'],{stdio:'inherit'});
+execFileSync('npm',['run','build:toolchain'],{stdio:'inherit'});
+const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('dist/catalog.json','utf8'));
+await writeFile('dist/operations.json',JSON.stringify(Object.fromEntries(catalog.system.functions.map(f=>[f.mnemonic,f.operations])),null,2));
+await build({entryPoints:['packages/backend/src/runtime-worker.ts'],outfile:'dist/worker-runtime.mjs',bundle:true,platform:'node',format:'esm',target:'node26',sourcemap:true,banner:{js:"import {createRequire} from 'node:module';const require=createRequire(import.meta.url);"}});
 execFileSync(xcodegenPath(),['generate','--spec','project.generated.yml'],{cwd:path.join(root,'native'),stdio:'inherit'});
 const derived=path.resolve(root,'.work/native');
 execFileSync('xcodebuild',['-project','native/CommandCenter.xcodeproj','-scheme','CommandCenter','-configuration','Debug','-derivedDataPath',derived,'build','CODE_SIGNING_ALLOWED=NO'],{stdio:'inherit'});
