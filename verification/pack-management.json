@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-02T22:16:37.603Z",
+  "scope": "Function Packs redesign; focused native checks, not a repeat of the full suite",
+  "passed": 8,
+  "failed": 0,
+  "suites": [
+    "PackManagementTests",
+    "PackTests"
+  ],
+  "coverage": [
+    "Top-aligned short list and compact sheet",
+    "Named functions from installed artifacts",
+    "Status-dependent enable, apply and retry actions",
+    "Stable cards during polling",
+    "Single-flight actions and refresh recovery",
+    "Separate removal/data deletion controls",
+    "Existing installation, Apply & Relaunch and missing-source workflow"
+  ],
+  "renderedFixtureStates": [
+    "active",
+    "update-ready",
+    "error",
+    "empty",
+    "removed"
+  ],
+  "build": "passed"
+}

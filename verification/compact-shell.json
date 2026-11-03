@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-03T14:59:20.280Z",
+  "native": {
+    "passed": 43,
+    "failed": 0,
+    "scope": "All functional native cases; excludes the 200-cycle retention soak"
+  },
+  "excludedStressCase": {
+    "test": "NavigationTests.testTwoHundredPushPopTransitionsAndRepeatedCancelRelease",
+    "evidence": "Passed the earlier toolbar run before navigation controls moved inline; a subsequent run was interrupted by a normal test-host exit. Not repeated for final chrome verification."
+  },
+  "build": "passed",
+  "specifications": "passed",
+  "liveVerification": "Installed shortcuts visible; HOST launched bare with active highlighting; pack terminology confirmed; inline Back displayed in a DRQS child with no separate navigation row",
+  "layout": "Input and inline navigation, then function toolbar; content immediately below"
+}

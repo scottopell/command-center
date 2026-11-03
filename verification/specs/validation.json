@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-02T21:52:41.337Z",
+  "generatedAt": "2026-11-03T14:59:20.622Z",
   "scope": "Specification structure and Allium analysis; application runtime evidence is maintained separately",
   "featureCount": 9,
-  "requirementCount": 91,
-  "activeRequirementCount": 87,
+  "requirementCount": 92,
+  "activeRequirementCount": 88,
   "deprecatedRequirementCount": 4,
   "modelCount": 7,
-  "adrCount": 17,
+  "adrCount": 18,
   "errors": [],
   "allium": [
     {

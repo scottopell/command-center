@@ -78,6 +78,8 @@ import WebKit
         try await Task.sleep(nanoseconds:60_000_000);XCTAssertTrue(copied.isEmpty)
     }
     func pointerClick(_ selector:String,count:Int=1) async throws {
+        // Native mouse selection requires the test window, rather than another app, to be active.
+        NSApp.activate(ignoringOtherApps:true);shell.window.makeKeyAndOrderFront(nil)
         _=try await js("document.querySelector('\(selector)').scrollIntoView({block:'center'});void 0")
         let rect=try await js("(()=>{var r=document.querySelector('\(selector)').getBoundingClientRect();return [r.x,r.y,r.height]})()") as! [Double]
         let y=shell.web!.isFlipped ? rect[1]+rect[2]/2 : shell.web!.bounds.height-rect[1]-rect[2]/2

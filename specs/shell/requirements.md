@@ -9,6 +9,7 @@ As the human operator, I need a predictable keyboard-driven command-center so th
 ### REQ-SH-001: Use one consistent command-center window
 
 THE SYSTEM SHALL present one command-center window with a top row containing the command input and its inline autocomplete button, one function content area, and empty, loading, and error states.
+THE SYSTEM SHALL place Back and available Previous/Next controls alongside the function input, with function content beginning immediately below the function toolbar and no separate navigation row.
 THE SYSTEM SHALL use compact typography, dark surfaces, amber content accents, and orange command text, caret, and focus cues.
 THE SYSTEM SHALL normalize committed command input to uppercase, including pasted commands.
 THE SYSTEM SHALL provide horizontal padding and vertically center entered text and inline error feedback within the command input.
@@ -33,7 +34,7 @@ WHEN the command is empty, THE SYSTEM SHALL remain at the command bar.
 ### REQ-SH-003: Discover registered functions
 
 WHEN the operator types a mnemonic or function-title fragment in the command bar, THE SYSTEM SHALL suggest matching registered functions and permit selection by keyboard or pointer.
-THE SYSTEM SHALL present suggestions in an autocomplete dropdown beneath the command input, without reserving a permanent function-list row.
+THE SYSTEM SHALL present suggestions in an autocomplete dropdown beneath the function input, independently of the function toolbar.
 WHEN the operator clicks the inline discovery button, THE SYSTEM SHALL toggle an autocomplete list of all registered functions without changing the command text, including when it contains a mnemonic and tail.
 WHEN the operator presses Down or Right in an empty command input, THE SYSTEM SHALL open autocomplete with all registered functions, permitting discovery without a typed prefix.
 WHEN the input is empty without an explicit discovery request, focus leaves command editing, or a function is executed, THE SYSTEM SHALL dismiss the autocomplete dropdown.
@@ -170,3 +171,14 @@ WHEN a submission or other action is entered while an invocation loads, THE SYST
 IF that invocation is retired first, THE SYSTEM SHALL discard the unexecuted action.
 
 **Rationale:** Fast operators can finish a familiar sequence without waiting, without sending it to another view.
+
+---
+
+### REQ-SH-017: Launch from a visible function toolbar
+
+THE SYSTEM SHALL provide a compact function toolbar below the function input, with a shortcut for every installed function in catalog order. Each shortcut SHALL show its mnemonic and expose its full title through a tooltip and accessible label. Shortcuts that do not fit SHALL remain available through an overflow menu.
+WHEN the operator activates a shortcut, THE SYSTEM SHALL immediately execute that function's bare mnemonic through ordinary command admission, without inheriting arguments or a draft command. Selecting the running function SHALL start a fresh invocation.
+THE SYSTEM SHALL highlight the currently running function independently of command editing and clear that highlight on cancellation. Catalog changes SHALL update the available shortcuts without changing command text, focus or the current invocation.
+THE SYSTEM SHALL provide pack management separately from the function shortcuts at the toolbar's right edge. Autocomplete and command tails SHALL remain available through the function input.
+
+**Rationale:** Functions should be discoverable and launchable without opening autocomplete or memorizing mnemonics.

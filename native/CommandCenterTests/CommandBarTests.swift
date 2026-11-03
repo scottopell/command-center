@@ -68,6 +68,88 @@ import WebKit
         XCTAssertEqual(shell.suggestionMatches.count,shell.entries.count)
     }
 
+    func shortcut(_ mnemonic:String)->NSButton? {
+        shell.functionToolbar.subviews.compactMap{$0 as? NSButton}.first{$0.identifier?.rawValue=="function:"+mnemonic}
+    }
+    // REQ-SH-017: shortcuts share destructive launch and native buffered-input handoff.
+    func testToolbarLaunchesBareFunctionFreshAndTracksInvocationInsteadOfDraft() async throws {
+        launch("SLOW 0 NAV");try await waitFor{self.shell.active?.phase == .interactive}
+        _=try await js("document.querySelector('[name=title]').value='old draft'")
+        let original=shell.active!.id
+        shell.focusCommand();shell.command.stringValue="DRQS A 42"
+        XCTAssertEqual(shell.functionToolbar.activeMnemonic,"SLOW")
+        try XCTUnwrap(shortcut("SLOW")).performClick(nil)
+        XCTAssertNotEqual(shell.active?.id,original);XCTAssertEqual(shell.active?.tail,"")
+        XCTAssertEqual(shell.command.stringValue,"SLOW");shell.append("fresh input")
+        try await waitFor{self.shell.active?.phase == .interactive}
+        try await equalJS("document.querySelector('[name=title]').value","fresh input")
+        shell.focusCommand();shell.command.stringValue="EDITED COMMAND"
+        XCTAssertEqual(shell.functionToolbar.activeMnemonic,"SLOW")
+        XCTAssertEqual(shortcut("SLOW")?.layer?.borderWidth,1)
+        try XCTUnwrap(shortcut("HOST")).performClick(nil)
+        XCTAssertEqual(shell.active?.mnemonic,"HOST");XCTAssertEqual(shell.active?.tail,"")
+        XCTAssertEqual(shell.command.stringValue,"HOST");XCTAssertEqual(shell.functionToolbar.activeMnemonic,"HOST")
+        shell.focusCommand();shell.escape();XCTAssertNil(shell.active);XCTAssertNil(shell.functionToolbar.activeMnemonic)
+        XCTAssertEqual(shortcut("HOST")?.layer?.borderWidth,0)
+    }
+
+    // REQ-SH-017: every shortcut remains reachable on small windows, with one launch action.
+    func testToolbarOverflowPreservesCatalogOrderAndLaunchesHiddenFunction() throws {
+        let toolbar=FunctionToolbar(frame:NSRect(x:0,y:0,width:380,height:34))
+        let functions=(0..<30).map{("FN\($0)","Fixture function \($0)")}
+        var launched=[String]();toolbar.onLaunch={launched.append($0)};toolbar.setFunctions(functions)
+        toolbar.layoutSubtreeIfNeeded()
+        let buttons=toolbar.subviews.compactMap{$0 as? NSButton}.filter{$0.identifier?.rawValue.hasPrefix("function:")==true}
+        let visible=buttons.filter{!$0.isHidden}.map{$0.title}
+        let menu=try XCTUnwrap(toolbar.overflowButton.menu)
+        let hidden=menu.items.compactMap{$0.representedObject as? String}
+        XCTAssertFalse(toolbar.overflowButton.isHidden);XCTAssertEqual(visible+hidden,functions.map{$0.0})
+        XCTAssertLessThanOrEqual(toolbar.overflowButton.frame.maxX,toolbar.managementButton.frame.minX-4)
+        for button in buttons where !button.isHidden {XCTAssertLessThanOrEqual(button.frame.maxX,toolbar.overflowButton.frame.minX-4)}
+        let last=try XCTUnwrap(menu.items.last);toolbar.setActiveFunction("FN29");XCTAssertEqual(last.state,.on)
+        menu.performActionForItem(at:menu.index(of:last));XCTAssertEqual(launched,["FN29"])
+        toolbar.setActiveFunction(nil);XCTAssertEqual(last.state,.off)
+        toolbar.setFrameSize(NSSize(width:3000,height:34));toolbar.needsLayout=true;toolbar.layoutSubtreeIfNeeded()
+        XCTAssertTrue(toolbar.overflowButton.isHidden);XCTAssertTrue(buttons.allSatisfy{!$0.isHidden})
+        toolbar.setFunctions(functions);XCTAssertTrue(toolbar.subviews.contains{$0===buttons[0]})
+    }
+
+    // REQ-SH-017, REQ-PK-007: catalog publication changes shortcuts, not an open invocation or command draft.
+    func testToolbarCatalogRefreshPreservesFocusAndCommandDraft() async throws {
+        launch("SLOW 0");try await waitFor{self.shell.active?.phase == .interactive}
+        shell.focusCommand();shell.command.stringValue="DRQS A 42";let invocation=shell.active!.id
+        let directory=shell.backend.directory.appendingPathComponent("packs")
+        try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        let cache=directory.appendingPathComponent("catalog.json")
+        let command:[String:Any]=["mnemonic":"NOTES","title":"Personal notes","packId":"example.notes","webDirectory":directory.appendingPathComponent("builds/fixture/functions/notes/web").path]
+        try JSONSerialization.data(withJSONObject:["commands":[command],"localSourceOrigins":[]]).write(to:cache)
+        shell.reloadCatalog();XCTAssertNotNil(shortcut("NOTES"));XCTAssertTrue(shell.commandFocused)
+        XCTAssertEqual(shell.command.stringValue,"DRQS A 42");XCTAssertEqual(shell.active?.id,invocation)
+        XCTAssertEqual(shell.functionToolbar.activeMnemonic,"SLOW")
+        try JSONSerialization.data(withJSONObject:["commands":[],"localSourceOrigins":[]]).write(to:cache)
+        shell.reloadCatalog();XCTAssertNil(shortcut("NOTES"));XCTAssertEqual(shell.active?.id,invocation)
+    }
+
+    // REQ-SH-001/017: navigation shares the input row; no blank row separates toolbar and view.
+    func testNavigationControlsShareInputRowAndContentStartsBelowToolbar() async throws {
+        launch("SLOW 0 NAV");try await waitFor{self.shell.active?.phase == .interactive}
+        let base=try XCTUnwrap(shell.window.contentView);base.layoutSubtreeIfNeeded()
+        XCTAssertTrue(shell.backButton.superview===shell.commandFrame.superview)
+        let input=shell.commandFrame.convert(shell.commandFrame.bounds,to:base)
+        let back=shell.backButton.convert(shell.backButton.bounds,to:base)
+        XCTAssertEqual(input.midY,back.midY,accuracy:1);XCTAssertLessThan(back.maxX,input.minX)
+        let toolbar=shell.functionToolbar.convert(shell.functionToolbar.bounds,to:base)
+        let view=try XCTUnwrap(shell.web).convert(shell.web!.bounds,to:base)
+        XCTAssertEqual(view.maxY,toolbar.minY,accuracy:1)
+        _=try await js("document.querySelector('[data-slow-sequence]').click()")
+        try await waitFor{self.shell.active?.phase == .interactive && self.shell.active?.entryDepth==2}
+        XCTAssertFalse(shell.previousButton.isHidden);XCTAssertFalse(shell.nextButton.isHidden)
+        XCTAssertTrue(shell.previousButton.superview===shell.commandFrame.superview)
+        XCTAssertTrue(shell.siblingPosition.superview===shell.commandFrame.superview)
+        shell.backButton.performClick(nil)
+        try await waitFor{self.shell.active?.phase == .interactive && self.shell.active?.entryDepth==1}
+    }
+
 
 
 

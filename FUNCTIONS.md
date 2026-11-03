@@ -77,7 +77,7 @@ Use `useOpenExternal()` from the framework to open validated sources directly fr
 
 ## Install, check and update
 
-In Functions management, choose Add Folder, wait for a successful candidate, then Apply. Source changes build automatically but activation is manual. Apply cancels an affected open function, finishes admitted work, briefly restarts the shared worker runtime, and relaunches its bare mnemonic without arguments. Other open functions remain mounted. A drain deadline postpones the update. Candidate startup failure retains the old installation; code fallback does not undo application writes.
+In Functions management, choose Add Pack, wait for Ready to enable, then Enable Functions. Each card shows its functions and status. Source changes prepare updates automatically; activation is manual through Apply Update (or Apply & Relaunch for an open function). More contains Check for Changes, Pack Details and Remove Pack; removed packs expose Delete Saved Data there. Apply cancels an affected open function, finishes admitted work, briefly restarts the shared worker runtime, and relaunches its bare mnemonic without arguments. Other open functions remain mounted. A drain deadline postpones the update. Candidate startup failure retains the old installation; code fallback does not undo application writes.
 
 ```sh
 command-center pack check /path/to/pack

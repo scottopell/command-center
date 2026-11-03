@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T21:52:35.836Z",
+  "generatedAt": "2026-11-03T14:59:20.283Z",
   "project": "CommandCenter",
   "checks": {
     "typecheck": "passed",
@@ -9,8 +9,9 @@
       "failed": 0
     },
     "nativeTests": {
-      "passed": 35,
-      "failed": 0
+      "passed": 43,
+      "failed": 0,
+      "scope": "Functional suite; excludes retention soak, see compact-shell.json"
     },
     "specificationModels": 7,
     "build": "passed",
@@ -18,7 +19,7 @@
   },
   "nativeMeasurements": {
     "samples": 30,
-    "maximumDisplayFlushMs": 2.8769166656275047,
+    "maximumDisplayFlushMs": 3.9381250098813325,
     "releasedWebViews": 30,
     "scope": "Native display flush; not compositor latency or an RSS reclamation deadline"
   },
@@ -42,7 +43,9 @@
     "retainedLaunchText": true,
     "inlineDiscovery": true,
     "rotatingExamples": false,
-    "verification": "Native command retention, buffered input, invalid correction, draft focus and autocomplete fixtures"
+    "verification": "Native command retention, buffered input, invalid correction, draft focus and autocomplete fixtures",
+    "functionToolbar": true,
+    "inlineNavigation": true
   },
   "projectGroups": {
     "groups": [

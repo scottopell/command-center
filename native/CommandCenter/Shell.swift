@@ -7,6 +7,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     let command = NSTextField()
     let commandFrame = CommandInputFrame()
     let autocompleteButton = NSButton()
+    let functionToolbar = FunctionToolbar(frame:.zero)
     let content = NSView()
     let backButton = NSButton(title:"‹ Back",target:nil,action:nil)
     let previousButton = NSButton(title:"Previous",target:nil,action:nil)
@@ -25,7 +26,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     var entries = [(String,String)]()
     let collector:DiagnosticsCollector
     let stragglerNotice=NSTextField(labelWithString:"")
-    let packsButton=NSButton(title:"Functions…",target:nil,action:nil)
+    var packsButton:NSButton {functionToolbar.managementButton}
     var packsTimer:Timer?
     var management:PackManagement?
     var active: Invocation?
@@ -50,6 +51,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         self.clipboardWriter = clipboardWriter
         window = CommandCenterWindow(contentRect:NSRect(x:0,y:0,width:1280,height:850),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
         super.init()
+        functionToolbar.onLaunch={ [weak self] mnemonic in self?.launchFunction(mnemonic) }
         window.title = "CommandCenter"; window.minSize = NSSize(width:930,height:620); window.center()
         window.backgroundColor = NSColor(calibratedWhite:0.04,alpha:1)
         if let url = Bundle.main.url(forResource:"operations",withExtension:"json"), let data = try? Data(contentsOf:url), let registry = try? JSONSerialization.jsonObject(with:data) as? [String:[String:Bool]] { operationMetadata = registry }
@@ -93,7 +95,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     func escape() { if commandFocused { cancel();hideSuggestions() } else { focusCommand() } }
     func build() {
         let base=window.contentView!; base.wantsLayer=true
-        // REQ-SH-001/003: one command field; completion overlays content, never a fixed row.
+        // REQ-SH-001/003/017: one function input, a launcher toolbar, and overlaid autocomplete.
         command.font = .monospacedSystemFont(ofSize:16,weight:.medium)
         command.textColor=commandOrange;command.backgroundColor=NSColor(calibratedWhite:0.06,alpha:1)
         command.delegate=self;command.target=self;command.action=#selector(execute);command.focusRingType = .none
@@ -103,8 +105,10 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         commandFrame.layer?.borderWidth=1;commandFrame.layer?.borderColor=commandOrange.cgColor
         command.maximumNumberOfLines=1;command.cell?.usesSingleLineMode=true
         updateCommandFeedback()
-        let bar=NSStackView(views:[commandFrame]);bar.orientation = .horizontal;bar.alignment = .centerY
+        let bar=NSStackView(views:[backButton,previousButton,nextButton,siblingPosition,commandFrame]);bar.orientation = .horizontal;bar.alignment = .centerY;bar.spacing=6;bar.detachesHiddenViews=true
         bar.edgeInsets=NSEdgeInsets(top:8,left:12,bottom:8,right:12)
+        commandFrame.setContentHuggingPriority(.defaultLow,for:.horizontal)
+        commandFrame.setContentCompressionResistancePriority(.defaultLow,for:.horizontal)
         suggestions.orientation = .vertical;suggestions.spacing=2;suggestions.alignment = .leading
         suggestions.edgeInsets=NSEdgeInsets(top:5,left:5,bottom:5,right:5)
         suggestionPanel.wantsLayer=true;suggestionPanel.layer?.backgroundColor=NSColor(calibratedWhite:0.075,alpha:1).cgColor
@@ -114,21 +118,23 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         content.wantsLayer=true;content.layer?.backgroundColor=NSColor(calibratedWhite:0.035,alpha:1).cgColor
         overlay.font = .monospacedSystemFont(ofSize:17,weight:.medium);overlay.textColor=amber;overlay.maximumNumberOfLines=0;overlay.alignment = .center
         capture.shell=self; capture.isRichText=false;capture.isAutomaticQuoteSubstitutionEnabled=false;capture.isAutomaticDashSubstitutionEnabled=false;capture.isAutomaticSpellingCorrectionEnabled=false;capture.drawsBackground=false;capture.textColor = .clear
-        [bar,content,status,capture,suggestionPanel].forEach{ $0.translatesAutoresizingMaskIntoConstraints=false;base.addSubview($0) }
+        [bar,functionToolbar,content,status,stragglerNotice,capture,suggestionPanel].forEach{ $0.translatesAutoresizingMaskIntoConstraints=false;base.addSubview($0) }
         content.addSubview(overlay);overlay.translatesAutoresizingMaskIntoConstraints=false
         backButton.target=self;backButton.action=#selector(pointerBack)
         backButton.refusesFirstResponder=true;backButton.font = .monospacedSystemFont(ofSize:12,weight:.medium)
-        content.addSubview(backButton);backButton.translatesAutoresizingMaskIntoConstraints=false
         for (button,action,hint) in [(previousButton,#selector(previousSibling),"Previous item · ⌘⌥↑"),(nextButton,#selector(nextSibling),"Next item · ⌘⌥↓")] {
             button.target=self;button.action=action;button.toolTip=hint;button.refusesFirstResponder=true
             button.font = .monospacedSystemFont(ofSize:12,weight:.medium)
-            content.addSubview(button);button.translatesAutoresizingMaskIntoConstraints=false
         }
         siblingPosition.font = .monospacedSystemFont(ofSize:11,weight:.regular);siblingPosition.textColor=amber
-        content.addSubview(siblingPosition);siblingPosition.translatesAutoresizingMaskIntoConstraints=false
+        for view in [backButton,previousButton,nextButton,siblingPosition] {
+            view.setContentHuggingPriority(.required,for:.horizontal)
+            view.setContentCompressionResistancePriority(.required,for:.horizontal)
+        }
         packsButton.target=self;packsButton.action=#selector(showPackManagement);packsButton.refusesFirstResponder=true
         stragglerNotice.font = .monospacedSystemFont(ofSize:11,weight:.medium);stragglerNotice.textColor=commandOrange
-        for view in [packsButton,stragglerNotice]{content.addSubview(view);view.translatesAutoresizingMaskIntoConstraints=false}
+        stragglerNotice.setContentHuggingPriority(.required,for:.horizontal)
+        stragglerNotice.setContentCompressionResistancePriority(.required,for:.horizontal)
         commandFrame.addSubview(command);command.translatesAutoresizingMaskIntoConstraints=false
         autocompleteButton.image=NSImage(systemSymbolName:"chevron.down",accessibilityDescription:"Show functions")
         autocompleteButton.setAccessibilityLabel("Show functions");autocompleteButton.toolTip="Browse functions"
@@ -138,20 +144,17 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         suggestionPanel.addSubview(suggestions);suggestions.translatesAutoresizingMaskIntoConstraints=false
         suggestionHeight=suggestionPanel.heightAnchor.constraint(equalToConstant:10)
         NSLayoutConstraint.activate([
-            bar.topAnchor.constraint(equalTo:base.topAnchor),bar.leadingAnchor.constraint(equalTo:base.leadingAnchor),bar.trailingAnchor.constraint(equalTo:base.trailingAnchor),bar.heightAnchor.constraint(equalToConstant:50),commandFrame.heightAnchor.constraint(equalToConstant:32),commandFrame.widthAnchor.constraint(equalTo:bar.widthAnchor,constant:-24),
+            bar.topAnchor.constraint(equalTo:base.topAnchor),bar.leadingAnchor.constraint(equalTo:base.leadingAnchor),bar.trailingAnchor.constraint(equalTo:base.trailingAnchor),bar.heightAnchor.constraint(equalToConstant:50),commandFrame.heightAnchor.constraint(equalToConstant:32),commandFrame.widthAnchor.constraint(greaterThanOrEqualToConstant:240),
+            backButton.heightAnchor.constraint(equalToConstant:26),previousButton.heightAnchor.constraint(equalToConstant:26),nextButton.heightAnchor.constraint(equalToConstant:26),
             command.leadingAnchor.constraint(equalTo:commandFrame.leadingAnchor,constant:10),command.trailingAnchor.constraint(equalTo:autocompleteButton.leadingAnchor,constant:-6),command.centerYAnchor.constraint(equalTo:commandFrame.centerYAnchor),command.heightAnchor.constraint(equalToConstant:command.intrinsicContentSize.height),
             autocompleteButton.trailingAnchor.constraint(equalTo:commandFrame.trailingAnchor,constant:-5),autocompleteButton.centerYAnchor.constraint(equalTo:commandFrame.centerYAnchor),autocompleteButton.widthAnchor.constraint(equalToConstant:26),autocompleteButton.heightAnchor.constraint(equalToConstant:26),
             suggestionPanel.topAnchor.constraint(equalTo:bar.bottomAnchor,constant:-1),suggestionPanel.leadingAnchor.constraint(equalTo:commandFrame.leadingAnchor),suggestionPanel.trailingAnchor.constraint(equalTo:commandFrame.trailingAnchor),suggestionHeight,
             suggestions.topAnchor.constraint(equalTo:suggestionPanel.topAnchor),suggestions.bottomAnchor.constraint(equalTo:suggestionPanel.bottomAnchor),suggestions.leadingAnchor.constraint(equalTo:suggestionPanel.leadingAnchor),suggestions.trailingAnchor.constraint(equalTo:suggestionPanel.trailingAnchor),
-            content.topAnchor.constraint(equalTo:bar.bottomAnchor),content.leadingAnchor.constraint(equalTo:base.leadingAnchor),content.trailingAnchor.constraint(equalTo:base.trailingAnchor),content.bottomAnchor.constraint(equalTo:status.topAnchor,constant:-5),
-            status.leadingAnchor.constraint(equalTo:base.leadingAnchor,constant:12),status.trailingAnchor.constraint(equalTo:base.trailingAnchor,constant:-12),status.bottomAnchor.constraint(equalTo:base.bottomAnchor,constant:-7),
+            functionToolbar.topAnchor.constraint(equalTo:bar.bottomAnchor),functionToolbar.leadingAnchor.constraint(equalTo:base.leadingAnchor),functionToolbar.trailingAnchor.constraint(equalTo:base.trailingAnchor),functionToolbar.heightAnchor.constraint(equalToConstant:34),
+            content.topAnchor.constraint(equalTo:functionToolbar.bottomAnchor),content.leadingAnchor.constraint(equalTo:base.leadingAnchor),content.trailingAnchor.constraint(equalTo:base.trailingAnchor),content.bottomAnchor.constraint(equalTo:status.topAnchor,constant:-5),
+            status.leadingAnchor.constraint(equalTo:base.leadingAnchor,constant:12),status.trailingAnchor.constraint(equalTo:stragglerNotice.leadingAnchor,constant:-12),status.bottomAnchor.constraint(equalTo:base.bottomAnchor,constant:-7),
             overlay.centerXAnchor.constraint(equalTo:content.centerXAnchor),overlay.centerYAnchor.constraint(equalTo:content.centerYAnchor),overlay.widthAnchor.constraint(lessThanOrEqualTo:content.widthAnchor,constant:-70),
-            packsButton.trailingAnchor.constraint(equalTo:content.trailingAnchor,constant:-12),packsButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
-            stragglerNotice.trailingAnchor.constraint(equalTo:packsButton.leadingAnchor,constant:-12),stragglerNotice.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
-            backButton.topAnchor.constraint(equalTo:content.topAnchor,constant:5),backButton.leadingAnchor.constraint(equalTo:content.leadingAnchor,constant:12),backButton.heightAnchor.constraint(equalToConstant:26),
-            previousButton.leadingAnchor.constraint(equalTo:backButton.trailingAnchor,constant:12),previousButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
-            nextButton.leadingAnchor.constraint(equalTo:previousButton.trailingAnchor,constant:5),nextButton.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
-            siblingPosition.leadingAnchor.constraint(equalTo:nextButton.trailingAnchor,constant:10),siblingPosition.centerYAnchor.constraint(equalTo:backButton.centerYAnchor),
+            stragglerNotice.trailingAnchor.constraint(equalTo:base.trailingAnchor,constant:-12),stragglerNotice.centerYAnchor.constraint(equalTo:status.centerYAnchor),
             capture.leadingAnchor.constraint(equalTo:base.leadingAnchor),capture.bottomAnchor.constraint(equalTo:base.bottomAnchor),capture.widthAnchor.constraint(equalToConstant:1),capture.heightAnchor.constraint(equalToConstant:1)
         ]); updateSuggestions()
     }
@@ -257,7 +260,8 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         }
         suggestionHeight.constant=CGFloat(matches.count*34+8);suggestionPanel.isHidden=false
     }
-    @objc func selectSuggestion(_ sender:NSButton) { clearCommandError();command.stringValue=sender.identifier!.rawValue;focusCommand();execute() }
+    func launchFunction(_ mnemonic:String) {clearCommandError();command.stringValue=mnemonic;focusCommand();execute()}
+    @objc func selectSuggestion(_ sender:NSButton) {launchFunction(sender.identifier!.rawValue)}
     @objc func execute() {
         let acceptedAt=ProcessInfo.processInfo.systemUptime
         reloadCatalog()
@@ -267,6 +271,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         clearCommandError()
         let submitted=command.stringValue.trimmingCharacters(in:.whitespacesAndNewlines)
         retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted,started:acceptedAt);active=invocation;launched+=1
+        functionToolbar.setActiveFunction(invocation.mnemonic)
         beginMeasurement(invocation,kind:"launch",started:acceptedAt)
         updateBackControl()
         command.stringValue=submitted;hideSuggestions();overlay.stringValue="\(parsed.mnemonic) · Loading…";overlay.isHidden=false
@@ -281,7 +286,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         let view=FunctionWebView(frame:content.bounds,configuration:configuration);view.autoresizingMask=[.width,.height];view.navigationDelegate=self;view.underPageBackgroundColor=NSColor(calibratedWhite:0.035,alpha:1);web=view
         view.translatesAutoresizingMaskIntoConstraints=false
         content.addSubview(view,positioned:.below,relativeTo:overlay)
-        NSLayoutConstraint.activate([view.leadingAnchor.constraint(equalTo:content.leadingAnchor),view.trailingAnchor.constraint(equalTo:content.trailingAnchor),view.topAnchor.constraint(equalTo:content.topAnchor,constant:36),view.bottomAnchor.constraint(equalTo:content.bottomAnchor)])
+        NSLayoutConstraint.activate([view.leadingAnchor.constraint(equalTo:content.leadingAnchor),view.trailingAnchor.constraint(equalTo:content.trailingAnchor),view.topAnchor.constraint(equalTo:content.topAnchor),view.bottomAnchor.constraint(equalTo:content.bottomAnchor)])
         var url=URLComponents();url.scheme="commandcenter";url.host="app";url.path="/index.html";url.queryItems=[URLQueryItem(name:"function",value:parsed.mnemonic),URLQueryItem(name:"tail",value:parsed.tail)]
         view.load(URLRequest(url:url.url!))
         presentFunction()
@@ -475,7 +480,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     func webViewWebContentProcessDidTerminate(_ webView:WKWebView) {if webView === web,let i=active{fail("Function web process terminated. Relaunch the command.",i)}}
     func retire() {
         window.functionCanOwnFocus=false
-        guard let i=active else{return};i.retire();active=nil;retired+=1;updateBackControl()
+        guard let i=active else{return};i.retire();active=nil;functionToolbar.setActiveFunction(nil);retired+=1;updateBackControl()
         capture.inputContext?.discardMarkedText();capture.unmarkText();capture.string=""
         // REQ-SH-011, REQ-FF-006: revoke identity first, detach immediately; no unload hook.
         if let old=web {old.keyboardAllowed=false;old.evaluateJavaScript("window.commandCenterHost?.dispose()",completionHandler:nil);old.stopLoading();old.configuration.userContentController.removeScriptMessageHandler(forName:"commandCenter");old.navigationDelegate=nil;old.removeFromSuperview()};web=nil

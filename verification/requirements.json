@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T21:46:57.253Z",
+  "generatedAt": "2026-11-03T14:45:27.529Z",
   "scope": "Implementation-to-check mapping; not a claim that every possible interleaving was exhaustively explored",
   "requirements": [
     {
@@ -16,7 +16,8 @@
         "native/CommandCenterTests/InvocationTests.swift",
         "native/CommandCenterTests/WebKitTests.swift",
         "native/CommandCenterTests/BenchmarkTests.swift",
-        "verification/screen-smoke.json"
+        "verification/screen-smoke.json",
+        "native/CommandCenterTests/CommandBarTests.swift"
       ]
     },
     {
@@ -50,7 +51,8 @@
         "native/CommandCenterTests/InvocationTests.swift",
         "native/CommandCenterTests/WebKitTests.swift",
         "native/CommandCenterTests/BenchmarkTests.swift",
-        "verification/screen-smoke.json"
+        "verification/screen-smoke.json",
+        "native/CommandCenterTests/CommandBarTests.swift"
       ]
     },
     {
@@ -84,7 +86,8 @@
         "native/CommandCenterTests/InvocationTests.swift",
         "native/CommandCenterTests/WebKitTests.swift",
         "native/CommandCenterTests/BenchmarkTests.swift",
-        "verification/screen-smoke.json"
+        "verification/screen-smoke.json",
+        "native/CommandCenterTests/CommandBarTests.swift"
       ]
     },
     {
@@ -1294,7 +1297,8 @@
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
-        "native/CommandCenterTests/PackTests.swift"
+        "native/CommandCenterTests/PackTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
       ]
     },
     {
@@ -1366,7 +1370,8 @@
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
-        "native/CommandCenterTests/PackTests.swift"
+        "native/CommandCenterTests/PackTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
       ]
     },
     {
@@ -1420,7 +1425,8 @@
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
-        "native/CommandCenterTests/PackTests.swift"
+        "native/CommandCenterTests/PackTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
       ]
     },
     {
@@ -1438,7 +1444,8 @@
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
-        "native/CommandCenterTests/PackTests.swift"
+        "native/CommandCenterTests/PackTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
       ]
     },
     {
@@ -1539,6 +1546,20 @@
       "tests": [
         "tests/diagnostics.test.ts",
         "native/CommandCenterTests/StragglerTests.swift",
+        "native/CommandCenterTests/PackTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-SH-017",
+      "title": "Launch from a visible function toolbar",
+      "feature": "shell",
+      "code": [
+        "native/CommandCenter/FunctionToolbar.swift",
+        "native/CommandCenter/Shell.swift",
+        "native/CommandCenter/PackManagement.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/CommandBarTests.swift",
         "native/CommandCenterTests/PackTests.swift"
       ]
     }

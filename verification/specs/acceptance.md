@@ -157,3 +157,13 @@ The input operation records are abstract specification history, not a requiremen
 | Responsive without focus theft | Keep command focus while a destination mounts. Its transition measurement completes without focus transfer or buffer drainage. | REQ-ST-001 |
 | Forced straggler | Block SLOW for 600 ms. Record one straggler, keep loading and deliver buffered input; STRAG lists and opens the record. | REQ-ST-002, REQ-ST-004 |
 | Collector bounds | Repeated updates use one trace identity; terminal outcomes attach to it. Local reader bounds malformed/oversize files and supports offline CLI history. | REQ-ST-003, REQ-ST-004 |
+
+## Function toolbar
+
+| Scenario | Required observation | Requirements |
+| --- | --- | --- |
+| Visible shortcuts | The row below the function input lists installed mnemonics in catalog order with title tooltips; pack management occupies its right edge. | REQ-SH-017 |
+| Bare fresh launch | With SLOW running and a different draft command in the input, click SLOW. A new invocation starts with no tail, displays SLOW in the input, discards the old form draft, and receives fresh buffered input. | REQ-SH-002, REQ-SH-005, REQ-SH-017 |
+| Active highlight | Editing the input does not move the current-function highlight. Switching functions moves it; cancellation clears it. | REQ-SH-017 |
+| Overflow | Narrow the row. Every shortcut remains present either as a button or a More item, in the same order. Activating an overflow item launches once. Widening the row restores the shortcuts. | REQ-SH-017 |
+| Installed catalog changes | Apply an independent pack; its shortcuts appear. Refreshing added/removed catalog entries preserves the open invocation, input draft and keyboard focus. | REQ-PK-007, REQ-SH-017 |

@@ -44,9 +44,11 @@ import WebKit
         try code.write(to:ui,atomically:true,encoding:.utf8)
         try await manage("add",source:source.path)
         XCTAssertFalse(shell.entries.contains{$0.0=="NOTES"})
+        XCTAssertFalse(shell.functionToolbar.subviews.contains{$0.identifier?.rawValue=="function:NOTES"})
         launch("SLOW 0 NAV");try await waitFor{self.shell.active?.phase == .interactive};let unrelated=shell.active!.id
         try await manage("apply",id:"example.notes");XCTAssertEqual(shell.active?.id,unrelated)
         XCTAssertTrue(shell.entries.contains{$0.0=="NOTES"})
+        XCTAssertTrue(shell.functionToolbar.subviews.contains{$0.identifier?.rawValue=="function:NOTES"})
         launch("NOTES EXTRA");shell.append("discard this draft");try await waitFor{self.shell.active?.phase == .interactive}
         let draft=try await shell.web!.evaluateJavaScript("document.querySelector('textarea').value") as? String;XCTAssertEqual(draft,"discard this draft")
         code=code.replacingOccurrences(of:"Installed from an independent folder",with:"Updated independently")

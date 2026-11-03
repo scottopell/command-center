@@ -25,6 +25,13 @@ import WebKit
     func launch(_ command:String){shell.command.stringValue=command;shell.execute()}
     func js(_ code:String) async throws -> Any? { try await shell.web!.evaluateJavaScript(code) }
     func assertJS<T: Equatable>(_ code:String,_ expected:T) async throws { let value=try await js(code) as? T;XCTAssertEqual(value,expected) }
+    func waitJS(_ code:String) async throws {
+        let limit=Date().addingTimeInterval(8)
+        while (try await js(code) as? Bool) != true {
+            if Date()>limit {XCTFail("DOM condition timed out: \(code)");throw NSError(domain:"DOM timeout",code:1)}
+            try await Task.sleep(nanoseconds:20_000_000)
+        }
+    }
     func readyService() async throws {try await waitFor({FileManager.default.fileExists(atPath:self.directory.appendingPathComponent("connection.json").path)})}
     // REQ-SH-006/007/008/013, REQ-FF-007/009: actual WebKit document and native buffer.
     func testRealWebKitBufferedSequenceAndSubmitRefusal() async throws {
@@ -63,16 +70,17 @@ import WebKit
         try await readyService();launch("DRQS A 42");shell.append("Native integration report");shell.tab();shell.append("Literal evidence <script>window.bad=true</script>")
         try await waitFor({self.shell.active?.phase == .interactive})
         try await assertJS("document.querySelector('[name=group]').value","42")
+        // Screen readiness is independent of the directory/identity reads needed to submit.
+        try await waitJS("document.querySelector('form .actions button')?.disabled === false")
         _=try await js("document.querySelector('form').requestSubmit()")
+        try await waitJS("!!document.querySelector('[name=comment]') && document.querySelector('form.update > button')?.disabled === false")
         try await waitFor({self.shell.web != nil && self.shell.active?.phase == .interactive})
-        var found=false
-        for _ in 0..<100 {found=(try await js("!!document.querySelector('[name=comment]')") as? Bool)==true;if found{break};try await Task.sleep(nanoseconds:20_000_000)}
-        XCTAssertTrue(found);try await assertJS("window.bad===undefined",true)
+        try await assertJS("window.bad===undefined",true)
         _=try await js("document.querySelector('[name=comment]').value='draft comment';document.querySelector('.section-heading button').click()")
         try await Task.sleep(nanoseconds:150_000_000)
         try await assertJS("document.querySelector('[name=comment]').value","draft comment")
         _=try await js("document.querySelector('[name=state]').value='N';document.querySelector('[name=owner]').value='owner@example.com';document.querySelector('form').requestSubmit()")
-        try await Task.sleep(nanoseconds:200_000_000)
+        try await waitJS("document.querySelectorAll('.history section').length === 1 && document.querySelector('[name=comment]')?.value === ''")
         try await assertJS("document.querySelectorAll('.history section').length",1)
         try await assertJS("document.querySelector('[name=comment]').value","")
     }

@@ -29,7 +29,9 @@ The shell owns command admission, invocation identity, buffered input, and visua
 | **REQ-SH-015:** Open sources outside the function document | ✅ Complete | URL/phase/generation guards, trusted-click check and bundled navigation tested; live archive handoff observed. |
 | **REQ-SH-016:** Copy intentionally selected display text | ✅ Complete | Actual WebKit selection, native Select All/pasteboard and authority/size/failure guards verified. |
 
-**Progress:** 15 of 15 active requirements complete; 1 deprecated requirement retained.
+| **REQ-SH-017:** Launch from a visible function toolbar | ✅ Complete | Catalog shortcuts, overflow, fresh launches, active highlighting, focus-safe refresh and inline navigation verified. |
+
+**Progress:** 16 of 16 active requirements complete; 1 deprecated requirement retained.
 
 Implementation evidence: [code, tests and measurement scope](../../verification/README.md).
 

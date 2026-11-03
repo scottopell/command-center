@@ -20,8 +20,8 @@ All feature specs share this one chain. Accepted records explain agreed decision
 | [ADR-014](014_public-project-groups.md) | Accepted | Authored project routing groups and an explicit Inbox |
 | [ADR-015](015_build-time-function-composition.md) | Superseded by ADR-017 | Explicit build-time function composition from an optional local checkout |
 | [ADR-016](016_reproducible-local-verification.md) | Accepted | Pinned build inputs, preflight and isolated packaged-runtime verification |
-
 | [ADR-017](017_runtime-packs-and-transition-diagnostics.md) | Accepted | Runtime local packs, safe shared-worker activation and transition diagnostics |
+| [ADR-018](018_function-toolbar.md) | Accepted | Visible catalog shortcuts with ordinary fresh-invocation launch |
 
 ## Task routing
 
