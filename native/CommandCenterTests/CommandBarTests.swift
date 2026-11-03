@@ -10,7 +10,7 @@ import WebKit
         shell=Shell(backend:isolatedBackend(),externalOpener:{[weak self] url in self?.opened.append(url);return true})
         try requireForegroundWebKit(shell.window)
     }
-    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;opened=[]}
+    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:shell.backend.directory)};shell.window.orderOut(nil);shell=nil;opened=[]}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let limit=Date().addingTimeInterval(8)
         while !condition(){if Date()>limit{XCTFail("Timed out: \(shell.status.stringValue)");throw NSError(domain:"Timeout",code:1)};try await Task.sleep(nanoseconds:10_000_000)}
@@ -160,7 +160,7 @@ import WebKit
 @MainActor final class ShellLayoutTests:XCTestCase {
     // REQ-SH-001/017: preserve real spacing and shared rows across system button ornamentation.
     func testNavigationAlignmentAndAdjacentContentAtSupportedWidths() throws {
-        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();shell.window.orderOut(nil);SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:shell.backend.directory)}
+        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();shell.window.orderOut(nil);try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:shell.backend.directory)}}
         let base=try XCTUnwrap(shell.window.contentView)
         func alignment(_ view:NSView)->NSRect {base.convert(view.alignmentRect(forFrame:view.frame),from:view.superview)}
         for width:CGFloat in [930,1280] {

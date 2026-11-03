@@ -19,7 +19,7 @@ import Darwin
 
     // REQ-PK-013: separate selections and value copies keep a generation leased.
     func testRetainsCurrentAndAllOwnersThenReclaimsLastRelease() throws {
-        let data=try fixture();defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=try fixture();defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         var first:SDKRuntime?=try select("a",in:data),copy=first,second:SDKRuntime?=try select("a",in:data)
         let old=first!.directory,current=try select("b",in:data)
         defer{withExtendedLifetime(current){}}
@@ -31,7 +31,7 @@ import Darwin
     }
 
     func testReclaimsAbandonedEntriesButLeavesUnrelatedFilesAndSymlinks() throws {
-        let data=try fixture();defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=try fixture();defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         let current=try select("a",in:data),root=data.appendingPathComponent("runtimes")
         defer{withExtendedLifetime(current){}}
         let stale=root.appendingPathComponent(String(repeating:"b",count:64)),stage=root.appendingPathComponent(".staging-"+UUID().uuidString),trash=root.appendingPathComponent(".trash-"+UUID().uuidString)
@@ -44,7 +44,7 @@ import Darwin
     }
 
     func testCleanupFailurePreservesCurrentAndRetriesOnLaterActivity() throws {
-        let data=try fixture();defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=try fixture();defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         let current=try select("a",in:data),stale=data.appendingPathComponent("runtimes/"+String(repeating:"b",count:64))
         defer{withExtendedLifetime(current){}}
         // A malformed lease cannot be safely locked; the sweeper must leave it alone.
@@ -55,7 +55,7 @@ import Darwin
         SDKRuntimeCache.queue.sync{};XCTAssertFalse(exists(stale))
     }
     func testOtherProcessLeaseSurvivesSweepAndCrashReleasesIt() throws {
-        let data=try fixture();defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=try fixture();defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         var old:SDKRuntime?=try select("a",in:data)
         let oldDirectory=old!.directory,current=try select("b",in:data)
         defer{withExtendedLifetime(current){}}
@@ -84,7 +84,7 @@ import Darwin
     }
 
     func testSweepDoesNotWaitForSelectionAndCleansAfterCoordinationReleases() throws {
-        let data=try fixture();defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=try fixture();defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         let current=try select("a",in:data),root=data.appendingPathComponent("runtimes"),stale=root.appendingPathComponent(String(repeating:"b",count:64))
         defer{withExtendedLifetime(current){}}
         SDKRuntimeCache.queue.sync{}

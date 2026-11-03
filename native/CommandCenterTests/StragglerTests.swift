@@ -75,7 +75,7 @@ private final class ReadinessMessages:NSObject,WKScriptMessageHandler {
     }
 
     func testShellForwardsApplicationAndWindowVisibilityEvents() throws {
-        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();shell.window.orderOut(nil);SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:shell.backend.directory)}
+        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();shell.window.orderOut(nil);try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:shell.backend.directory)}}
         let invocation=Invocation("SLOW","",commandText:"SLOW");shell.active=invocation
         for (name,object) in [(NSApplication.didResignActiveNotification,NSApp as AnyObject),(NSWindow.didChangeOcclusionStateNotification,shell.window as AnyObject)] {
             var foreground=true

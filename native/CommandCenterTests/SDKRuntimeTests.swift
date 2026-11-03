@@ -13,7 +13,7 @@ private final class SDKMessages:NSObject,WKScriptMessageHandler {
     // REQ-PK-011: actual module loading/React hooks with unchanged function bytes; no pixel claim.
     func testOpenDocumentPinsSDKAndNextDocumentAdoptsNewSameEpochRuntime() async throws {
         let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString)
-        defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         let source=data.appendingPathComponent("service/toolchain/runtime")
         try FileManager.default.createDirectory(at:source.deletingLastPathComponent(),withIntermediateDirectories:true)
         try FileManager.default.copyItem(at:SDKRuntime.bundled.directory,to:source)
@@ -57,7 +57,7 @@ private final class SDKMessages:NSObject,WKScriptMessageHandler {
 
     // REQ-PK-012: reject incompatible local runtimes before resolving a function's imports.
     func testEpochMismatchAndUntrustedRuntimePathsAreRejected() throws {
-        let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString);defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
+        let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString);defer{try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:data)}}
         let source=data.appendingPathComponent("service/toolchain/runtime");try FileManager.default.createDirectory(at:source.deletingLastPathComponent(),withIntermediateDirectories:true)
         try FileManager.default.copyItem(at:SDKRuntime.bundled.directory,to:source)
         let file=source.appendingPathComponent("runtime.json");var manifest=try JSONSerialization.jsonObject(with:Data(contentsOf:file)) as! [String:Any]

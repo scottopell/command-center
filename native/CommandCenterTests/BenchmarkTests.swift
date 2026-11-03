@@ -21,7 +21,7 @@ private final class BundleReadyBridge:NSObject,WKScriptMessageHandler {
     }
     // REQ-SH-006/011, REQ-FF-006: raw samples, foreground native render flush and ownership.
     func testWarmLaunchSamplesAndRepeatedDisposal() async throws {
-        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil)}
+        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();try? SDKRuntimeCache.queue.sync{try FileManager.default.removeItem(at:shell.backend.directory)};shell.window.orderOut(nil)}
         try requireForegroundWebKit(shell.window)
         var released=0,escapeSamples=[Double]()
         for index in 0..<30 {
