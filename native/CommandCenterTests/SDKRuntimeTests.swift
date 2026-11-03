@@ -13,7 +13,7 @@ private final class SDKMessages:NSObject,WKScriptMessageHandler {
     // REQ-PK-011: actual module loading/React hooks with unchanged function bytes; no pixel claim.
     func testOpenDocumentPinsSDKAndNextDocumentAdoptsNewSameEpochRuntime() async throws {
         let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString)
-        defer{try? FileManager.default.removeItem(at:data)}
+        defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
         let source=data.appendingPathComponent("service/toolchain/runtime")
         try FileManager.default.createDirectory(at:source.deletingLastPathComponent(),withIntermediateDirectories:true)
         try FileManager.default.copyItem(at:SDKRuntime.bundled.directory,to:source)
@@ -43,6 +43,12 @@ private final class SDKMessages:NSObject,WKScriptMessageHandler {
         let first=try await open(generation("a"));defer{first.stopLoading();first.configuration.userContentController.removeScriptMessageHandler(forName:"commandCenter")}
         _=try await first.evaluateJavaScript("document.querySelector('[name=title]').value='Retained SDK draft';true")
         let second=try await open(generation("b"));defer{second.stopLoading();second.configuration.userContentController.removeScriptMessageHandler(forName:"commandCenter")}
+        // REQ-PK-013: the asset handler alone pins the old generation. A new
+        // module request after sweeping must still read its files from disk.
+        SDKRuntimeCache.queue.sync{SDKRuntimeCache.collect(in:data.appendingPathComponent("runtimes"))}
+        let oldURL="commandcenter://app/__runtime/"+String(repeating:"a",count:64)+"/browser/framework.js?lease-check=1"
+        let reread=try await first.callAsyncJavaScript("await import(url); return globalThis.__sdkRuntimeFixture;",arguments:["url":oldURL],in:nil,contentWorld:.page) as? String
+        XCTAssertEqual(reread,"a")
         let old=try await first.evaluateJavaScript("globalThis.__sdkRuntimeFixture") as? String,new=try await second.evaluateJavaScript("globalThis.__sdkRuntimeFixture") as? String
         XCTAssertEqual(old,"a");XCTAssertEqual(new,"b")
         let draft=try await first.evaluateJavaScript("document.querySelector('[name=title]').value") as? String;XCTAssertEqual(draft,"Retained SDK draft")
@@ -51,7 +57,7 @@ private final class SDKMessages:NSObject,WKScriptMessageHandler {
 
     // REQ-PK-012: reject incompatible local runtimes before resolving a function's imports.
     func testEpochMismatchAndUntrustedRuntimePathsAreRejected() throws {
-        let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString);defer{try? FileManager.default.removeItem(at:data)}
+        let data=FileManager.default.temporaryDirectory.appendingPathComponent("cc-sdk-"+UUID().uuidString);defer{SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:data)}
         let source=data.appendingPathComponent("service/toolchain/runtime");try FileManager.default.createDirectory(at:source.deletingLastPathComponent(),withIntermediateDirectories:true)
         try FileManager.default.copyItem(at:SDKRuntime.bundled.directory,to:source)
         let file=source.appendingPathComponent("runtime.json");var manifest=try JSONSerialization.jsonObject(with:Data(contentsOf:file)) as! [String:Any]

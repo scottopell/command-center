@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-03T21:17:17.716Z",
+  "requirement": "REQ-PK-013",
+  "focusedNative": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cases": [
+    "Current shell selection, independent selections and copied SDK values retain shared leases",
+    "Last local owner release schedules reclamation",
+    "A separate native process protects its generation; SIGKILL releases the lease",
+    "Fresh module URL in an old WebKit document still loads after a sweep",
+    "Generated staging/trash cleanup preserves unknown entries, symlinks and source/application files",
+    "Failed lease acquisition leaves the generation intact; later activity retries",
+    "Sweeper does not wait on the selection coordination lock"
+  ],
+  "scope": "Host-owned browser-runtime cache only; no pack source/build removal or application-data deletion",
+  "build": "passed",
+  "specs": "Seven models checked and analysed without findings",
+  "fullNativeLocal": {
+    "passed": 28,
+    "skipped": 33,
+    "failed": 0,
+    "limitation": "Foreground cases skipped because the test host could not obtain a visible window"
+  }
+}

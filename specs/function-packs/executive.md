@@ -24,8 +24,9 @@ See [ADR-017](../adrs/017_runtime-packs-and-transition-diagnostics.md). The host
 | **REQ-PK-010:** Keep system dependencies explicit | ✅ Complete | One explicit host-wired read-only STRAG dependency; folder system identity refused. |
 | **REQ-PK-011:** Adopt compatible host runtime updates automatically | ✅ Complete | Shared browser/worker runtime, immutable document generations and source-independent adoption checks. |
 | **REQ-PK-012:** Reject incompatible installed code without losing data | ✅ Complete | Epoch gates at build/startup/activation and retained unavailable packs. |
+| **REQ-PK-013:** Reclaim unused runtime generations | ✅ Complete | Shared OS leases, crash recovery, cache confinement and real WebKit resource rereads verified. |
 
-**Progress:** 12 of 12 complete.
+**Progress:** 13 of 13 complete.
 
 ## Open Questions & Future Directions
 

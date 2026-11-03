@@ -177,3 +177,11 @@ The input operation records are abstract specification history, not a requiremen
 | Compatible runtime replacement | Keep function artifact bytes and revision unchanged, replace the host runtime with another generation in the same epoch, and start a worker/view. The new SDK takes effect without reading or applying changed source. An existing document keeps its old runtime and draft. | REQ-PK-011 |
 | Incompatible installed artifact | Start with a legacy missing-epoch artifact or a different epoch. Its worker is never imported; its functions show Update required. Other packs work, identities remain reserved and saved data remains. A compatible rebuild and explicit Apply restore access. | REQ-PK-012 |
 | Source compatibility | Check registered source against the current SDK without applying it. A missing source or type error yields non-success; unsupported SDK exports fail clearly instead of hanging at launch. | REQ-PK-003, REQ-PK-012 |
+
+## Runtime cache reclamation
+
+| Scenario | Required observation | Requirements |
+| --- | --- | --- |
+| Live generation leases | Select a new runtime while an old document is open, then sweep. The current generation and all old generations with live owners remain; the old WebView can request a previously uncached module URL. Releasing the final owner reclaims the old generation. | REQ-PK-011, REQ-PK-013 |
+| Process exit | Another app process holds a generation lease. Sweeping leaves it intact; killing that process releases the lease and later cache activity reclaims it. | REQ-PK-013 |
+| Cleanup boundaries | Reclaim abandoned staging/trash and unleased generation folders. Preserve unknown entries, symlinks, application data and source runtime files. A malformed lease is retained and logged; later activity retries after repair. A sweep never waits for an in-progress selection. | REQ-PK-013 |

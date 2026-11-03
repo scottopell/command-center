@@ -6,6 +6,7 @@ struct SDKRuntime {
     struct Manifest:Decodable {let apiEpoch:Int;let fingerprint:String;let imports:[String:String]}
     let directory:URL
     let manifest:Manifest
+    private var lease:SDKRuntimeLease?
     static let bundled=try! SDKRuntime(directory:Bundle.main.resourceURL!.appendingPathComponent("toolchain/runtime"))
     init(directory:URL) throws {
         self.directory=directory
@@ -24,17 +25,22 @@ struct SDKRuntime {
         }
         guard selected.manifest.apiEpoch==bundled.manifest.apiEpoch else{throw NSError(domain:"Update required: restart the matching CommandCenter app and local service.",code:1)}
         let generations=data.appendingPathComponent("runtimes"),destination=generations.appendingPathComponent(selected.manifest.fingerprint)
-        if !FileManager.default.fileExists(atPath:destination.appendingPathComponent("runtime.json").path) {
-            try FileManager.default.createDirectory(at:generations,withIntermediateDirectories:true)
-            let staging=generations.appendingPathComponent(".staging-"+UUID().uuidString)
-            defer{try? FileManager.default.removeItem(at:staging)}
-            try FileManager.default.createDirectory(at:staging,withIntermediateDirectories:true)
-            try FileManager.default.copyItem(at:selected.directory.appendingPathComponent("browser"),to:staging.appendingPathComponent("browser"))
-            try FileManager.default.copyItem(at:selected.directory.appendingPathComponent("runtime.json"),to:staging.appendingPathComponent("runtime.json"))
-            guard try SDKRuntime(directory:staging).manifest.fingerprint==selected.manifest.fingerprint else{throw NSError(domain:"Host runtime changed while copying. Try again.",code:1)}
-            try FileManager.default.moveItem(at:staging,to:destination)
+        let pinned=try SDKRuntimeCache.withSelectionLock(in:generations) {
+            if !FileManager.default.fileExists(atPath:destination.appendingPathComponent("runtime.json").path) {
+                let staging=generations.appendingPathComponent(".staging-"+UUID().uuidString)
+                defer{try? FileManager.default.removeItem(at:staging)}
+                try FileManager.default.createDirectory(at:staging,withIntermediateDirectories:true)
+                try FileManager.default.copyItem(at:selected.directory.appendingPathComponent("browser"),to:staging.appendingPathComponent("browser"))
+                try FileManager.default.copyItem(at:selected.directory.appendingPathComponent("runtime.json"),to:staging.appendingPathComponent("runtime.json"))
+                guard try SDKRuntime(directory:staging).manifest.fingerprint==selected.manifest.fingerprint else{throw NSError(domain:"Host runtime changed while copying. Try again.",code:1)}
+                try FileManager.default.moveItem(at:staging,to:destination)
+            }
+            var runtime=try SDKRuntime(directory:destination)
+            runtime.lease=try SDKRuntimeCache.lease(directory:destination,root:generations)
+            return runtime
         }
-        return try SDKRuntime(directory:destination)
+        SDKRuntimeCache.scheduleCleanup(in:generations)
+        return pinned
     }
     func prepareHTML(_ data:Data) throws -> Data {
         guard var html=String(data:data,encoding:.utf8),html.contains("<!-- COMMAND_CENTER_RUNTIME -->") else{throw NSError(domain:"Update required: rebuild this legacy function with API epoch \(manifest.apiEpoch).",code:1)}

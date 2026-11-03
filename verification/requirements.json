@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T14:45:27.529Z",
+  "generatedAt": "2026-11-03T21:17:17.715Z",
   "scope": "Implementation-to-check mapping; not a claim that every possible interleaving was exhaustively explored",
   "requirements": [
     {
@@ -1597,6 +1597,19 @@
         "tests/packs.test.ts",
         "native/CommandCenterTests/SDKRuntimeTests.swift",
         "native/CommandCenterTests/PackManagementTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-013",
+      "title": "Reclaim unused runtime generations",
+      "feature": "function-packs",
+      "code": [
+        "native/CommandCenter/SDKRuntimeCache.swift",
+        "native/CommandCenter/SDKRuntime.swift"
+      ],
+      "tests": [
+        "native/CommandCenterTests/SDKRuntimeCacheTests.swift",
+        "native/CommandCenterTests/SDKRuntimeTests.swift"
       ]
     }
   ]

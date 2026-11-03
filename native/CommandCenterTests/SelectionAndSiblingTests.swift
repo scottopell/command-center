@@ -13,7 +13,7 @@ import WebKit
         shell=Shell(backend:isolatedBackend(),clipboardWriter:{[weak self] text in self?.copied.append(text);return true},externalOpener:{_ in false})
         try requireForegroundWebKit(shell.window)
     }
-    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;copied=[]}
+    override func tearDownWithError() throws {shell.cancel();shell.collector.flush();SDKRuntimeCache.queue.sync{};try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;copied=[]}
     func js(_ code:String) async throws->Any? {try await shell.web!.evaluateJavaScript(code)}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let deadline=Date().addingTimeInterval(8)

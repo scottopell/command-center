@@ -92,7 +92,7 @@ No native build or private npm install is needed for platform-provided dependenc
 
 ## Runtime updates and compatibility
 
-`apiEpoch` is the only compatibility declaration. CC supports one epoch across the SDK, native bridge and workers. SDK implementation changes within that epoch reach the next function launch and worker start automatically, without a pack rebuild or Apply. Open documents retain their selected immutable runtime and drafts. Ordinary source edits still require manual Apply. A build fingerprint records which SDK checked an artifact; a different fingerprint does not block it.
+`apiEpoch` is the only compatibility declaration. CC supports one epoch across the SDK, native bridge and workers. SDK implementation changes within that epoch reach the next function launch and worker start automatically, without a pack rebuild or Apply. Open documents retain their selected immutable runtime and drafts. Cached runtime generations are reclaimed in the background after their last shell/document lease ends; process exit releases leases automatically. Ordinary source edits still require manual Apply. A build fingerprint records which SDK checked an artifact; a different fingerprint does not block it.
 
 For a breaking API change, bump the epoch and update your functions together. Run pack check/test against the new SDK. A missing or mismatched epoch gives Update required; that pack's workers are not imported, while its registration, installed code and saved data remain. Other compatible packs continue to work. A breaking host upgrade restarts the app and drains worker requests through normal service replacement; it does not preserve old UI instances or migrate stored data automatically.
 

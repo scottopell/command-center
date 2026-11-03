@@ -1,5 +1,5 @@
 -- allium: 3
--- REQ-PK-003, REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009, REQ-PK-011, REQ-PK-012
+-- REQ-PK-003, REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009, REQ-PK-011, REQ-PK-012, REQ-PK-013
 
 entity FunctionPack {
     identity: String
@@ -115,6 +115,13 @@ contract PackBoundary {
         -- no function rebuild or source Apply. Open documents pin immutable
         -- runtime resources. Source edits remain manual Apply. Runtime build
         -- fingerprints are diagnostic, not another compatibility constraint.
+    @invariant RuntimeCacheLifetime
+        -- Live shell selections and document asset handlers retain shared
+        -- generation leases. Reclamation serializes with acquisition across
+        -- app processes and removes only unleased generated cache entries.
+        -- OS process death releases leases. Retirement is atomic; recursive
+        -- deletion runs outside the coordination lock and transition path.
+        -- Cleanup errors are logged and retried on later cache activity.
     @invariant IndependentOwnership
         -- Mnemonics are unique labels. Persistent data is owned by stable pack
         -- and function identity; removing code does not delete retained records.

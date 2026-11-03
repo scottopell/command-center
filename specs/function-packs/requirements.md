@@ -77,3 +77,9 @@ WHEN the host supplies a new runtime within the supported epoch, subsequent laun
 THE SYSTEM SHALL check epochs during build, activation, installed artifact loading and worker startup. Missing or mismatched epochs SHALL make the affected functions unavailable with an actionable Update required explanation while retaining their code, registration and data. Compatible functions SHALL remain usable. Applying a breaking host upgrade SHALL retire old UI instances and drain admitted worker requests before replacement. The platform SHALL support one epoch without version negotiation, compatibility adapters or automatic source/data migrations.
 
 **Rationale:** A sole maintainer can change functions and the platform together while detecting wrong combinations explicitly.
+
+### REQ-PK-013: Reclaim unused runtime generations
+
+THE SYSTEM SHALL automatically reclaim host-cached SDK generations that are neither selected by a live shell nor retained by a function document, including generations abandoned by a terminated process. Selection and reclamation SHALL coordinate so a generation cannot be removed while it is being acquired or read by another CommandCenter process. Cleanup SHALL run outside the screen-transition path, remain confined to generated runtime-cache entries, and leave function data, installed pack artifacts and source runtimes intact. Cleanup failures SHALL be logged and retried on later cache activity without failing a function launch.
+
+**Rationale:** SDK updates must not accumulate obsolete code or break an open view.

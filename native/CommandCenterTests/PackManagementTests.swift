@@ -24,7 +24,7 @@ private final class PackUIBackend: Backend {
     }
     override func tearDownWithError() throws {
         controller.panel.orderOut(nil);controller=nil;shell.cancel();shell.collector.flush();shell.window.orderOut(nil);shell=nil
-        try FileManager.default.removeItem(at:backend.directory);backend=nil
+        SDKRuntimeCache.queue.sync{};try FileManager.default.removeItem(at:backend.directory);backend=nil
     }
     func pack(_ status:String="active",installed:Bool=true)->[String:Any] {
         var value:[String:Any]=["id":"example.notes","source":"/Users/example/dev/personal-functions","status":status,"candidate":revision]

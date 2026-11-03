@@ -17,7 +17,7 @@ import WebKit
     }
     override func tearDownWithError() throws {
         shell.cancel();shell.window.orderOut(nil);shell=nil
-        if process.isRunning {process.terminate();process.waitUntilExit()};try FileManager.default.removeItem(at:directory)
+        if process.isRunning {process.terminate();process.waitUntilExit()};SDKRuntimeCache.queue.sync{};try FileManager.default.removeItem(at:directory)
     }
     func waitFor(_ condition: @escaping ()->Bool, seconds:Double=8) async throws {
         let limit=Date().addingTimeInterval(seconds)
