@@ -1,0 +1,726 @@
+{
+  "checkedAt": "2026-11-03T21:42:13.415Z",
+  "commit": "853e09b4b65f05190fe4d9acc065118f290fc0cd",
+  "method": "31 SLOW 0 commands launched through native accessibility input/Return in the live CommandCenter app; production STRAG recorder provides all timings. Current host SDK/React and normal immutable generation URLs.",
+  "endpoint": "Native acceptance of the submitted command to the actual framework frame/queued-task responsiveness checkpoint",
+  "limits": "Automated operator interaction with the live production shell. Native app startup, OS/filesystem cache coldness and isolated JavaScript parsing are not measured. One first-use observation is not a cold-start distribution. No artificial SLOW delay or worker requests. Accessibility inspection may perturb timings.",
+  "profile": {
+    "chip": "Apple M5 Pro",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "processors": 18,
+    "physicalMemoryBytes": 68719476736,
+    "apiEpoch": 1,
+    "runtimeFingerprint": "e8efb99e9afed13da24a80a1a09279d54eb62db85b6e18a200d901a552a0cae1"
+  },
+  "firstUseEvidence": "App restarted before the sequence; recorder had zero function transitions between process start and this sequence. OS/filesystem/WebKit caches were not cleared. Ordering uses collector file-write times because start timestamps have second precision.",
+  "summary": {
+    "firstUseAfterAppRestart": {
+      "count": 1,
+      "medianMs": 212.27379166521132,
+      "p95Ms": 212.27379166521132,
+      "minimumMs": 212.27379166521132,
+      "maximumMs": 212.27379166521132,
+      "over500ms": 0
+    },
+    "repeated": {
+      "count": 30,
+      "medianMs": 100.83749999466818,
+      "p95Ms": 113.38774999603629,
+      "minimumMs": 90.31854166823905,
+      "maximumMs": 114.22691667394247,
+      "over500ms": 0
+    },
+    "all": {
+      "count": 31,
+      "medianMs": 101.04791667254176,
+      "p95Ms": 114.22691667394247,
+      "minimumMs": 90.31854166823905,
+      "maximumMs": 212.27379166521132,
+      "over500ms": 0
+    }
+  },
+  "samples": [
+    {
+      "index": 0,
+      "id": "1DA080A0-6ADB-4819-A606-3EB0E940DDE9",
+      "startedAt": "2026-11-03T21:40:42Z",
+      "elapsedMs": 212.27379166521132,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 11,
+        "nativeReadyMs": 212.2480833204463
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 1,
+      "id": "E962D1C6-336F-45CB-B4A8-503516EA819E",
+      "startedAt": "2026-11-03T21:40:58Z",
+      "elapsedMs": 105.25841667549685,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 15,
+        "nativeReadyMs": 105.2357083390234
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 2,
+      "id": "BA966982-FFFA-4BD1-9A1F-66C015EA2B60",
+      "startedAt": "2026-11-03T21:40:58Z",
+      "elapsedMs": 99.26991666725371,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 11,
+        "nativeReadyMs": 99.24658332602121,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 3,
+      "id": "0F528686-8D2A-42B0-9EEE-5BF5A7941130",
+      "startedAt": "2026-11-03T21:40:59Z",
+      "elapsedMs": 105.96412500308361,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 5,
+        "checkpointMs": 15,
+        "nativeReadyMs": 105.94170833064709
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 4,
+      "id": "8035838F-BDD2-4FF2-BF92-340984EFC940",
+      "startedAt": "2026-11-03T21:40:59Z",
+      "elapsedMs": 90.57320831925608,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 8,
+        "nativeReadyMs": 90.54904166259803,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 5,
+      "id": "4256E832-6B26-4C55-83FC-93093C0F9E39",
+      "startedAt": "2026-11-03T21:41:00Z",
+      "elapsedMs": 102.26258332841098,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 10,
+        "nativeReadyMs": 102.23550000227988
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 6,
+      "id": "DCB7646C-CBBF-4B1E-8150-5ABB4A9A1892",
+      "startedAt": "2026-11-03T21:41:00Z",
+      "elapsedMs": 99.70620833337307,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 6,
+        "nativeReadyMs": 99.67162499378901,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 7,
+      "id": "38847FB5-A1D9-485D-B83C-8A40BCA173CB",
+      "startedAt": "2026-11-03T21:41:01Z",
+      "elapsedMs": 92.74879166332539,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 7,
+        "nativeReadyMs": 92.72654165397398,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 8,
+      "id": "3F2D885C-34D5-4D3E-A746-B423D6DF259C",
+      "startedAt": "2026-11-03T21:41:01Z",
+      "elapsedMs": 90.31854166823905,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "nativeReadyMs": 90.29708332673181,
+        "checkpointMs": 6,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 9,
+      "id": "89B7B030-FBF4-46E3-A699-152E07CE3935",
+      "startedAt": "2026-11-03T21:41:02Z",
+      "elapsedMs": 99.85558333573863,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 13,
+        "preparedMs": 5,
+        "nativeReadyMs": 99.83091666072141
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 10,
+      "id": "002C3CA1-394D-49B4-913E-DB4583D0F26B",
+      "startedAt": "2026-11-03T21:41:02Z",
+      "elapsedMs": 92.11558333481662,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 5,
+        "checkpointMs": 6,
+        "nativeReadyMs": 92.09008332982194
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 11,
+      "id": "3D3ACE89-8ADC-4357-800C-222ED10D333C",
+      "startedAt": "2026-11-03T21:41:08Z",
+      "elapsedMs": 104.53650000272319,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 15,
+        "nativeReadyMs": 104.50604166544508,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 12,
+      "id": "EA6859AF-EEFC-4486-AB04-E7E9A9EA55D3",
+      "startedAt": "2026-11-03T21:41:08Z",
+      "elapsedMs": 101.04791667254176,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 11,
+        "nativeReadyMs": 101.02683333388995
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 13,
+      "id": "D756ECC5-C54A-4A22-BFC8-5C78C56ED3DC",
+      "startedAt": "2026-11-03T21:41:09Z",
+      "elapsedMs": 100.08287499658763,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 8,
+        "nativeReadyMs": 100.0603333231993,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 14,
+      "id": "D725C00E-E406-4A77-A165-6914591F7209",
+      "startedAt": "2026-11-03T21:41:09Z",
+      "elapsedMs": 95.45087500009686,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 7,
+        "nativeReadyMs": 95.42720833269414
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 15,
+      "id": "3FC4EB3F-D4D0-4D1A-A85B-4DF4C0BA3317",
+      "startedAt": "2026-11-03T21:41:10Z",
+      "elapsedMs": 102.85608332196716,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 11,
+        "preparedMs": 5,
+        "nativeReadyMs": 102.82841666776221
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 16,
+      "id": "F5DFD74F-F044-442B-9C3E-D499B9470C6B",
+      "startedAt": "2026-11-03T21:41:10Z",
+      "elapsedMs": 114.22691667394247,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 9,
+        "nativeReadyMs": 114.20241666201036,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 17,
+      "id": "06BE51F8-912A-444E-B901-81BFE08911AA",
+      "startedAt": "2026-11-03T21:41:11Z",
+      "elapsedMs": 101.52479166572448,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 11,
+        "nativeReadyMs": 101.49120833375491,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 18,
+      "id": "3DC500F8-8EDC-4518-A3C4-3AF5D1C554B5",
+      "startedAt": "2026-11-03T21:41:11Z",
+      "elapsedMs": 100.57400001096539,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "nativeReadyMs": 100.54983333975542,
+        "checkpointMs": 10,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 19,
+      "id": "568FB18A-583C-462C-ADE4-1ABF982E67EE",
+      "startedAt": "2026-11-03T21:41:12Z",
+      "elapsedMs": 100.66295832803007,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 6,
+        "nativeReadyMs": 100.64204166701529,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 20,
+      "id": "BC91081F-2D93-40D9-A38B-FFA3EC3FD3F8",
+      "startedAt": "2026-11-03T21:41:12Z",
+      "elapsedMs": 101.92225000355393,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 15,
+        "nativeReadyMs": 101.89979166898411
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 21,
+      "id": "3ADEFE5C-DB2A-4901-B60D-038A72CB2695",
+      "startedAt": "2026-11-03T21:41:20Z",
+      "elapsedMs": 100.26929168088827,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 7,
+        "nativeReadyMs": 100.2462083415594
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 22,
+      "id": "38CC3DA6-4D67-4F9A-B971-D434493364AD",
+      "startedAt": "2026-11-03T21:41:21Z",
+      "elapsedMs": 103.10387499339413,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 11,
+        "nativeReadyMs": 103.0812916578725,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 23,
+      "id": "2B1FA89C-2AEF-4113-88A6-D99014FA8D64",
+      "startedAt": "2026-11-03T21:41:21Z",
+      "elapsedMs": 101.46837499632966,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "nativeReadyMs": 101.43041666015051,
+        "checkpointMs": 12,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 24,
+      "id": "298E86AC-C1D4-4686-9250-9445F75D88D1",
+      "startedAt": "2026-11-03T21:41:22Z",
+      "elapsedMs": 100.14695834252052,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 10,
+        "preparedMs": 5,
+        "nativeReadyMs": 100.12362500128802
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 25,
+      "id": "54243155-6A5A-4440-AF92-65D5CD03DD36",
+      "startedAt": "2026-11-03T21:41:22Z",
+      "elapsedMs": 113.38774999603629,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 10,
+        "nativeReadyMs": 113.3642916684039,
+        "preparedMs": 5
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 26,
+      "id": "A39530B7-3C23-4C60-B682-F38DB30076A1",
+      "startedAt": "2026-11-03T21:41:23Z",
+      "elapsedMs": 100.83749999466818,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "nativeReadyMs": 100.81250000803266,
+        "checkpointMs": 14,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 27,
+      "id": "225E7FB1-434C-4644-87BF-E466A80F87E8",
+      "startedAt": "2026-11-03T21:41:23Z",
+      "elapsedMs": 105.18724999565165,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 18,
+        "nativeReadyMs": 105.15800000575837
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 28,
+      "id": "21D2F860-23BE-425B-8A71-5B70D833DFAC",
+      "startedAt": "2026-11-03T21:41:24Z",
+      "elapsedMs": 96.02808332419954,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 6,
+        "checkpointMs": 9,
+        "nativeReadyMs": 95.99287499440834
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 29,
+      "id": "322C1DD2-15ED-4695-8792-101FD7948203",
+      "startedAt": "2026-11-03T21:41:25Z",
+      "elapsedMs": 111.73466665786691,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "preparedMs": 5,
+        "checkpointMs": 12,
+        "nativeReadyMs": 111.70804165885784
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    },
+    {
+      "index": 30,
+      "id": "66327706-5DF3-457D-9533-39FE184D11AA",
+      "startedAt": "2026-11-03T21:41:25Z",
+      "elapsedMs": 103.45716666779481,
+      "outcome": "ready",
+      "sloEligible": true,
+      "straggler": false,
+      "phases": {
+        "checkpointMs": 15,
+        "nativeReadyMs": 103.43404166633263,
+        "preparedMs": 6
+      },
+      "checkpoint": "frame",
+      "visibility": {
+        "appActive": true,
+        "windowVisible": true,
+        "windowOcclusionVisible": true,
+        "documentVisibility": "visible"
+      },
+      "thermalState": 0
+    }
+  ]
+}
