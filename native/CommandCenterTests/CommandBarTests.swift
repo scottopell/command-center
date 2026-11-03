@@ -8,6 +8,7 @@ import WebKit
     var opened=[URL]()
     override func setUpWithError() throws {
         shell=Shell(backend:isolatedBackend(),externalOpener:{[weak self] url in self?.opened.append(url);return true})
+        try requireForegroundWebKit(shell.window)
     }
     override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:shell.backend.directory);shell.window.orderOut(nil);shell=nil;opened=[]}
     func waitFor(_ condition:@escaping()->Bool) async throws {

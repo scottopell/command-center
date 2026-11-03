@@ -2,6 +2,8 @@
 
 A pack is a source folder with `command-center.json`. Git is optional. CommandCenter snapshots the folder, type-checks it with its pinned SDK/compiler, and builds per-function browser assets and a worker module. No Swift build belongs in a pack. Start with [the NOTES example](examples/notes-pack/command-center.json).
 
+Built-in functions and installed packs use minified browser JavaScript and CSS. Separate linked `.map` files include the original sources for debugging; they are local build artifacts and are not part of the normal page load. Worker bundles remain unminified. Existing installed packs need a rebuild and Apply Update to adopt a new compiler output.
+
 ```json
 {
   "id": "example.notes",
@@ -45,7 +47,7 @@ export const notes = defineFunction({
 
 Keep the real initial interaction surface mounted while queries load. Exactly one active-entry element must declare `data-initial-focus`: a usable input or a reading container with `tabIndex={0}`. Never replace a draft field when data arrives, key the whole form by query data, or reset draft state on refresh. Ordinary `useState`, uncontrolled fields, FormData and React cleanup remain supported. Query-dependent actions may remain disabled until validation data arrives. Suspense or a spinner must not replace the initial interaction surface.
 
-Readiness is framework-owned: commit, destination validation, a rendering opportunity and a separately queued acknowledgment. Occluded WebKit views can throttle rendering callbacks; the framework uses a tagged queued-task fallback. Native timing is separate from actual focus/input activation, IME composition and buffer drainage. A transition over 500 ms records a straggler without terminating it. No exact compositor-presentation or arbitrary-button correctness guarantee is made.
+Readiness is framework-owned: commit, destination validation, an animation-frame callback and a separately queued acknowledgment. There is no timer substitute for the frame. Hidden views may await resumed rendering before readiness; preparation and application queries can continue. Native timing is separate from actual focus/input activation, IME composition and buffer drainage. The 500 ms budget applies only while CC stays active and its window remains at least partially unoccluded. Switching away before detection permanently excludes that measurement; returning never restarts its clock. An already-detected straggler remains recorded. All raw durations remain inspectable, with excluded records omitted from SLO counts and maxima. No exact compositor-presentation or arbitrary-button correctness guarantee is made.
 
 ## Local typed worker contracts
 

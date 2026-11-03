@@ -19,8 +19,9 @@ export function diagnosticsReader(directory:string):DiagnosticsReader {
     for(let i=0;i<names.length;i+=32){const batch=await Promise.allSettled(names.slice(i,i+32).map(n=>read(n.slice(0,-5))));for(const item of batch)if(item.status==='fulfilled'&&item.value.startedAt>=since&&(!input.mnemonic||item.value.mnemonic===input.mnemonic.toUpperCase()))records.push(item.value);}
     records.sort((a,b)=>b.startedAt.localeCompare(a.startedAt));
     const groups=new Map<string,{mnemonic:string;transitions:number;stragglers:number;maximumMs:number}>();
-    for(const r of records){const g=groups.get(r.mnemonic)??{mnemonic:r.mnemonic,transitions:0,stragglers:0,maximumMs:0};g.transitions++;g.stragglers+=Number(r.straggler);g.maximumMs=Math.max(g.maximumMs,r.elapsedMs);groups.set(r.mnemonic,g);}
-    const filtered=records.filter(r=>!input.onlyStragglers||r.straggler);
-    return {items:filtered.slice(0,input.limit),total:filtered.length,truncated:filtered.length>input.limit,summary:{transitions:records.length,stragglers:records.filter(r=>r.straggler).length,byFunction:[...groups.values()].sort((a,b)=>b.stragglers-a.stragglers)}};
+    const eligible=records.filter(r=>r.sloEligible);
+    for(const r of eligible){const g=groups.get(r.mnemonic)??{mnemonic:r.mnemonic,transitions:0,stragglers:0,maximumMs:0};g.transitions++;g.stragglers+=Number(r.straggler);g.maximumMs=Math.max(g.maximumMs,r.elapsedMs);groups.set(r.mnemonic,g);}
+    const filtered=records.filter(r=>!input.onlyStragglers||(r.sloEligible&&r.straggler));
+    return {items:filtered.slice(0,input.limit),total:filtered.length,truncated:filtered.length>input.limit,summary:{transitions:eligible.length,excludedTransitions:records.length-eligible.length,stragglers:eligible.filter(r=>r.straggler).length,byFunction:[...groups.values()].sort((a,b)=>b.stragglers-a.stragglers)}};
   }});
 }

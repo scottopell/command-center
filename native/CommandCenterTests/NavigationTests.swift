@@ -15,7 +15,7 @@ final class NavigationFixtureBackend:Backend {
     var shell:Shell!
     var fixture:NavigationFixtureBackend!
     var context=""
-    override func setUpWithError() throws {fixture=NavigationFixtureBackend();shell=Shell(backend:fixture,externalOpener:{_ in false})}
+    override func setUpWithError() throws {fixture=NavigationFixtureBackend();shell=Shell(backend:fixture,externalOpener:{_ in false});try requireForegroundWebKit(shell.window)}
     override func tearDownWithError() throws {shell.cancel();shell.collector.flush();try? FileManager.default.removeItem(at:fixture.directory);shell.window.orderOut(nil);shell=nil}
     func waitFor(_ condition:@escaping()->Bool) async throws {
         let deadline=Date().addingTimeInterval(8)

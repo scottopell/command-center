@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-03T18:52:16.528Z",
+  "policy": "500 ms while continuously foreground and unoccluded until readiness or detection; permanent exclusion on interruption; existing stragglers remain",
+  "checks": {
+    "sourceBackend": {
+      "passed": 34,
+      "failed": 0
+    },
+    "native": {
+      "passed": 18,
+      "skipped": 31,
+      "failed": 0,
+      "longRetentionSoak": "not selected",
+      "foregroundSuite": "skipped: test host could not obtain foreground visibility",
+      "focusedStragglerCases": [
+        "background start and brief foreground loss stay excluded",
+        "visibility rechecked at deadline and completion",
+        "already detected straggler survives switching away",
+        "single notice and final record update",
+        "fast cancellation is not a straggler",
+        "application and window notification forwarding",
+        "real SDK waits for controlled frame callback beyond 250 ms"
+      ]
+    },
+    "specs": "7 models checked and analysed without findings",
+    "build": "passed",
+    "packagedServiceCLI": "passed"
+  },
+  "liveSamples": [
+    {
+      "command": "SLOW 0",
+      "elapsedMs": 97.11845833226107,
+      "sloEligible": true,
+      "straggler": false,
+      "outcome": "ready",
+      "checkpoint": "frame"
+    },
+    {
+      "command": "SLOW 3000",
+      "elapsedMs": 3666.874166665366,
+      "sloEligible": false,
+      "straggler": false,
+      "outcome": "ready",
+      "checkpoint": "frame"
+    }
+  ]
+}

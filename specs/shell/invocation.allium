@@ -377,10 +377,12 @@ surface ShellFunctionBoundary {
         DrainStep(invocation) when invocation.current and invocation.phase = draining and shell.focus_owner != command_bar
         FinishHandoff(invocation) when invocation.current and invocation.phase = draining and shell.focus_owner != command_bar
         DeliveryFailed(invocation) when invocation.current and invocation.phase = draining
-    @guarantee VisualBudget
-        -- REQ-SH-006: a destination view or named loading frame is visible within
-        -- 500 ms of command admission in the agreed running-app measurement profile.
-        -- This state model does not prove rendering or OS scheduling latency.
+    @guarantee ResponsivenessBudget
+        -- REQ-SH-006: native loading feedback and capture start immediately.
+        -- REQ-ST-001,002: the foreground 500 ms budget ends at the framework's
+        -- frame-based responsiveness checkpoint, not a named loading label.
+        -- Background interruption permanently excludes an unfinished sample;
+        -- already detected misses remain. This model does not prove presentation.
     @guarantee OrderedControlEffects
         -- REQ-SH-007,008,013: applied operations are committed text/paste,
         -- Backspace within the current pending segment, and forward Tab through

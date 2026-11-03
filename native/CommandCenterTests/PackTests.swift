@@ -13,6 +13,7 @@ import WebKit
         process.arguments=[Bundle.main.resourceURL!.appendingPathComponent("backend.mjs").path,"--data-dir",directory.path,"--port","0"]
         process.standardOutput=FileHandle.nullDevice;process.standardError=FileHandle.nullDevice;try process.run()
         shell=Shell(backend:Backend(directory:directory))
+        try requireForegroundWebKit(shell.window)
     }
     override func tearDownWithError() throws {
         shell.cancel();shell.collector.flush();shell.window.orderOut(nil);shell=nil

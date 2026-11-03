@@ -11,7 +11,7 @@ extension Shell {
     func beginMeasurement(_ invocation:Invocation,kind:String,started:Double?=nil){
         invocation.measurement?.finish("superseded")
         let definition=catalog.commands.first{$0.mnemonic==invocation.mnemonic}
-        let trace=TransitionMeasurement(mnemonic:invocation.mnemonic,command:invocation.commandText,kind:kind,token:invocation.transitionToken,packId:definition?.packId ?? "cc.system",functionId:definition?.id ?? invocation.mnemonic.lowercased(),revision:definition?.revision ?? "bundled",collector:collector,started:started)
+        let trace=TransitionMeasurement(mnemonic:invocation.mnemonic,command:invocation.commandText,kind:kind,token:invocation.transitionToken,packId:definition?.packId ?? "cc.system",functionId:definition?.id ?? invocation.mnemonic.lowercased(),revision:definition?.revision ?? "bundled",collector:collector,foreground:{[weak window] in NSApp.isActive && window?.occlusionState.contains(.visible)==true},started:started)
         trace.context(["windowVisible":window.isVisible,"windowOcclusionVisible":window.occlusionState.contains(.visible),"thermalState":ProcessInfo.processInfo.thermalState.rawValue])
         let generation=invocation.id,token=invocation.transitionToken,noticeID=trace.id,mnemonic=invocation.mnemonic
         trace.onStraggler={ [weak self] in

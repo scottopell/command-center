@@ -37,7 +37,7 @@ final class Assets: NSObject, WKURLSchemeHandler {
         guard file.path.hasPrefix(directory.standardizedFileURL.path + "/") else { task.didFailWithError(NSError(domain: "Assets", code: 403)); return }
         do {
             let data = try Data(contentsOf: file)
-            let type = ["html":"text/html", "js":"text/javascript", "css":"text/css", "json":"application/json", "svg":"image/svg+xml", "png":"image/png"][file.pathExtension] ?? "application/octet-stream"
+            let type = ["html":"text/html", "js":"text/javascript", "css":"text/css", "json":"application/json", "map":"application/json", "svg":"image/svg+xml", "png":"image/png"][file.pathExtension] ?? "application/octet-stream"
             task.didReceive(URLResponse(url: url, mimeType: type, expectedContentLength: data.count, textEncodingName: "utf-8")); task.didReceive(data); task.didFinish()
         } catch { task.didFailWithError(error) }
     }

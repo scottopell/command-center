@@ -80,7 +80,7 @@ For REQ-HO-004, include a LAN-only listener and a reachable local port, and veri
 
 ## Timing and evidence
 
-Measure command admission to a visible named loading/destination frame separately from resolution, first commit, focus, and handoff completion. Report every visual sample exceeding 500 ms. Verify continuous input ownership and measure Escape separately; do not substitute backend response time or average frame time. Cold application startup and cold backend activation are separate cases. Record the benchmark profile under ADR-007; there is no additional invented millisecond deadline for input capture.
+Measure command admission to the frame-based responsiveness checkpoint separately from native loading feedback, first commit, focus and input handoff. Apply the 500 ms SLO only while the app stays active and its window unoccluded; report excluded samples separately without pausing their clocks. Verify continuous input ownership and measure Escape separately; do not substitute backend response time or average frame time. Cold application startup and cold backend activation are separate cases. ADR-019 defines eligibility; ADR-007's native visual-flush benchmark is a separate historical measurement, not proof of readiness. There is no additional invented millisecond deadline for input capture.
 
 ## Properties for generated event sequences
 
@@ -155,7 +155,9 @@ The input operation records are abstract specification history, not a requiremen
 | Failed activation | Inject candidate startup failure. Exact previous runtime identity and catalog remain usable; stale revisions are refused before admission. | REQ-PK-007 |
 | System provenance | Folder packs cannot claim the system identity. Only the built-in STRAG factory receives the diagnostics reader. | REQ-PK-010 |
 | Responsive without focus theft | Keep command focus while a destination mounts. Its transition measurement completes without focus transfer or buffer drainage. | REQ-ST-001 |
-| Forced straggler | Block SLOW for 600 ms. Record one straggler, keep loading and deliver buffered input; STRAG lists and opens the record. | REQ-ST-002, REQ-ST-004 |
+| Forced straggler | Keep CC active and its window unoccluded; block SLOW for 600 ms. Record one straggler, keep loading and deliver buffered input; STRAG lists and opens the record. | REQ-ST-002, REQ-ST-004 |
+| Foreground eligibility | Start hidden, or briefly switch away before detection then return. Preserve raw duration, exclude the transition from SLO counts/maxima and show its exclusion in STRAG/CLI. A previously detected straggler remains counted. | REQ-ST-002, REQ-ST-004 |
+| Frame checkpoint | Withhold the animation-frame callback beyond 100 ms. No timer may acknowledge readiness. Release the callback and verify the separately queued acknowledgment. Hidden views may wait until rendering resumes. | REQ-ST-001 |
 | Collector bounds | Repeated updates use one trace identity; terminal outcomes attach to it. Local reader bounds malformed/oversize files and supports offline CLI history. | REQ-ST-003, REQ-ST-004 |
 
 ## Function toolbar

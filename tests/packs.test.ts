@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {tmpdir} from 'node:os';
+import {SourceMap} from 'node:module';
 import {buildPack} from '../packages/packs/src/builder.ts';
 import {startServer} from '../packages/backend/src/server.ts';
 import {storageNamespace,assertNoConflicts} from '../packages/packs/src/manifest.ts';
@@ -16,6 +17,18 @@ test('pack builds use the standalone SDK and reject source/dependency escapes',a
   try{
     const artifact=await buildPack(f.source,f.builds,f.toolchain);assert.equal(artifact.id,'example.notes');assert.deepEqual(artifact.functions[0].operations,{read:false,save:true});
     const web=await fs.readFile(path.join(f.builds,artifact.revision,'functions/notes/web/app.js'),'utf8');assert.ok(web.includes('Installed from an independent folder'));assert.ok(!web.includes('Development request system'));
+    // Separate linked maps retain source content without inflating the launch payload.
+    assert.match(web,/sourceMappingURL=app\.js\.map/);
+    const webRoot=path.join(f.builds,artifact.revision,'functions/notes/web');
+    for(const file of ['app.js','style.css']){
+      const map=JSON.parse(await fs.readFile(path.join(webRoot,file+'.map'),'utf8'));
+      assert.equal(map.version,3);assert.ok(map.mappings.length);assert.equal(map.sourcesContent.length,map.sources.length);
+      assert.ok(map.sourcesContent.every((source:unknown)=>typeof source==='string'));
+    }
+    const sourceMap=new SourceMap(JSON.parse(await fs.readFile(path.join(webRoot,'app.js.map'),'utf8')));
+    const beforeLiteral=web.slice(0,web.indexOf('Installed from an independent folder')).split('\n');
+    const original=sourceMap.findEntry(beforeLiteral.length-1,beforeLiteral.at(-1)!.length);
+    assert.ok('originalSource' in original);assert.match(String(original.originalSource),/ui\.tsx$/);
     await fs.symlink('/tmp',path.join(f.source,'outside'));await assert.rejects(buildPack(f.source,f.builds,f.toolchain),/symlink/);await fs.unlink(path.join(f.source,'outside'));
     await fs.writeFile(path.join(f.source,'package.json'),JSON.stringify({scripts:{build:'arbitrary-code'}}));await assert.rejects(buildPack(f.source,f.builds,f.toolchain),/hooks/);await fs.unlink(path.join(f.source,'package.json'));
     const ui=await fs.readFile(path.join(f.source,'ui.tsx'),'utf8');await fs.writeFile(path.join(f.source,'ui.tsx'),ui.replace('prepare({tail})','async prepare({tail})'));await assert.rejects(buildPack(f.source,f.builds,f.toolchain),/prepare|Promise|synchronous/);

@@ -33,6 +33,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     var web: FunctionWebView?
     var eventMonitor: Any?
     var clickMonitor: Any?
+    var visibilityObservers=[NSObjectProtocol]()
     var samples = [[String:Any]]()
     var launched = 0, retired = 0
     var operationMetadata = [String:[String:Bool]]()
@@ -89,9 +90,13 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             return event
         }
         showEmpty(); focusCommand(); window.makeKeyAndOrderFront(nil)
+        // REQ-ST-002: a brief trip away permanently excludes an unfinished sample.
+        for (name,object) in [(NSApplication.didResignActiveNotification,NSApp as AnyObject),(NSWindow.didChangeOcclusionStateNotification,window as AnyObject)] {
+            visibilityObservers.append(NotificationCenter.default.addObserver(forName:name,object:object,queue:.main){[weak self] _ in self?.active?.measurement?.observeVisibility()})
+        }
         packsTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in self?.refreshPackBadge()}
     }
-    deinit {packsTimer?.invalidate();if let monitor=eventMonitor{NSEvent.removeMonitor(monitor)};if let monitor=clickMonitor{NSEvent.removeMonitor(monitor)} }
+    deinit {packsTimer?.invalidate();for observer in visibilityObservers{NotificationCenter.default.removeObserver(observer)};if let monitor=eventMonitor{NSEvent.removeMonitor(monitor)};if let monitor=clickMonitor{NSEvent.removeMonitor(monitor)} }
     func escape() { if commandFocused { cancel();hideSuggestions() } else { focusCommand() } }
     func build() {
         let base=window.contentView!; base.wantsLayer=true

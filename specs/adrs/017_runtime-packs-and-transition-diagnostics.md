@@ -4,6 +4,7 @@
 - **Date:** 2026-11-02
 - **Affects:** REQ-PK-001..010, REQ-ST-001..004, REQ-FF-001, REQ-FF-002, REQ-FF-003, REQ-FF-008, REQ-FF-009, REQ-FF-011, REQ-SH-006, REQ-NV-006, REQ-QL-001
 - **Supersedes:** ADR-015's build-time-only composition; ADR-007's visual-only latency endpoint
+- **Amended by:** [ADR-019](019_foreground-transition-budget.md) replaces the readiness fallback and unconditional transition budget; other decisions stand.
 
 ## Context
 

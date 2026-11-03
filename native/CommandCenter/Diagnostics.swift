@@ -46,22 +46,31 @@ final class TransitionMeasurement {
     let token:String
     private let clock:()->Double
     private let collector:DiagnosticsCollector
+    private let foreground:()->Bool
     private var timer:Timer?
     private(set) var finished=false
     private(set) var straggler=false
+    private(set) var sloEligible:Bool
     private(set) var snapshot:[String:Any]
     var onStraggler:(()->Void)?
-    init(mnemonic:String,command:String,kind:String,token:String,packId:String,functionId:String,revision:String,collector:DiagnosticsCollector,started:Double?=nil,clock:@escaping()->Double={ProcessInfo.processInfo.systemUptime},scheduleDeadline:Bool=true){
-        self.clock=clock;self.started=started ?? clock();self.token=token;self.collector=collector
-        snapshot=["mnemonic":mnemonic,"packId":packId,"functionId":functionId,"revision":revision,"command":String(command.prefix(4096)),"kind":kind,"startedAt":ISO8601DateFormatter().string(from:Date()),"elapsedMs":0.0,"straggler":false,"outcome":"pending","phases":[String:Double](),"operations":[[String:Any]](),"context":["os":ProcessInfo.processInfo.operatingSystemVersionString,"processors":ProcessInfo.processInfo.processorCount,"physicalMemoryBytes":ProcessInfo.processInfo.physicalMemory,"appActive":NSApp.isActive] as [String:Any]]
+    init(mnemonic:String,command:String,kind:String,token:String,packId:String,functionId:String,revision:String,collector:DiagnosticsCollector,foreground:@escaping()->Bool,started:Double?=nil,clock:@escaping()->Double={ProcessInfo.processInfo.systemUptime},scheduleDeadline:Bool=true){
+        self.clock=clock;self.started=started ?? clock();self.token=token;self.collector=collector;self.foreground=foreground;self.sloEligible=foreground()
+        snapshot=["mnemonic":mnemonic,"packId":packId,"functionId":functionId,"revision":revision,"command":String(command.prefix(4096)),"kind":kind,"startedAt":ISO8601DateFormatter().string(from:Date()),"elapsedMs":0.0,"straggler":false,"sloEligible":sloEligible,"outcome":"pending","phases":[String:Double](),"operations":[[String:Any]](),"context":["os":ProcessInfo.processInfo.operatingSystemVersionString,"processors":ProcessInfo.processInfo.processorCount,"physicalMemoryBytes":ProcessInfo.processInfo.physicalMemory,"appActive":NSApp.isActive] as [String:Any]]
         snapshot["id"]=id;collector.record(snapshot)
-        if scheduleDeadline {timer=Timer.scheduledTimer(withTimeInterval:0.501,repeats:false){[weak self] _ in self?.checkBudget()}}
+        if scheduleDeadline && sloEligible {timer=Timer.scheduledTimer(withTimeInterval:0.501,repeats:false){[weak self] _ in self?.checkBudget()}}
     }
     deinit{timer?.invalidate()}
     var elapsedMs:Double{max(0,(clock()-started)*1000)}
     func context(_ values:[String:Any]){var current=snapshot["context"] as? [String:Any] ?? [:];current.merge(values){_,new in new};snapshot["context"]=current}
+    // Eligibility is a latch, not a foreground-time accumulator. Never erase a detected miss.
+    func observeVisibility(){
+        guard !finished,!straggler,sloEligible,!foreground() else{return}
+        sloEligible=false;snapshot["sloEligible"]=false;snapshot["elapsedMs"]=elapsedMs
+        timer?.invalidate();timer=nil;collector.record(snapshot)
+    }
     func checkBudget(){
-        guard !finished,!straggler,elapsedMs>500 else{return}
+        observeVisibility()
+        guard !finished,!straggler,sloEligible,elapsedMs>500 else{return}
         straggler=true;snapshot["straggler"]=true;snapshot["elapsedMs"]=elapsedMs;collector.record(snapshot);onStraggler?()
     }
     func finish(_ outcome:String,phases:[String:Double]=[:]){

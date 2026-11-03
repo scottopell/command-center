@@ -1,0 +1,893 @@
+{
+  "checkedAt": "2026-11-03T16:51:50.881Z",
+  "function": "SLOW 0",
+  "method": "Paired alternating AB/BA; 2 warmups per variant; 30 measured fresh WebViews per variant; unique resource URLs; production React in both builds",
+  "endpoint": "Before WKWebView/configuration creation to native receipt of the real framework viewReady checkpoint",
+  "limits": "Warm app/filesystem; WebKit controls process reuse. Includes local loading, parsing, evaluation, React commit and responsiveness probe; does not isolate parsing, exact pixel presentation or full native command admission. Hidden views use the framework's tagged 100 ms throttling fallback; inspect visibility before comparing this with foreground interaction.",
+  "sizes": {
+    "unminified": {
+      "app.js": 1586739,
+      "style.css": 5139,
+      "app.js.map": 2746525,
+      "style.css.map": 7545
+    },
+    "minified": {
+      "app.js": 731405,
+      "style.css": 4049,
+      "app.js.map": 2809187,
+      "style.css.map": 7603
+    }
+  },
+  "summary": {
+    "unminified": {
+      "samples": 30,
+      "jsBytes": 1586739,
+      "cssBytes": 5139,
+      "mapBytes": 2754070,
+      "medianReadyMs": 183.08004167920444,
+      "p95ReadyMs": 188.26845833973493,
+      "meanReadyMs": 183.1496013891107,
+      "over500ms": 0,
+      "frameCheckpoints": 0
+    },
+    "minified": {
+      "samples": 30,
+      "jsBytes": 731405,
+      "cssBytes": 4049,
+      "mapBytes": 2816790,
+      "medianReadyMs": 177.52649998874404,
+      "p95ReadyMs": 182.76500000501983,
+      "meanReadyMs": 178.04125416635847,
+      "over500ms": 0,
+      "frameCheckpoints": 0
+    }
+  },
+  "profile": {
+    "assets": "Unique per-launch URLs, hard-linked prebuilt local files; warm filesystem",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "physicalMemoryBytes": 68719476736,
+    "processors": 18,
+    "webView": "Fresh WKWebView per sample; default website data store, matching the app; WebKit-managed process reuse"
+  },
+  "warmups": [
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 109,
+        "preparedMs": 7
+      },
+      "readyMs": 327.1975833340548,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 175.6537499895785,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 105,
+        "preparedMs": 5
+      },
+      "readyMs": 178.32133332558442,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 4
+      },
+      "readyMs": 172.02083332813345,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    }
+  ],
+  "samples": [
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 174.85116666648537,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 172.31033333519008,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 172.5330416666111,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 176.20229166641366,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 175.0459583272459,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 175.43854167161044,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 176.63562500092667,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 6
+      },
+      "readyMs": 182.17425000329968,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 182.78141667542513,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 4
+      },
+      "readyMs": 178.7657500099158,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 175.53770834638271,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 186.8456249940209,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 183.08004167920444,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 177.52649998874404,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 178.68787499901373,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 187.2799583361484,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 188.26845833973493,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 179.94566666311584,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 177.01987500186078,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 182.3129166587023,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 6
+      },
+      "readyMs": 179.57104166271165,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 176.68383332784288,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 182.2519166598795,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 185.113541665487,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 184.85200000577606,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 180.36524999479298,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 176.94104166002944,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 7
+      },
+      "readyMs": 183.2917083374923,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 192.7622499933932,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 178.55799999961164,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 180.2892083360348,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 184.45487499411684,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 183.7261249893345,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 178.62154166505206,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 180.84270833060145,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 183.44341666670516,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 185.52758333680686,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 177.68237499694806,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 176.51124999974854,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 7
+      },
+      "readyMs": 182.86141667340416,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 184.8980000067968,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 183.04783332860097,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 182.76500000501983,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 182.17404166352935,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 183.24262500391342,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 4
+      },
+      "readyMs": 175.77724999864586,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 5
+      },
+      "readyMs": 177.36237499048002,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 181.8361666664714,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 183.6954166792566,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 176.5295000077458,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 179.4815416651545,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 6
+      },
+      "readyMs": 182.66704166308045,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 186.83629167207982,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 105,
+        "preparedMs": 5
+      },
+      "readyMs": 176.32079166651238,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 179.36479166382924,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 181.61416666407604,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 108,
+        "preparedMs": 6
+      },
+      "readyMs": 180.3514999919571,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 175.19070833805017,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 106,
+        "preparedMs": 5
+      },
+      "readyMs": 182.24979167280253,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "minified",
+      "windowOcclusionVisible": false
+    },
+    {
+      "appActive": false,
+      "documentVisibility": "hidden",
+      "pagePhases": {
+        "checkpointMs": 107,
+        "preparedMs": 5
+      },
+      "readyMs": 182.72674999025185,
+      "renderOpportunity": "throttled",
+      "thermalState": 0,
+      "variant": "unminified",
+      "windowOcclusionVisible": false
+    }
+  ],
+  "visibility": {
+    "visibleSamples": 0,
+    "frameCheckpoints": 0,
+    "totalSamples": 60
+  }
+}

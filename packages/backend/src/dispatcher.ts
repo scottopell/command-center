@@ -9,7 +9,7 @@ import type {DiagnosticsReader} from '../../contracts/src/diagnostics.ts';
 export const SYSTEM_PACK='cc.system';
 export const systemNamespace=(id:string)=>storageNamespace(SYSTEM_PACK,id.toLowerCase());
 export type RegisteredWorker={worker:DefinedWorker;namespace:string};
-const emptyHistory:DiagnosticsReader={list:async()=>({items:[],total:0,truncated:false,summary:{transitions:0,stragglers:0,byFunction:[]}}),get:async()=>{throw new AppError('not_found','Transition not found');}};
+const emptyHistory:DiagnosticsReader={list:async()=>({items:[],total:0,truncated:false,summary:{transitions:0,excludedTransitions:0,stragglers:0,byFunction:[]}}),get:async()=>{throw new AppError('not_found','Transition not found');}};
 // REQ-BW-002/003/004/007/009, REQ-PK-004/010: authoritative local worker schemas.
 export function createDispatcher(store:Store,additional:Record<string,DefinedWorker>={},options:{history?:DiagnosticsReader;registrations?:Record<string,RegisteredWorker>}={}){
  const workers:Record<string,RegisteredWorker>={DRQS:{worker:drqsWorker,namespace:systemNamespace('drqs')},HOST:{worker:hostWorker,namespace:systemNamespace('host')},STRAG:{worker:createStragWorker(options.history??emptyHistory),namespace:systemNamespace('strag')}};

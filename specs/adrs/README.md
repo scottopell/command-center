@@ -22,11 +22,13 @@ All feature specs share this one chain. Accepted records explain agreed decision
 | [ADR-016](016_reproducible-local-verification.md) | Accepted | Pinned build inputs, preflight and isolated packaged-runtime verification |
 | [ADR-017](017_runtime-packs-and-transition-diagnostics.md) | Accepted | Runtime local packs, safe shared-worker activation and transition diagnostics |
 | [ADR-018](018_function-toolbar.md) | Accepted | Visible catalog shortcuts with ordinary fresh-invocation launch |
+| [ADR-019](019_foreground-transition-budget.md) | Accepted | Foreground-only transition budget and a single frame-based readiness path |
 
 ## Task routing
 
 - Function authoring and focus handoff: ADR-000, ADR-004, ADR-005, ADR-008.
 - Runtime ownership and latency: ADR-002, ADR-007.
+- Transition readiness and SLO eligibility: ADR-017, ADR-019 (replaces ADR-017's fallback and unconditional budget).
 - Worker transport, storage and startup: ADR-001, ADR-003, ADR-009.
 - DRQS domain behavior: ADR-006, ADR-014.
 - Retained Back and query integration: ADR-011.

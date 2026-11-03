@@ -11,6 +11,8 @@ entity ScreenTransition {
     notice_count: Integer
     current: Boolean
     checkpoint_valid: Boolean
+    foreground: Boolean
+    slo_eligible: Boolean
 }
 
 rule InitializeTransition {
@@ -20,6 +22,16 @@ rule InitializeTransition {
         transition.outcome = pending
         transition.straggler = false
         transition.notice_count = 0
+        transition.slo_eligible = transition.foreground
+}
+
+rule ExcludeBackgroundTransition {
+    when: ForegroundChanged(transition)
+    requires: transition.outcome = pending
+    requires: not transition.foreground
+    requires: not transition.straggler
+    ensures:
+        transition.slo_eligible = false
 }
 
 rule DetectDeadlineMiss {
@@ -27,6 +39,8 @@ rule DetectDeadlineMiss {
     requires: transition.outcome = pending
     requires: transition.elapsed_ms > 500
     requires: not transition.straggler
+    requires: transition.slo_eligible
+    requires: transition.foreground
     ensures:
         transition.straggler = true
         transition.notice_count = 1
@@ -39,7 +53,9 @@ rule AcceptCheckpoint {
     requires: transition.outcome = pending
     ensures:
         transition.outcome = ready
-        if transition.elapsed_ms > 500:
+        if not transition.foreground and not transition.straggler:
+            transition.slo_eligible = false
+        if transition.slo_eligible and transition.foreground and transition.elapsed_ms > 500:
             transition.straggler = true
             transition.notice_count = 1
 }
@@ -49,7 +65,9 @@ rule CancelTransition {
     requires: transition.outcome = pending
     ensures:
         transition.outcome = canceled
-        if transition.elapsed_ms > 500:
+        if not transition.foreground and not transition.straggler:
+            transition.slo_eligible = false
+        if transition.slo_eligible and transition.foreground and transition.elapsed_ms > 500:
             transition.straggler = true
             transition.notice_count = 1
 }
@@ -59,7 +77,9 @@ rule FailTransition {
     requires: transition.outcome = pending
     ensures:
         transition.outcome = error
-        if transition.elapsed_ms > 500:
+        if not transition.foreground and not transition.straggler:
+            transition.slo_eligible = false
+        if transition.slo_eligible and transition.foreground and transition.elapsed_ms > 500:
             transition.straggler = true
             transition.notice_count = 1
 }
@@ -70,7 +90,9 @@ rule SupersedeTransition {
     ensures:
         transition.outcome = superseded
         transition.current = false
-        if transition.elapsed_ms > 500:
+        if not transition.foreground and not transition.straggler:
+            transition.slo_eligible = false
+        if transition.slo_eligible and transition.foreground and transition.elapsed_ms > 500:
             transition.straggler = true
             transition.notice_count = 1
 }
@@ -79,13 +101,24 @@ invariant OneNoticePerTransition {
     ScreenTransitions.all(t => t.notice_count >= 0 and t.notice_count <= 1)
 }
 
+invariant ExcludedTransitionsAreNotStragglers {
+    ScreenTransitions.all(t => t.straggler implies t.slo_eligible)
+}
+
 contract ResponsivenessCheckpoint {
     @invariant IndependentOfOperatorInput
         -- Destination commit, interaction-surface validation and a separately
         -- queued page acknowledgment determine readiness. Buffer drainage, IME
         -- completion and actual focus ownership do not gate this checkpoint.
-        -- A throttled rendering callback uses a tagged fallback. No exact
-        -- compositor presentation guarantee or arbitrary-action proof is made.
+        -- The callback always follows an animation frame; no timer replaces it.
+        -- A hidden view may await resumed rendering. No exact compositor
+        -- presentation guarantee or arbitrary-action proof is made.
+    @invariant ForegroundBudget
+        -- Eligibility starts only while the app is active and its window is
+        -- unoccluded. Losing either before detection permanently excludes this
+        -- transition, without restarting or pausing its raw elapsed clock.
+        -- Already detected stragglers survive visibility changes. Excluded raw
+        -- records remain inspectable but do not enter SLO counts or maxima.
     @invariant DiagnosticNotCancellation
         -- Detection preserves the pending transition and input capture. One
         -- bounded record receives its final outcome; typed input and request
@@ -99,12 +132,14 @@ surface TransitionObserver {
         transition.elapsed_ms
         transition.outcome
         transition.straggler
+        transition.slo_eligible
     provides:
         CheckDeadline(transition) when transition.outcome = pending
         CheckpointReceived(transition) when transition.outcome = pending and transition.current
         TransitionCanceled(transition) when transition.outcome = pending
         TransitionFailed(transition) when transition.outcome = pending
         TransitionSuperseded(transition) when transition.outcome = pending
+        ForegroundChanged(transition) when transition.outcome = pending
     contracts:
         fulfils ResponsivenessCheckpoint
 }

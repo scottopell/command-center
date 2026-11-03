@@ -29,7 +29,8 @@
     "setup:native": "node scripts/setup-native.mjs",
     "smoke:service": "node scripts/smoke-service.mjs",
     "verify": "npm run doctor && npm run check && npm run build && npm run smoke:service && npm run test:native",
-    "build:toolchain": "node scripts/build-toolchain.mjs"
+    "build:toolchain": "node scripts/build-toolchain.mjs",
+    "benchmark:bundles": "node scripts/benchmark-bundles.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "5.105.0",

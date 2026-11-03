@@ -8,13 +8,13 @@ As an operator, I need to identify slow screen transitions and inspect their con
 
 ### REQ-ST-001: Measure a framework-owned responsiveness checkpoint
 
-THE SYSTEM SHALL measure native monotonic elapsed time from acceptance of launch, push, replace, sibling movement or Back to receipt of the active transition's responsiveness checkpoint. The checkpoint SHALL follow destination commit, real initial interaction-surface validation, a rendering opportunity and separately queued page task. It SHALL NOT await application queries, input-buffer drainage, IME completion or actual native focus ownership. Superseded acknowledgements SHALL NOT complete another transition. When WebKit throttles rendering callbacks, a tagged queued-task fallback SHALL remain available and its context SHALL be recorded. Exact compositor presentation SHALL NOT be claimed.
+THE SYSTEM SHALL measure native monotonic elapsed time from acceptance of launch, push, replace, sibling movement or Back to receipt of the active transition's responsiveness checkpoint. The checkpoint SHALL follow destination commit, real initial interaction-surface validation, an animation-frame callback and separately queued page task. It SHALL NOT await application queries, input-buffer drainage, IME completion or actual native focus ownership. Superseded acknowledgements SHALL NOT complete another transition. A hidden destination MAY await resumed rendering before acknowledging readiness; a timer SHALL NOT substitute for the animation-frame callback. Exact compositor presentation SHALL NOT be claimed.
 
 **Rationale:** Slow transitions must be distinguished from data loading and operator behavior.
 
 ### REQ-ST-002: Detect stragglers without canceling
 
-WHEN a transition exceeds 500 milliseconds without a successful checkpoint, THE SYSTEM SHALL record one straggler and show a transient non-blocking Straggler detected notice while continuing the transition and buffered-input capture. Completion, failure or cancellation SHALL update that same transition record. Background and occlusion context SHALL be recorded.
+WHEN an eligible transition exceeds 500 milliseconds without a successful checkpoint, THE SYSTEM SHALL record one straggler and show a transient non-blocking Straggler detected notice while continuing the transition and buffered-input capture. A transition SHALL start eligible only while CommandCenter is active and its window is at least partially unoccluded. Losing either condition before detection SHALL permanently exclude that transition from the SLO, without pausing or restarting its clock. A straggler already detected SHALL retain its classification when visibility changes. Completion, failure or cancellation SHALL update that same transition record. Excluded transitions SHALL retain their raw elapsed time and explicit eligibility in diagnostic history.
 
 **Rationale:** Performance diagnostics must not make a slow application unusable.
 
@@ -26,6 +26,6 @@ THE SYSTEM SHALL record bounded local transition summaries and richer straggler 
 
 ### REQ-ST-004: Inspect history through a normal function
 
-THE SYSTEM SHALL provide STRAG as an ordinary read-only function with time/function filtering, transition detail, and summary counts, using the standard framework and worker contracts. THE SYSTEM SHALL provide CLI history access as a recovery option. Diagnostic collection SHALL NOT depend on opening STRAG.
+THE SYSTEM SHALL provide STRAG as an ordinary read-only function with time/function filtering, transition detail, and summary counts, using the standard framework and worker contracts. SLO summary counts and per-function maxima SHALL include eligible transitions only; excluded transitions SHALL be counted separately and inspectable without being labeled within budget. Historical records without eligibility SHALL retain their original classification. THE SYSTEM SHALL provide CLI history access as a recovery option. Diagnostic collection SHALL NOT depend on opening STRAG.
 
 **Rationale:** The framework should serve its own useful management views.

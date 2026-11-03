@@ -80,17 +80,15 @@ export function mount<P>(definition:FunctionDefinition<P>,tail:string) {
       entry.target=initial(entry);
       if(entry.restoring)correct(entry,false);
       entry.phase='prepared';entry.preparedAt=performance.now();entry.preparedSent=true;
-      const token=entry.transitionToken;let acknowledged=false,frame=0;
-      const checkpoint=(mode:'frame'|'throttled')=>{
-        if(acknowledged)return;acknowledged=true;clearTimeout(fallback);cancelAnimationFrame(frame);
+      const token=entry.transitionToken;
+      // Hidden views may await rendering on return. A timer must not substitute for a frame.
+      const frame=requestAnimationFrame(()=>{
         setTimeout(()=>{
           if(disposed||current()!==entry||entry.transitionToken!==token||entry.phase==='retired'||entry.phase==='error')return;
-          try{const destination=initial(entry);if(entry.restoring)correct(entry,false);else entry.target=destination;send({kind:'viewReady',entryId:entry.id,transitionToken:token,renderOpportunity:mode,visibility:document.visibilityState,phases:{preparedMs:Math.round(entry.preparedAt!-entry.transitionAt),checkpointMs:Math.round(performance.now()-entry.transitionAt)}});publishSiblings();}catch(error){fail(error,entry);}
+          try{const destination=initial(entry);if(entry.restoring)correct(entry,false);else entry.target=destination;send({kind:'viewReady',entryId:entry.id,transitionToken:token,renderOpportunity:'frame',visibility:document.visibilityState,phases:{preparedMs:Math.round(entry.preparedAt!-entry.transitionAt),checkpointMs:Math.round(performance.now()-entry.transitionAt)}});publishSiblings();}catch(error){fail(error,entry);}
         },0);
-      };
-      // WKWebView can throttle rAF when occluded; a separately queued probe still tests responsiveness.
-      const fallback=setTimeout(()=>checkpoint('throttled'),100);
-      frame=requestAnimationFrame(()=>checkpoint('frame'));
+      });
+      entry.controller.signal.addEventListener('abort',()=>cancelAnimationFrame(frame),{once:true});
     }catch(error){fail(error,entry);}
   }
   function makeEntry(name:string,params:unknown,screen?:ScreenDefinition<any,any>):Entry {
