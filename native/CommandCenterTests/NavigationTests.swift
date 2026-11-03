@@ -21,7 +21,7 @@ final class NavigationFixtureBackend:Backend {
         let deadline=Date().addingTimeInterval(8)
         while !condition(){
             if Date()>deadline{
-                let diagnostics=try? await js("window.commandCenterHost?.diagnostics()")
+                let diagnostics=try? await js("({framework:window.commandCenterHost?.diagnostics(),viewports:Array.from(document.querySelectorAll('.entry-viewport')).map(v=>({id:v.dataset.entryId,inert:v.inert,display:getComputedStyle(v).display,rects:v.getClientRects().length}))})")
                 XCTFail("Timed out \(context): native phase=\(shell.active?.phase.rawValue ?? "empty") entry=\(shell.active?.entryID ?? "empty") depth=\(shell.active?.entryDepth ?? 0) prepared=\(shell.active?.viewReady ?? false) inFlight=\(shell.active?.inFlight ?? false); framework metadata=\(String(describing:diagnostics))")
                 throw NSError(domain:"NavigationTimeout",code:1)
             }
@@ -30,7 +30,7 @@ final class NavigationFixtureBackend:Backend {
     }
     func js(_ code:String) async throws->Any?{try await shell.web!.evaluateJavaScript(code)}
     func launch() async throws {shell.command.stringValue="SLOW 0 NAV";shell.execute();try await waitFor({self.shell.active?.phase == .interactive})}
-    let viewport="document.querySelector('.entry-viewport:not([inert])')"
+    let viewport=activeEntryViewportScript
     func equalJS<T:Equatable>(_ code:String,_ expected:T) async throws {let value=try await js(code) as? T;XCTAssertEqual(value,expected)}
     func waitJS(_ code:String) async throws {
         let deadline=Date().addingTimeInterval(8)
@@ -123,6 +123,32 @@ final class NavigationFixtureBackend:Backend {
         try await equalJS("\(viewport).querySelector('[data-slow-probe]').getAttribute('data-slow-setups')","2")
         try await equalJS("(()=>{const count=window.slowCleanupProbe.getAttribute('data-slow-cleanups');delete window.slowCleanupProbe;return count})()","1")
         try await equalJS("document.querySelectorAll('.entry-viewport').length",1)
+    }
+
+    // REQ-NV-004/006/009: a retained hidden tree's props can lag its display:none.
+    func testNavigationTargetsActiveEntryWhenHiddenParentAttributesLag() async throws {
+        try await launch()
+        _=try await js("\(viewport).querySelector('[data-slow-push]').click()")
+        try await waitFor{self.shell.active?.entryDepth==2 && self.shell.active?.phase == .interactive}
+        // Recreate the allowed intermediate DOM state deterministically instead of
+        // depending on React's low-priority hidden render losing a timing race.
+        let expected=shell.active!.entryID
+        // One page task keeps the deliberately stale attribute stable throughout the observation.
+        let observed=try await js("""
+        (()=>{
+          const parent=document.querySelector('[data-entry-id=root]');parent.removeAttribute('inert');
+          const observed={legacyTarget:document.querySelector('.entry-viewport:not([inert])').dataset.entryId,
+            hiddenRects:parent.getClientRects().length,activeTarget:\(viewport).dataset.entryId};
+          parent.querySelector('[data-slow-push]').click();
+          observed.depthAfterHiddenClick=window.commandCenterHost.diagnostics().depth;
+          \(viewport).querySelector('[data-slow-push]').click();return observed;
+        })()
+        """) as? [String:Any]
+        XCTAssertEqual(observed?["legacyTarget"] as? String,"root")
+        XCTAssertEqual(observed?["hiddenRects"] as? Int,0)
+        XCTAssertEqual(observed?["activeTarget"] as? String,expected)
+        XCTAssertEqual(observed?["depthAfterHiddenClick"] as? Int,2) // Covered views have no authority.
+        try await waitFor{self.shell.active?.entryDepth==3 && self.shell.active?.phase == .interactive}
     }
 
     func testTwoHundredPushPopTransitionsAndRepeatedCancelRelease() async throws {

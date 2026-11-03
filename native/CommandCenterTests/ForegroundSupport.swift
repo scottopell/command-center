@@ -1,6 +1,10 @@
 import XCTest
 import AppKit
 
+// Activity hides retained DOM before lower-priority prop updates necessarily commit.
+// The old viewport may still lack inert, so select the framework's active identity.
+let activeEntryViewportScript="Array.from(document.querySelectorAll('.entry-viewport')).find(view => view.dataset.entryId === window.commandCenterHost.diagnostics().activeEntry)"
+
 // Rendering conformance must use real foreground frames, never a test-only readiness fallback.
 @MainActor func requireForegroundWebKit(_ window:NSWindow) throws {
     NSApp.activate(ignoringOtherApps:true);window.makeKeyAndOrderFront(nil)

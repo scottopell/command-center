@@ -8,7 +8,7 @@ import WebKit
     var shell:Shell!
     var copied=[String]()
     var context=""
-    let viewport="document.querySelector('.entry-viewport:not([inert])')"
+    let viewport=activeEntryViewportScript
     override func setUpWithError() throws {
         shell=Shell(backend:isolatedBackend(),clipboardWriter:{[weak self] text in self?.copied.append(text);return true},externalOpener:{_ in false})
         try requireForegroundWebKit(shell.window)

@@ -136,8 +136,8 @@ import WebKit
         launch("SLOW 0 NAV");try await waitFor{self.shell.active?.phase == .interactive}
         let base=try XCTUnwrap(shell.window.contentView);base.layoutSubtreeIfNeeded()
         XCTAssertTrue(shell.backButton.superview===shell.commandFrame.superview)
-        let input=shell.commandFrame.convert(shell.commandFrame.bounds,to:base)
-        let back=shell.backButton.convert(shell.backButton.bounds,to:base)
+        let input=base.convert(shell.commandFrame.alignmentRect(forFrame:shell.commandFrame.frame),from:shell.commandFrame.superview)
+        let back=base.convert(shell.backButton.alignmentRect(forFrame:shell.backButton.frame),from:shell.backButton.superview)
         XCTAssertEqual(input.midY,back.midY,accuracy:1);XCTAssertLessThan(back.maxX,input.minX)
         let toolbar=shell.functionToolbar.convert(shell.functionToolbar.bounds,to:base)
         let view=try XCTUnwrap(shell.web).convert(shell.web!.bounds,to:base)
@@ -154,4 +154,32 @@ import WebKit
 
 
 
+}
+
+// Geometry requires AppKit layout, but no function launch, rendering callback or foreground window.
+@MainActor final class ShellLayoutTests:XCTestCase {
+    // REQ-SH-001/017: preserve real spacing and shared rows across system button ornamentation.
+    func testNavigationAlignmentAndAdjacentContentAtSupportedWidths() throws {
+        let shell=Shell(backend:isolatedBackend());defer{shell.cancel();shell.collector.flush();shell.window.orderOut(nil);try? FileManager.default.removeItem(at:shell.backend.directory)}
+        let base=try XCTUnwrap(shell.window.contentView)
+        func alignment(_ view:NSView)->NSRect {base.convert(view.alignmentRect(forFrame:view.frame),from:view.superview)}
+        for width:CGFloat in [930,1280] {
+            shell.window.setContentSize(NSSize(width:width,height:850))
+            for siblings in [false,true] {
+                let invocation=Invocation("SLOW","");invocation.phase = .interactive
+                if siblings{XCTAssertTrue(invocation.admitEntry("child",from:"root",depth:2,kind:"push"));invocation.phase = .interactive;invocation.siblingIndex=2;invocation.siblingCount=3}
+                shell.active=invocation;shell.updateBackControl();base.layoutSubtreeIfNeeded()
+                let input=alignment(shell.commandFrame),back=alignment(shell.backButton)
+                print("Compact row: width=\(width), siblings=\(siblings), Back frame=\(shell.backButton.frame), Back alignment=\(back), input alignment=\(input)")
+                XCTAssertEqual(input.midY,back.midY,accuracy:1)
+                let controls:[NSView]=siblings ? [shell.backButton,shell.previousButton,shell.nextButton,shell.siblingPosition,shell.commandFrame] : [shell.backButton,shell.commandFrame]
+                for (left,right) in zip(controls,controls.dropFirst()) {
+                    XCTAssertTrue(left.superview===right.superview)
+                    XCTAssertLessThan(alignment(left).maxX,alignment(right).minX,"Alignment rectangles must remain separated")
+                }
+                XCTAssertGreaterThanOrEqual(input.width,240)
+                XCTAssertEqual(shell.content.frame.maxY,shell.functionToolbar.frame.minY,accuracy:1)
+            }
+        }
+    }
 }
