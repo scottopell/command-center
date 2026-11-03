@@ -8,7 +8,7 @@ As an operator and function author, I need to add and update independently built
 
 ### REQ-PK-001: Add an existing source folder
 
-THE SYSTEM SHALL register an explicitly selected local folder containing a pack manifest with stable pack and function identities, function mnemonics, titles, entry points and supported SDK version. Git SHALL NOT be required. Pack discovery SHALL NOT search sibling folders implicitly.
+THE SYSTEM SHALL register an explicitly selected local folder containing a pack manifest with stable pack and function identities, function mnemonics, titles, entry points and an integer API epoch. Git SHALL NOT be required. Pack discovery SHALL NOT search sibling folders implicitly.
 
 **Rationale:** Private and public source folders use one installation path.
 
@@ -20,7 +20,7 @@ THE SYSTEM SHALL snapshot pack source and build frontend entries separately for 
 
 ### REQ-PK-003: Own the supported SDK and toolchain
 
-THE SYSTEM SHALL supply one supported SDK/protocol version and pinned React, framework and compiler dependencies. Independent pack clients SHALL derive types from their own operation schemas rather than a global compiled function union. The build SHALL type-check source and apply targeted source and dependency checks without claiming whole-program purity or a sandbox.
+THE SYSTEM SHALL supply one supported API epoch spanning the SDK, native bridge and worker boundary, with host-owned React, framework and compiler dependencies. Functions SHALL reference local host-provided SDK/runtime modules instead of embedding SDK or React implementations in their artifacts. Independent pack clients SHALL derive types from their own operation schemas rather than a global compiled function union. The build SHALL type-check source against the current SDK and apply targeted source and dependency checks without claiming whole-program purity or a sandbox. SDK build fingerprints SHALL provide diagnostic context rather than compatibility gating within an epoch.
 
 **Rationale:** Independent functions retain type safety without compatibility machinery.
 
@@ -65,3 +65,15 @@ WHEN a pack is removed, THE SYSTEM SHALL unregister its functions while retainin
 THE SYSTEM SHALL supply the system STRAG worker with one read-only diagnostics reader. Folder packs SHALL NOT self-declare system provenance or obtain that dependency through their manifest. Private source visibility SHALL NOT imply system privileges.
 
 **Rationale:** Diagnostics access needs one explicit dependency, not a general permissions framework.
+
+### REQ-PK-011: Adopt compatible host runtime updates automatically
+
+WHEN the host supplies a new runtime within the supported epoch, subsequent launches and worker starts SHALL use it without rebuilding or applying function source. Each open view SHALL retain its selected immutable runtime for its lifetime. Runtime adoption SHALL NOT activate unapplied source edits. Runtime resources and module resolution SHALL remain local, preserve source maps, and provide one React/framework instance per document.
+
+**Rationale:** Routine SDK fixes should not create per-pack maintenance work.
+
+### REQ-PK-012: Reject incompatible installed code without losing data
+
+THE SYSTEM SHALL check epochs during build, activation, installed artifact loading and worker startup. Missing or mismatched epochs SHALL make the affected functions unavailable with an actionable Update required explanation while retaining their code, registration and data. Compatible functions SHALL remain usable. Applying a breaking host upgrade SHALL retire old UI instances and drain admitted worker requests before replacement. The platform SHALL support one epoch without version negotiation, compatibility adapters or automatic source/data migrations.
+
+**Rationale:** A sole maintainer can change functions and the platform together while detecting wrong combinations explicitly.

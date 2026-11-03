@@ -2,12 +2,12 @@
 
 A pack is a source folder with `command-center.json`. Git is optional. CommandCenter snapshots the folder, type-checks it with its pinned SDK/compiler, and builds per-function browser assets and a worker module. No Swift build belongs in a pack. Start with [the NOTES example](examples/notes-pack/command-center.json).
 
-Built-in functions and installed packs use minified browser JavaScript and CSS. Separate linked `.map` files include the original sources for debugging; they are local build artifacts and are not part of the normal page load. Worker bundles remain unminified. Existing installed packs need a rebuild and Apply Update to adopt a new compiler output.
+Built-in functions and installed packs use minified browser JavaScript and CSS with separate source maps. Function artifacts contain application code and references to local host modules; the SDK, React and query providers are supplied by CC, with one identity per document. Worker SDK imports resolve through the host's local runtime too. No runtime modules come from the network. Worker bundles remain unminified.
 
 ```json
 {
   "id": "example.notes",
-  "sdkVersion": "1.0.0",
+  "apiEpoch": 1,
   "functions": [{
     "id": "notes", "mnemonic": "NOTES", "title": "Personal notes",
     "ui": "ui.tsx", "uiExport": "notes",
@@ -86,6 +86,16 @@ command-center pack check /path/to/pack
 command-center pack test /path/to/pack
 ```
 
-The second command also type-checks the pack's tests and runs its `tests/*.test.ts` through the installed SDK toolchain. No native build or private npm install is needed for platform-provided dependencies. CommandCenter owns SDK 1.0.0, React 19.3.1, React DOM 19.3.1, TanStack Query 5.105.0, Zod 4.6.7 and the pinned compiler. Additional dependencies require exact registry versions and a SHA-512 integrity lockfile. Lifecycle/build scripts, native add-ons, computed runtime imports, symlinks and imports escaping the source snapshot are unsupported. Explicitly copy worker assets using the manifest `assets` list; browser asset imports are bundled. External owner services remain legitimate dependencies.
+The second command also type-checks the pack's tests and runs its `tests/*.test.ts` through the installed SDK toolchain. `command-center pack check-installed` checks all non-removed registered source folders against the current SDK without applying their changes; it works with the service stopped and returns nonzero if any source is unavailable or incompatible.
+
+No native build or private npm install is needed for platform-provided dependencies. CommandCenter owns React 19.3.1, React DOM 19.3.1, TanStack Query 5.105.0, Zod 4.6.7 and the compiler. Omit those dependencies from a pack's package.json; CC supplies their runtime and types. Additional dependencies require exact registry versions and a SHA-512 integrity lockfile. Lifecycle/build scripts, native add-ons, computed runtime imports, symlinks and imports escaping the source snapshot are unsupported. Explicitly copy worker assets using the manifest `assets` list; browser asset imports are bundled. External owner services remain legitimate dependencies.
+
+## Runtime updates and compatibility
+
+`apiEpoch` is the only compatibility declaration. CC supports one epoch across the SDK, native bridge and workers. SDK implementation changes within that epoch reach the next function launch and worker start automatically, without a pack rebuild or Apply. Open documents retain their selected immutable runtime and drafts. Ordinary source edits still require manual Apply. A build fingerprint records which SDK checked an artifact; a different fingerprint does not block it.
+
+For a breaking API change, bump the epoch and update your functions together. Run pack check/test against the new SDK. A missing or mismatched epoch gives Update required; that pack's workers are not imported, while its registration, installed code and saved data remain. Other compatible packs continue to work. A breaking host upgrade restarts the app and drains worker requests through normal service replacement; it does not preserve old UI instances or migrate stored data automatically.
+
+Legacy packs using sdkVersion need a one-time manifest change to apiEpoch: 1, followed by Rebuild and Apply. Compatible installed artifacts continue working if their source folder is moved or unavailable. The CC installation supplies SDK updates; there is no separate network SDK updater.
 
 System STRAG receives one explicitly host-wired read-only diagnostics reader. Private pack visibility is separate from system provenance; folders cannot grant themselves platform dependencies.

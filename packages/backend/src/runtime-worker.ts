@@ -5,15 +5,19 @@ import {Store} from './store.ts';
 import {createDispatcher,publicError,type RegisteredWorker} from './dispatcher.ts';
 import {diagnosticsReader} from './diagnostics.ts';
 import {storageNamespace,type PackArtifact} from '../../packs/src/manifest.ts';
+import {API_EPOCH,epochError,type HostRuntime} from '../../packs/src/runtime-contract.ts';
 
 export interface ActivePack {artifact:PackArtifact;directory:string}
-export interface RuntimeConfiguration {directory:string;identity:string;systemRevision:string;packs:ActivePack[]}
+export interface RuntimeConfiguration {directory:string;identity:string;systemRevision:string;runtime:HostRuntime;unavailable:Record<string,string>;packs:ActivePack[]}
 
 let dispatch:ReturnType<typeof createDispatcher>|undefined,store:Store|undefined;
 process.on('message',async(message:any)=>{
   if(message.kind==='start'){
     try{
       const config=message.config as RuntimeConfiguration,registrations:Record<string,RegisteredWorker>={};
+      if(config.runtime.apiEpoch!==API_EPOCH)throw new Error('Incompatible host runtime epoch');
+      for(const pack of config.packs){const reason=epochError(pack.artifact.apiEpoch);if(reason)throw new Error(reason);}
+      await import(pathToFileURL(path.join(config.runtime.directory,'loader.mjs')).href);
       for(const pack of config.packs){
         const module=await import(pathToFileURL(path.join(pack.directory,pack.artifact.worker)).href),workers=module.createWorkers();
         for(const [name,worker]of Object.entries(workers)){

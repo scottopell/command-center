@@ -1562,6 +1562,42 @@
         "native/CommandCenterTests/CommandBarTests.swift",
         "native/CommandCenterTests/PackTests.swift"
       ]
+    },
+    {
+      "id": "REQ-PK-011",
+      "title": "Adopt compatible host runtime updates automatically",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/runtime-contract.ts",
+        "packages/packs/src/runtime-build.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/SDKRuntime.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "native/CommandCenterTests/SDKRuntimeTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-012",
+      "title": "Reject incompatible installed code without losing data",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/runtime-contract.ts",
+        "packages/packs/src/runtime-build.ts",
+        "packages/packs/src/builder.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/runtime-worker.ts",
+        "native/CommandCenter/SDKRuntime.swift"
+      ],
+      "tests": [
+        "tests/packs.test.ts",
+        "native/CommandCenterTests/SDKRuntimeTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
+      ]
     }
   ]
 }

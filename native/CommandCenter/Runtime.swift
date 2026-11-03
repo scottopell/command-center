@@ -29,14 +29,24 @@ final class CommandCenterWindow: NSWindow {
 // Stateless asset serving, with all content confined to the bundled function build.
 final class Assets: NSObject, WKURLSchemeHandler {
     let directory: URL
-    init(directory: URL) { self.directory = directory }
+    let runtime:SDKRuntime
+    init(directory: URL,runtime:SDKRuntime = .bundled) { self.directory = directory;self.runtime=runtime }
     func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {
         guard let url = task.request.url else { return }
-        let path = url.path == "/" ? "index.html" : String(url.path.dropFirst())
-        let file = directory.appendingPathComponent(path).standardizedFileURL
-        guard file.path.hasPrefix(directory.standardizedFileURL.path + "/") else { task.didFailWithError(NSError(domain: "Assets", code: 403)); return }
+        guard url.host=="app" else{task.didFailWithError(NSError(domain:"Assets",code:403));return}
+        var path = url.path == "/" ? "index.html" : String(url.path.dropFirst()),root=directory
+        let runtimeRequest=path.hasPrefix("__runtime/")
+        if path.hasPrefix("__runtime/") {
+            let prefix="__runtime/\(runtime.manifest.fingerprint)/"
+            guard path.hasPrefix(prefix+"browser/") else{task.didFailWithError(NSError(domain:"Assets",code:403));return}
+            path=String(path.dropFirst(prefix.count));root=runtime.directory
+        }
+        let file = root.appendingPathComponent(path).standardizedFileURL
+        guard file.path.hasPrefix(root.standardizedFileURL.path + "/") else { task.didFailWithError(NSError(domain: "Assets", code: 403)); return }
+        if runtimeRequest && !file.path.hasPrefix(runtime.directory.appendingPathComponent("browser").standardizedFileURL.path+"/"){task.didFailWithError(NSError(domain:"Assets",code:403));return}
         do {
-            let data = try Data(contentsOf: file)
+            var data = try Data(contentsOf: file)
+            if root==directory && file.pathExtension=="html" {data=try runtime.prepareHTML(data)}
             let type = ["html":"text/html", "js":"text/javascript", "css":"text/css", "json":"application/json", "map":"application/json", "svg":"image/svg+xml", "png":"image/png"][file.pathExtension] ?? "application/octet-stream"
             task.didReceive(URLResponse(url: url, mimeType: type, expectedContentLength: data.count, textEncodingName: "utf-8")); task.didReceive(data); task.didFinish()
         } catch { task.didFailWithError(error) }
@@ -102,6 +112,7 @@ struct FunctionCatalog: Decodable {
     struct Command: Decodable {
         let mnemonic:String;let title:String
         let id:String?;let packId:String?;let revision:String?
+        let apiEpoch:Int?;let checkedWith:String?;let unavailableReason:String?
         let uiDirectory:String?;let webDirectory:String?;let operations:[String:Bool]?
         func directory()->URL {
             if let directory=webDirectory{return URL(fileURLWithPath:directory)}
@@ -110,6 +121,9 @@ struct FunctionCatalog: Decodable {
     }
     let commands:[Command]
     let localSourceOrigins:[String]
+    let apiEpoch:Int?
+    let runtime:SDKRuntime.Descriptor?
+    init(commands:[Command],localSourceOrigins:[String],apiEpoch:Int?=nil,runtime:SDKRuntime.Descriptor?=nil){self.commands=commands;self.localSourceOrigins=localSourceOrigins;self.apiEpoch=apiEpoch;self.runtime=runtime}
     static let current:FunctionCatalog = {
         guard let url=Bundle.main.url(forResource:"catalog",withExtension:"json"),
               let data=try? Data(contentsOf:url),let catalog=try? JSONDecoder().decode(FunctionCatalog.self,from:data) else {
@@ -122,13 +136,16 @@ struct FunctionCatalog: Decodable {
         let file=directory.appendingPathComponent("packs/catalog.json")
         guard let data=try? Data(contentsOf:file),let installed=try? JSONDecoder().decode(FunctionCatalog.self,from:data) else{return current}
         let buildRoot=directory.appendingPathComponent("packs/builds").resolvingSymlinksInPath().path+"/"
-        let external=installed.commands.filter{command in
-            guard command.packId != "cc.system",let path=command.webDirectory else{return false}
-            return URL(fileURLWithPath:path).resolvingSymlinksInPath().path.hasPrefix(buildRoot)
+        let serviceRoot=directory.appendingPathComponent("service").resolvingSymlinksInPath().path+"/",bundleRoot=Bundle.main.resourceURL!.resolvingSymlinksInPath().path+"/"
+        let accepted=installed.commands.filter{command in
+            guard let path=command.webDirectory else{return false}
+            let resolved=URL(fileURLWithPath:path).resolvingSymlinksInPath().path
+            return command.packId=="cc.system" ? (resolved.hasPrefix(serviceRoot)||resolved.hasPrefix(bundleRoot)) : resolved.hasPrefix(buildRoot)
         }
-        let commands=current.commands+external
+        let system=accepted.filter{$0.packId=="cc.system"}
+        let commands=(system.isEmpty ? current.commands : system)+accepted.filter{$0.packId != "cc.system"}
         guard Set(commands.map{$0.mnemonic}).count==commands.count else{return current}
-        return FunctionCatalog(commands:commands,localSourceOrigins:Array(Set(current.localSourceOrigins+installed.localSourceOrigins)))
+        return FunctionCatalog(commands:commands,localSourceOrigins:Array(Set(current.localSourceOrigins+installed.localSourceOrigins)),apiEpoch:installed.apiEpoch ?? current.apiEpoch,runtime:installed.runtime)
     }
 }
 // REQ-SH-015: external URLs never become documents with access to the function bridge.

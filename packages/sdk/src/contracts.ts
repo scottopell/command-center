@@ -15,7 +15,7 @@ export class AppError extends Error {
   details?: unknown;
   constructor(code: string, message: string, details?: unknown) { super(message);this.name='CommandCenterError'; this.code = code; this.details = details; }
 }
-export const envelopeSchema = z.strictObject({ function: z.string().min(1).max(32), operation: z.string().min(1).max(64), input: z.unknown(),revision:z.string().max(128).optional() });
+export const envelopeSchema = z.strictObject({ function: z.string().min(1).max(32), operation: z.string().min(1).max(64), input: z.unknown(),revision:z.string().max(128).optional(),apiEpoch:z.number().int().positive().optional() });
 export function operation<I extends z.ZodType,O extends z.ZodType>(input:I,output:O):Readonly<{input:I;output:O;mutating:false}>;
 export function operation<I extends z.ZodType,O extends z.ZodType,M extends boolean>(input:I,output:O,mutating:M):Readonly<{input:I;output:O;mutating:M}>;
 export function operation(input:z.ZodType,output:z.ZodType,mutating=false){return Object.freeze({input,output,mutating});}

@@ -18,6 +18,7 @@ const help = `CommandCenter local agent client
   command-center drqs get NUMBER
   command-center drqs update NUMBER [--comment text] [--group 44] [--state N] [--owner email|--clear-owner]
   command-center pack check|test FOLDER
+  command-center pack check-installed
   command-center strag list [--since ISO_DATE] [--function MNEMONIC] [--all]
   command-center strag get ID
   command-center host
@@ -41,10 +42,18 @@ export async function main(args = process.argv.slice(2)) {
   const actor: Actor | undefined = values.human ? undefined : {kind:'agent',id:values.actor || process.env.COMMAND_CENTER_AGENT || 'local-cli',name:values['actor-name'] || values.actor || 'Local coding agent'};
   let result: unknown;
   if(positionals[0].toLowerCase()==='pack'){
-    if(!['check','test'].includes(positionals[1])||!positionals[2])throw new AppError('validation','Use pack check FOLDER or pack test FOLDER');
+    if(!['check','test','check-installed'].includes(positionals[1])||(positionals[1]!=='check-installed'&&!positionals[2]))throw new AppError('validation','Use pack check FOLDER, pack test FOLDER or pack check-installed');
     const artifacts=await mkdtemp(path.join(tmpdir(),'cc-pack-check-'));
     try{const base=path.dirname(fileURLToPath(import.meta.url)),toolchain=import.meta.url.endsWith('.mjs')?path.join(base,'toolchain'):fileURLToPath(new URL('../../../dist/toolchain',import.meta.url));
-      const output=await run(process.execPath,[path.join(toolchain,'builder.mjs'),path.resolve(positionals[2]),artifacts,...(positionals[1]==='test'?['--test']:[])],{timeout:180000});result=JSON.parse(output.trim().split('\n').at(-1)!);
+      if(positionals[1]==='check-installed'){
+        let registrations:Array<{id:string;source:string;removed?:boolean}>=[];
+        try{registrations=JSON.parse(await readFile(path.join(directory??dataDirectory(),'packs/registry.json'),'utf8'));}catch(error:any){if(error.code!=='ENOENT')throw error;}
+        const checks=[];for(const pack of registrations.filter(p=>!p.removed)){
+          try{await run(process.execPath,[path.join(toolchain,'builder.mjs'),pack.source,artifacts],{timeout:180000});checks.push({id:pack.id,ok:true});}
+          catch(error){checks.push({id:pack.id,ok:false,error:error instanceof Error?error.message:'Pack check failed'});}
+        }
+        result=checks;if(checks.some(c=>!c.ok))process.exitCode=1;
+      }else{const output=await run(process.execPath,[path.join(toolchain,'builder.mjs'),path.resolve(positionals[2]),artifacts,...(positionals[1]==='test'?['--test']:[])],{timeout:180000});result=JSON.parse(output.trim().split('\n').at(-1)!);}
     }finally{await rm(artifacts,{recursive:true,force:true});}
   }else if(positionals[0].toLowerCase()==='strag'){
     const history=diagnosticsReader(directory??dataDirectory());

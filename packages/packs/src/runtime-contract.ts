@@ -1,0 +1,6 @@
+// REQ-PK-003/011/012: one compatibility epoch, not an SDK/dependency version matrix.
+export const API_EPOCH=1;
+export interface HostRuntime {apiEpoch:number;fingerprint:string;directory:string;imports:Record<string,string>}
+export const runtimeMarker='<!-- COMMAND_CENTER_RUNTIME -->';
+export function functionHTML(){return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src commandcenter:; style-src commandcenter: \'unsafe-inline\'; img-src commandcenter: data:; font-src commandcenter:; connect-src \'none\'; frame-src \'none\'; worker-src \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'">'+runtimeMarker+'<link rel="stylesheet" href="app.css"></head><body><div id="root"></div><script type="module" src="app.js"></script></body></html>';}
+export function epochError(epoch:unknown){return epoch===API_EPOCH?undefined:`Update required: this pack uses API epoch ${epoch??'missing (legacy build)'}, but CommandCenter supports ${API_EPOCH}. Update its manifest and source, run pack check, rebuild and Apply. Saved data is retained.`;}

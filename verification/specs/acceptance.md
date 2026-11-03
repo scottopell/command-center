@@ -169,3 +169,11 @@ The input operation records are abstract specification history, not a requiremen
 | Active highlight | Editing the input does not move the current-function highlight. Switching functions moves it; cancellation clears it. | REQ-SH-017 |
 | Overflow | Narrow the row. Every shortcut remains present either as a button or a More item, in the same order. Activating an overflow item launches once. Widening the row restores the shortcuts. | REQ-SH-017 |
 | Installed catalog changes | Apply an independent pack; its shortcuts appear. Refreshing added/removed catalog entries preserves the open invocation, input draft and keyboard focus. | REQ-PK-007, REQ-SH-017 |
+
+## Host runtime compatibility
+
+| Scenario | Required observation | Requirements |
+| --- | --- | --- |
+| Compatible runtime replacement | Keep function artifact bytes and revision unchanged, replace the host runtime with another generation in the same epoch, and start a worker/view. The new SDK takes effect without reading or applying changed source. An existing document keeps its old runtime and draft. | REQ-PK-011 |
+| Incompatible installed artifact | Start with a legacy missing-epoch artifact or a different epoch. Its worker is never imported; its functions show Update required. Other packs work, identities remain reserved and saved data remains. A compatible rebuild and explicit Apply restore access. | REQ-PK-012 |
+| Source compatibility | Check registered source against the current SDK without applying it. A missing source or type error yields non-success; unsupported SDK exports fail clearly instead of hanging at launch. | REQ-PK-003, REQ-PK-012 |

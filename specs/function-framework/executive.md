@@ -32,4 +32,4 @@ Implementation evidence: [code, tests and measurement scope](../../verification/
 ## Open questions & future directions
 
 - The standalone SDK is distributed with the host toolchain; publishing it separately remains optional.
-- Local folder packs use SDK 1.0.0. Cross-version negotiation and arbitrary embedded web apps remain deferred.
+- Local folder packs declare API epoch 1 and use the host-provided SDK and React runtime. Cross-version negotiation and arbitrary embedded web apps remain deferred.

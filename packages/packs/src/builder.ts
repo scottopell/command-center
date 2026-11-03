@@ -6,11 +6,12 @@ import {createHash} from 'node:crypto';
 import {run} from './process.ts';
 import {build} from 'esbuild';
 import ts from 'typescript';
-import {manifestSchema,SDK_VERSION,type PackArtifact} from './manifest.ts';
+import {parsePackManifest,type PackArtifact} from './manifest.ts';
+import {epochError,functionHTML} from './runtime-contract.ts';
+import {runtimeImports,providedPackages} from './runtime-build.ts';
 
 const ignored=new Set(['.git','node_modules','.work','.tools','.generated','build','dist','.DS_Store']);
 const reserved=['@command-center/sdk','react','react-dom','scheduler','zod','@tanstack/react-query','@tanstack/query-core','@types/react','@types/react-dom','@types/node','csstype','undici-types'];
-const pins:Record<string,string>={'@command-center/sdk':SDK_VERSION,react:'19.3.1','react-dom':'19.3.1',zod:'4.6.7','@tanstack/react-query':'5.105.0'};
 
 // REQ-PK-002: snapshot inputs once; generated artifacts never refer to the source checkout.
 export async function snapshot(source:string,destination:string){
@@ -36,10 +37,10 @@ async function installDependencies(root:string,toolchain:string){
   if(['preinstall','install','postinstall','prepare','prebuild','build','postbuild'].some(key=>pkg.scripts?.[key]))throw new Error('Pack build/install hooks are not supported; CommandCenter owns compilation');
   const dependencies={...pkg.dependencies,...pkg.devDependencies};
   for(const [name,version]of Object.entries(dependencies)){
-    if(pins[name]&&version!==pins[name])throw new Error(`${name} must use the platform version ${pins[name]}`);
-    if(!pins[name]&&!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(String(version)))throw new Error(`Dependency ${name} must have an exact registry version`);
+    // Platform dependencies are supplied by the host; API epoch controls compatibility.
+    if(!providedPackages.includes(name)&&!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(String(version)))throw new Error(`Dependency ${name} must have an exact registry version`);
   }
-  if(Object.keys(dependencies).some(name=>!pins[name])){
+  if(Object.keys(dependencies).some(name=>!providedPackages.includes(name))){
     const lock=JSON.parse(await fs.readFile(path.join(root,'package-lock.json'),'utf8'));
     for(const [name,item]of Object.entries(lock.packages??{}) as [string,any][]){if(!name)continue;if(item.link||!String(item.resolved).startsWith('https://registry.npmjs.org/')||!String(item.integrity).startsWith('sha512-'))throw new Error('Use a registry lockfile with integrity hashes, without local or Git dependencies');}
     await run(process.execPath,[path.join(toolchain,'node_modules/npm/bin/npm-cli.js'),'ci','--ignore-scripts','--no-audit','--no-fund'],{cwd:root,timeout:120000});
@@ -69,7 +70,9 @@ export async function buildPack(source:string,builds:string,toolchain:string,tes
   source=path.resolve(source);builds=path.resolve(builds);toolchain=path.resolve(toolchain);await fs.mkdir(builds,{recursive:true});
   const temporary=await fs.mkdtemp(path.join(builds,'.staging-'));const root=path.join(temporary,'source'),out=path.join(temporary,'artifact');
   try{
-    const digest=await snapshot(await fs.realpath(source),root),manifest=manifestSchema.parse(JSON.parse(await fs.readFile(path.join(root,'command-center.json'),'utf8')));
+    const digest=await snapshot(await fs.realpath(source),root),manifest=parsePackManifest(JSON.parse(await fs.readFile(path.join(root,'command-center.json'),'utf8')));
+    const runtime=JSON.parse(await fs.readFile(path.join(toolchain,'runtime/runtime.json'),'utf8'));
+    if(epochError(runtime.apiEpoch))throw new Error('Host compiler/runtime epoch mismatch. Reinstall CommandCenter.');
     const toolchainId=await fs.readFile(path.join(toolchain,'identity'),'utf8');const revision=createHash('sha256').update(digest).update(toolchainId).digest('hex');
     const final=path.join(builds,revision);
     await installDependencies(root,toolchain);await fs.mkdir(out,{recursive:true});
@@ -83,28 +86,27 @@ export async function buildPack(source:string,builds:string,toolchain:string,tes
     if(diagnostics.length)throw new Error(ts.formatDiagnosticsWithColorAndContext(diagnostics,{getCanonicalFileName:f=>f,getCurrentDirectory:()=>root,getNewLine:()=> '\n'}).slice(0,16384));
     for(const file of program.getSourceFiles())if(file.fileName.startsWith(root+path.sep)&&!file.fileName.includes(`${path.sep}node_modules${path.sep}`)&&!file.fileName.includes(`${path.sep}tests${path.sep}`)&&!file.isDeclarationFile)checkSource(path.relative(root,file.fileName),file.text);
     const compile=async(entry:string,output:string,platform:'browser'|'node')=>{
-      const result=await build({entryPoints:[entry],outfile:output,absWorkingDir:root,bundle:true,format:'esm',platform,target:platform==='node'?'node26':'safari17',jsx:'automatic',alias:Object.fromEntries(['react','react-dom','@tanstack/react-query','@tanstack/query-core','zod'].map(name=>[name,path.join(toolchain,'node_modules',name)])),define:{'process.env.NODE_ENV':'"production"'},metafile:true,minify:platform==='browser',sourcemap:true,loader:{'.png':'file','.svg':'file','.woff2':'file'},nodePaths:[path.join(root,'node_modules')],...(platform==='node'?{banner:{js:"import {createRequire} from 'node:module';const require=createRequire(import.meta.url);"}}:{} )});
-      for(const input of Object.keys(result.metafile!.inputs)){const resolved=path.resolve(root,input);if(![root,toolchain].some(base=>resolved.startsWith(path.resolve(base)+path.sep)))throw new Error(`Import escapes the pack: ${input}`);if(input.endsWith('.node'))throw new Error('Native add-ons are not supported');}
+      const result=await build({entryPoints:[entry],outfile:output,absWorkingDir:root,bundle:true,format:'esm',platform,target:platform==='node'?'node26':'safari17',jsx:'automatic',plugins:[runtimeImports()],define:{'process.env.NODE_ENV':'"production"'},metafile:true,minify:platform==='browser',sourcemap:true,loader:{'.png':'file','.svg':'file','.woff2':'file'},nodePaths:[path.join(root,'node_modules')],...(platform==='node'?{banner:{js:"import {createRequire} from 'node:module';const require=createRequire(import.meta.url);"}}:{} )});
+      for(const input of Object.keys(result.metafile!.inputs)){if(input.startsWith('cc-runtime:'))continue;const resolved=path.resolve(root,input);if(![root,toolchain].some(base=>resolved.startsWith(path.resolve(base)+path.sep)))throw new Error(`Import escapes the pack: ${input}`);if(input.endsWith('.node'))throw new Error('Native add-ons are not supported');}
     };
     if(tests&&testFiles.length){
       const compiled:string[]=[];for(const [i,file]of testFiles.entries()){const target=path.join(temporary,'test-'+i+'.mjs');await compile(file,target,'node');compiled.push(target);}
-      const output=await run(process.execPath,['--test',...compiled],{cwd:root,timeout:60000});process.stderr.write(output);
+      const output=await run(process.execPath,['--import',path.join(toolchain,'runtime/loader.mjs'),'--test',...compiled],{cwd:root,timeout:60000});process.stderr.write(output);
     }
     for(const f of manifest.functions){
       const bootstrap=path.join(root,`.cc-${f.id}.tsx`),directory=path.join(out,'functions',f.id,'web');await fs.mkdir(directory,{recursive:true});
       await fs.writeFile(bootstrap,`import {mount} from '@command-center/sdk/runtime';import {${f.uiExport} as definition} from ${JSON.stringify('./'+f.ui)};mount(definition,new URLSearchParams(location.search).get('tail')||'');`);
       await compile(bootstrap,path.join(directory,'app.js'),'browser');
       try{await fs.access(path.join(directory,'app.css'));}catch{await fs.writeFile(path.join(directory,'app.css'),'');}
-      await compile(path.join(toolchain,'node_modules/@command-center/sdk/src/style.css'),path.join(directory,'style.css'),'browser');
-      await fs.writeFile(path.join(directory,'index.html'),'<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src commandcenter:; style-src commandcenter: \'unsafe-inline\'; img-src commandcenter: data:; font-src commandcenter:; connect-src \'none\'; frame-src \'none\'; worker-src \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css"></head><body><div id="root"></div><script type="module" src="app.js"></script></body></html>');
+      await fs.writeFile(path.join(directory,'index.html'),functionHTML());
     }
     const imports=manifest.functions.filter(f=>f.worker).map((f,i)=>`import {${f.workerExport} as w${i}} from ${JSON.stringify('./'+f.worker)};`);
     const workerEntry=path.join(root,'.cc-workers.ts');await fs.writeFile(workerEntry,imports.join('\n')+'\nexport function createWorkers(){return {'+manifest.functions.filter(f=>f.worker).map((f,i)=>`${JSON.stringify(f.mnemonic)}:w${i}`).join(',')+'};}\n');
     await compile(workerEntry,path.join(out,'worker.mjs'),'node');
     for(const asset of manifest.assets){const from=path.join(root,asset),to=path.join(out,asset);if(['artifact.json','worker.mjs','functions'].includes(asset.split('/')[0]))throw new Error(`Asset path ${asset} conflicts with installed code`);await fs.cp(from,to,{recursive:true});}
     const probe=`const m=await import(${JSON.stringify(pathToFileURL(path.join(out,'worker.mjs')).href)});const workers=m.createWorkers();let result={};for(const [name,w]of Object.entries(workers)){if(w.name!==name)throw Error('Worker mnemonic differs from manifest');result[name]={};for(const [op,d]of Object.entries(w.definition)){if(typeof w.handlers[op]!=='function'||typeof d.mutating!=='boolean'||typeof d.input?.parse!=='function'||typeof d.output?.parse!=='function')throw Error('Invalid worker contract');result[name][op]=d.mutating;}}console.log(JSON.stringify(result));`;
-    const metadata=JSON.parse((await run(process.execPath,['--input-type=module','-e',probe],{timeout:10000})).trim().split('\n').at(-1)!);
-    const artifact:PackArtifact={id:manifest.id,sdkVersion:manifest.sdkVersion,revision,worker:'worker.mjs',localSourceOrigins:manifest.localSourceOrigins,functions:manifest.functions.map(f=>({id:f.id,mnemonic:f.mnemonic,title:f.title,uiDirectory:`functions/${f.id}/web`,operations:metadata[f.mnemonic]??{}}))};
+    const metadata=JSON.parse((await run(process.execPath,['--import',path.join(toolchain,'runtime/loader.mjs'),'--input-type=module','-e',probe],{timeout:10000})).trim().split('\n').at(-1)!);
+    const artifact:PackArtifact={id:manifest.id,apiEpoch:manifest.apiEpoch,checkedWith:runtime.fingerprint,revision,worker:'worker.mjs',localSourceOrigins:manifest.localSourceOrigins,functions:manifest.functions.map(f=>({id:f.id,mnemonic:f.mnemonic,title:f.title,uiDirectory:`functions/${f.id}/web`,operations:metadata[f.mnemonic]??{}}))};
     await fs.writeFile(path.join(out,'artifact.json'),JSON.stringify(artifact,null,2)+'\n');try{await fs.access(final);}catch{await fs.rename(out,final);}return artifact;
   }finally{await fs.rm(temporary,{recursive:true,force:true});}
 }

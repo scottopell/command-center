@@ -23,6 +23,7 @@ All feature specs share this one chain. Accepted records explain agreed decision
 | [ADR-017](017_runtime-packs-and-transition-diagnostics.md) | Accepted | Runtime local packs, safe shared-worker activation and transition diagnostics |
 | [ADR-018](018_function-toolbar.md) | Accepted | Visible catalog shortcuts with ordinary fresh-invocation launch |
 | [ADR-019](019_foreground-transition-budget.md) | Accepted | Foreground-only transition budget and a single frame-based readiness path |
+| [ADR-020](020_host-runtime-and-api-epoch.md) | Accepted | Host-provided SDK/React runtime and a single compatibility epoch |
 
 ## Task routing
 

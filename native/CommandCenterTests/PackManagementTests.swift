@@ -48,6 +48,16 @@ private final class PackUIBackend: Backend {
         XCTAssertNil(PackPresentation(pack("building"))?.primaryAction)
     }
 
+    func testIncompatibleInstalledPackExplainsUnavailableStateWithoutDeletingIt() {
+        var legacy=pack();legacy["incompatible"]="Update required: rebuild for API epoch 1. Saved data is retained."
+        let presentation=PackPresentation(legacy)!
+        XCTAssertEqual(presentation.status,"Update required");XCTAssertTrue(presentation.installed)
+        XCTAssertEqual(presentation.primaryTitle,"Rebuild");XCTAssertEqual(presentation.primaryAction,"build")
+        XCTAssertTrue(presentation.explanation.contains("Saved data is retained"))
+        legacy["status"]="ready";legacy["candidate"]="compatible-build"
+        XCTAssertEqual(PackPresentation(legacy)?.primaryTitle,"Apply Update")
+    }
+
     // Regression for a short document appearing at the bottom of a large empty viewport.
     func testCardsStartAtTopNameTheirFunctionsAndDoNotRebuildDuringPolling() throws {
         controller.render([pack()]);controller.panel.contentView!.layoutSubtreeIfNeeded()

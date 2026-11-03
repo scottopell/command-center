@@ -20,6 +20,7 @@ final class Invocation {
     let commandText: String
     let started:Double
     var transitionToken="root"
+    var apiEpoch:Int?
     var measurement:TransitionMeasurement?
     var phase = Phase.resolving
     var ownsInput = true

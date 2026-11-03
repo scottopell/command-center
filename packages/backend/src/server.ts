@@ -14,6 +14,7 @@ import { dataDirectory, defaultPort } from './config.ts';
 import {WorkerRuntime} from './runtime.ts';
 import {PackManager} from '../../packs/src/manager.ts';
 import type {ActivePack} from './runtime-worker.ts';
+import {API_EPOCH} from '../../packs/src/runtime-contract.ts';
 
 export const MAX_RPC_RESPONSE_BYTES = 2 * 1024 * 1024;
 
@@ -30,8 +31,8 @@ export async function startServer({ directory = dataDirectory(), port = defaultP
   const resourceRoot=resources??(import.meta.url.endsWith('.mjs')?path.dirname(fileURLToPath(import.meta.url)):fileURLToPath(new URL('../../../dist',import.meta.url)));
   const definitions={...builtinContracts,STRAG:stragContract.operations};
   const functions=['DRQS','HOST','SLOW','STRAG'].map(mnemonic=>({id:mnemonic.toLowerCase(),mnemonic,title:{DRQS:'Development request system',HOST:'Host and user services',SLOW:'Lifecycle conformance',STRAG:'Transition diagnostics'}[mnemonic]!,uiDirectory:`functions/${mnemonic.toLowerCase()}/web`,operations:Object.fromEntries(Object.entries(definitions[mnemonic as keyof typeof definitions]??{}).map(([key,value])=>[key,value.mutating]))}));
-  let system:ActivePack={directory:resourceRoot,artifact:{id:SYSTEM_PACK,sdkVersion:'1.0.0',revision:'development',worker:'worker-runtime.mjs',functions,localSourceOrigins:[]}};
-  try{const catalog=JSON.parse(await readFile(path.join(resourceRoot,'catalog.json'),'utf8'));if(catalog.system)system={directory:resourceRoot,artifact:catalog.system};}catch{}
+  let system:ActivePack={directory:resourceRoot,artifact:{id:SYSTEM_PACK,apiEpoch:API_EPOCH,revision:'development',worker:'worker-runtime.mjs',functions,localSourceOrigins:[]}};
+  try{const catalog=JSON.parse(await readFile(path.join(resourceRoot,'catalog.json'),'utf8'));if(catalog.system?.apiEpoch===API_EPOCH)system={directory:resourceRoot,artifact:catalog.system};}catch{}
   const runtime=new WorkerRuntime(),packs=new PackManager(directory,path.join(resourceRoot,'toolchain'),system,runtime,store);
   try{await packs.initialize();await runtime.start(await packs.configuration());await packs.publish();}catch(error){await packs.close();store.close();throw error;}
   const server = createServer(async (req, res) => {

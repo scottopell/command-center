@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-11-03T20:35:36.652Z",
+  "policy": "Host-provided runtime; one API epoch; immutable per-document generations; manual Apply for source changes",
+  "checks": {
+    "sourceBackend": {
+      "passed": 36,
+      "failed": 0
+    },
+    "nativeLocal": {
+      "passed": 23,
+      "skipped": 33,
+      "failed": 0,
+      "foregroundSuite": "Skipped: test host could not obtain foreground visibility",
+      "sdkModuleCases": 3
+    },
+    "packagedServiceCLI": "passed",
+    "privatePackSource": "Typecheck and seven fixture tests passed; no owner data writes"
+  },
+  "evidence": [
+    "Unchanged installed worker adopts a same-epoch host SDK without rebuild or source access",
+    "Two real WebKit documents use different SDK generations; old draft retained; React hooks mount successfully",
+    "Missing or mismatched epochs rejected before worker import; data retained; compatible Apply restores access",
+    "Missing SDK export produces actionable WebKit module-load error",
+    "Function source maps remain separate and resolve to original TSX"
+  ],
+  "limitations": [
+    "No foreground timing or pixel-presentation claim from the local run",
+    "Old runtime-generation disk reclamation is deferred",
+    "Host installation supplies runtime updates; no independent network updater"
+  ]
+}

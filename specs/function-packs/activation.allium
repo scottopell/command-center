@@ -1,5 +1,5 @@
 -- allium: 3
--- REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009
+-- REQ-PK-003, REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009, REQ-PK-011, REQ-PK-012
 
 entity FunctionPack {
     identity: String
@@ -8,12 +8,16 @@ entity FunctionPack {
     candidate_valid: Boolean
     retained_data: Boolean
     removed: Boolean
+    api_epoch: Integer?
+    candidate_api_epoch: Integer?
+    available: Boolean
 }
 
 entity WorkerService {
     admission_open: Boolean
     active_handlers: Integer
     installation_identity: String
+    api_epoch: Integer
 }
 
 enum ActivationPhase { draining | starting | applied | postponed | failed }
@@ -32,6 +36,7 @@ rule RequestActivation {
     requires: service.admission_open
     requires: pack.candidate_valid
     requires: pack.candidate_revision != null
+    requires: pack.candidate_api_epoch = service.api_epoch
     requires: not pack.removed
     ensures:
         service.admission_open = false
@@ -63,6 +68,8 @@ rule PublishMatchingInstallation {
     requires: reported_identity = activation.expected_identity
     ensures:
         activation.pack.active_revision = activation.candidate_revision
+        activation.pack.api_epoch = activation.pack.candidate_api_epoch
+        activation.pack.available = true
         activation.service.installation_identity = reported_identity
         activation.service.admission_open = true
         activation.phase = applied
@@ -87,9 +94,27 @@ rule RemovePackCode {
     ensures:
         pack.removed = true
         pack.active_revision = null
+        pack.available = false
+}
+
+rule CheckInstalledEpoch {
+    when: InstalledPackChecked(pack, service)
+    ensures:
+        pack.available = not pack.removed and pack.active_revision != null and pack.api_epoch = service.api_epoch
 }
 
 contract PackBoundary {
+    @invariant OneEpoch
+        -- Build, activation and worker startup accept exactly the host's API
+        -- epoch. Missing/mismatched installed epochs remain registered with
+        -- code/data retained and an Update required reason; their workers
+        -- are never imported. Compatible packs continue to run.
+    @invariant HostRuntimeAdoption
+        -- Functions reference local host SDK/React modules. Within one epoch,
+        -- new documents and worker starts adopt the current host runtime with
+        -- no function rebuild or source Apply. Open documents pin immutable
+        -- runtime resources. Source edits remain manual Apply. Runtime build
+        -- fingerprints are diagnostic, not another compatibility constraint.
     @invariant IndependentOwnership
         -- Mnemonics are unique labels. Persistent data is owned by stable pack
         -- and function identity; removing code does not delete retained records.
@@ -111,9 +136,12 @@ surface RegisteredPack {
         pack.candidate_revision
         pack.retained_data
         pack.removed
+        pack.available
+        pack.api_epoch
     provides:
         ApplyRequested(pack, service, candidate_identity) when pack.candidate_valid and not pack.removed
         PackRemoved(pack) when not pack.removed
+        InstalledPackChecked(pack, service)
     contracts:
         fulfils PackBoundary
 }

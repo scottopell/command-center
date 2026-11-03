@@ -22,8 +22,10 @@ See [ADR-017](../adrs/017_runtime-packs-and-transition-diagnostics.md). The host
 | **REQ-PK-008:** Relaunch an affected open function | ✅ Complete | Actual WebKit Apply & Relaunch drops tail/draft and retains an unrelated invocation. |
 | **REQ-PK-009:** Remove code while retaining data | ✅ Complete | Removal retains records; native-only purge requires removal first. |
 | **REQ-PK-010:** Keep system dependencies explicit | ✅ Complete | One explicit host-wired read-only STRAG dependency; folder system identity refused. |
+| **REQ-PK-011:** Adopt compatible host runtime updates automatically | ✅ Complete | Shared browser/worker runtime, immutable document generations and source-independent adoption checks. |
+| **REQ-PK-012:** Reject incompatible installed code without losing data | ✅ Complete | Epoch gates at build/startup/activation and retained unavailable packs. |
 
-**Progress:** 10 of 10 complete.
+**Progress:** 12 of 12 complete.
 
 ## Open Questions & Future Directions
 

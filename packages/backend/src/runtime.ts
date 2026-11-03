@@ -2,6 +2,7 @@ import {fork,type ChildProcess} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {AppError} from '../../contracts/src/core.ts';
 import type {RuntimeConfiguration} from './runtime-worker.ts';
+import {API_EPOCH} from '../../packs/src/runtime-contract.ts';
 
 // REQ-PK-006/007: one shared replaceable runtime; pending tracks handlers, not sockets.
 export class WorkerRuntime {
@@ -14,11 +15,13 @@ export class WorkerRuntime {
   operations:Record<string,Record<string,boolean>>={};
   identity='';
   private revisions:Record<string,string>={};
+  private unavailable:Record<string,string>={};
   get activeHandlers(){return this.pending.size;}
   get available(){return this.ready && Boolean(this.child?.connected);}
   get admissionOpen(){return this.accepting;}
   async start(configuration:RuntimeConfiguration){
     this.ready=false;this.configuration=configuration;
+    this.unavailable=configuration.unavailable;
     this.revisions=Object.fromEntries([...['DRQS','HOST','STRAG'].map(name=>[name,configuration.systemRevision]),...configuration.packs.flatMap(p=>p.artifact.functions.map(f=>[f.mnemonic,p.artifact.revision]))]);
     const entry=new URL(import.meta.url.endsWith('.mjs')?'./worker-runtime.mjs':'./runtime-worker.ts',import.meta.url);
     const child=fork(fileURLToPath(entry),[],{stdio:['ignore','inherit','inherit','ipc'],serialization:'json'});this.child=child;
@@ -46,6 +49,8 @@ export class WorkerRuntime {
   async call(payload:any){
     if(!this.accepting)throw new AppError('maintenance','CommandCenter is applying an update; this request was not admitted');
     if(!this.available)throw new AppError('unavailable','The worker process is unavailable');
+    if(payload?.apiEpoch!==undefined&&payload.apiEpoch!==API_EPOCH)throw new AppError('update_required','Update required: this view uses a different API epoch. Restart the matching CommandCenter app. This request was not admitted.');
+    if(Object.hasOwn(this.unavailable,payload?.function))throw new AppError('update_required',this.unavailable[payload.function]);
     if(payload?.revision&&payload.revision!==this.revisions[payload.function])throw new AppError('conflict','The function has been updated. Relaunch before making another request. This request was not admitted.');
     const id=++this.sequence,mutation=this.operations[payload?.function]?.[payload?.operation]===true;
     return new Promise<any>((resolve,reject)=>{this.pending.set(id,{resolve,reject,mutation});this.child!.send({kind:'call',id,payload},error=>{if(error){const waiter=this.pending.get(id);this.pending.delete(id);waiter?.reject(new AppError(mutation?'outcome_unknown':'unavailable','Worker communication failed; no retry was attempted'));}});});

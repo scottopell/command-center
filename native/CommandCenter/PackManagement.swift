@@ -3,6 +3,9 @@ import AppKit
 extension Shell {
     func reloadCatalog(){
         catalog=FunctionCatalog.installed(in:backend.directory);entries=catalog.commands.map{($0.mnemonic,$0.title)}
+        do {sdkRuntime=try SDKRuntime.selected(in:backend.directory,descriptor:catalog.runtime);runtimeError=nil}
+        catch {runtimeError="Update required: the local SDK runtime is unavailable or incompatible. Reinstall CommandCenter and its service."}
+        if catalog.apiEpoch != SDKRuntime.bundled.manifest.apiEpoch,active != nil {cancel()}
         for item in catalog.commands {if let operations=item.operations{operationMetadata[item.mnemonic]=operations}}
         let names=Set(catalog.commands.map{$0.mnemonic});operationMetadata=operationMetadata.filter{names.contains($0.key)}
         functionToolbar.setFunctions(entries)
@@ -12,7 +15,7 @@ extension Shell {
         invocation.measurement?.finish("superseded")
         let definition=catalog.commands.first{$0.mnemonic==invocation.mnemonic}
         let trace=TransitionMeasurement(mnemonic:invocation.mnemonic,command:invocation.commandText,kind:kind,token:invocation.transitionToken,packId:definition?.packId ?? "cc.system",functionId:definition?.id ?? invocation.mnemonic.lowercased(),revision:definition?.revision ?? "bundled",collector:collector,foreground:{[weak window] in NSApp.isActive && window?.occlusionState.contains(.visible)==true},started:started)
-        trace.context(["windowVisible":window.isVisible,"windowOcclusionVisible":window.occlusionState.contains(.visible),"thermalState":ProcessInfo.processInfo.thermalState.rawValue])
+        trace.context(["windowVisible":window.isVisible,"windowOcclusionVisible":window.occlusionState.contains(.visible),"thermalState":ProcessInfo.processInfo.thermalState.rawValue,"apiEpoch":sdkRuntime.manifest.apiEpoch,"runtimeFingerprint":sdkRuntime.manifest.fingerprint,"checkedWith":definition?.checkedWith ?? "host build"])
         let generation=invocation.id,token=invocation.transitionToken,noticeID=trace.id,mnemonic=invocation.mnemonic
         trace.onStraggler={ [weak self] in
             guard let self=self,self.active?.id==generation,self.active?.transitionToken==token else{return}
@@ -66,6 +69,7 @@ struct PackPresentation {
     let candidate: String?
     let error: String?
     let relaunch: Bool
+    let incompatible:String?
     var title: String { source.isEmpty ? id : URL(fileURLWithPath: source).lastPathComponent }
     var preparing: Bool { !removed && (state == "building" || state == "changed") }
     var ready: Bool { !removed && state == "ready" && candidate != nil }
@@ -73,12 +77,14 @@ struct PackPresentation {
     var status: String {
         if removed { return "Removed" }
         if preparing { return "Preparing…" }
+        if incompatible != nil && !ready {return "Update required"}
         if failed { return installed ? "Update failed" : "Setup failed" }
         if ready { return installed ? "Update ready" : "Ready to enable" }
         return installed ? "Up to date" : "Not enabled"
     }
     var explanation: String {
         if removed { return "These functions are no longer available in CommandCenter. Removal does not delete saved data." }
+        if let reason=incompatible,!ready {return reason}
         if preparing { return installed ? "Preparing your saved edits. The installed version is still available." : "Preparing functions from this folder. You can enable them when ready." }
         if failed { return installed ? "The installed version is still available. View the error, fix the source, then retry." : "This pack could not be prepared. View the error, fix the source, then retry." }
         if ready { return relaunch ? "Applying restarts the open function without its draft, history or arguments." : installed ? "Your update is ready. Apply it to use the new version." : "Enable this pack to make its functions available in CommandCenter." }
@@ -86,17 +92,18 @@ struct PackPresentation {
     }
     var primaryTitle: String? {
         if removed { return "Add Again" }
+        if incompatible != nil && !preparing && !ready {return "Rebuild"}
         if failed { return "Retry" }
         if ready { return installed ? (relaunch ? "Apply & Relaunch" : "Apply Update") : "Enable Functions" }
         return nil
     }
-    var primaryAction: String? { removed ? "add" : failed ? "build" : ready ? "apply" : nil }
-    var color: NSColor { removed ? .secondaryLabelColor : failed ? .systemRed : preparing || ready ? NSColor(calibratedRed:1,green:0.61,blue:0.16,alpha:1) : installed ? .systemGreen : .secondaryLabelColor }
+    var primaryAction: String? { removed ? "add" : incompatible != nil && !preparing && !ready ? "build" : failed ? "build" : ready ? "apply" : nil }
+    var color: NSColor { removed ? .secondaryLabelColor : failed || incompatible != nil ? .systemRed : preparing || ready ? NSColor(calibratedRed:1,green:0.61,blue:0.16,alpha:1) : installed ? .systemGreen : .secondaryLabelColor }
     init?(_ pack: [String:Any], relaunch: Bool = false) {
         guard let id = pack["id"] as? String else { return nil }
         self.id=id;source=pack["source"] as? String ?? "";state=pack["status"] as? String ?? "unknown"
         removed=pack["removed"] as? Bool == true;installed=pack["active"] as? String != nil && !removed
-        candidate=pack["candidate"] as? String;error=pack["error"] as? String;self.relaunch=relaunch
+        candidate=pack["candidate"] as? String;error=pack["error"] as? String;self.relaunch=relaunch;incompatible=pack["incompatible"] as? String
     }
 }
 

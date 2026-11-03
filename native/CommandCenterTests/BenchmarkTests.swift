@@ -64,7 +64,7 @@ private final class BundleReadyBridge:NSObject,WKScriptMessageHandler {
             }
             defer{try? FileManager.default.removeItem(at:directory)}
             let bridge=BundleReadyBridge(),start=ProcessInfo.processInfo.systemUptime
-            let config=WKWebViewConfiguration();config.setURLSchemeHandler(Assets(directory:root),forURLScheme:"commandcenter")
+            let config=WKWebViewConfiguration();config.setURLSchemeHandler(Assets(directory:root,runtime:try SDKRuntime(directory:root.appendingPathComponent(variant+"-runtime"))),forURLScheme:"commandcenter")
             config.userContentController.add(bridge,name:"commandCenter")
             let web=FunctionWebView(frame:window.contentView!.bounds,configuration:config)
             web.autoresizingMask=[.width,.height];window.contentView!.addSubview(web)
@@ -84,7 +84,7 @@ private final class BundleReadyBridge:NSObject,WKScriptMessageHandler {
         for pair in 0..<30 {
             for variant in (pair%2==0 ? ["unminified","minified"] : ["minified","unminified"]) {samples.append(try await launch(variant))}
         }
-        let report:[String:Any]=["profile":["os":ProcessInfo.processInfo.operatingSystemVersionString,"processors":ProcessInfo.processInfo.processorCount,"physicalMemoryBytes":ProcessInfo.processInfo.physicalMemory,"webView":"Fresh WKWebView per sample; default website data store, matching the app; WebKit-managed process reuse","assets":"Unique per-launch URLs, hard-linked prebuilt local files; warm filesystem"],"warmups":warmups,"samples":samples]
+        let report:[String:Any]=["profile":["os":ProcessInfo.processInfo.operatingSystemVersionString,"processors":ProcessInfo.processInfo.processorCount,"physicalMemoryBytes":ProcessInfo.processInfo.physicalMemory,"webView":"Fresh WKWebView per sample; default website data store, matching the app; WebKit-managed process reuse","assets":"Unique per-launch function URLs; SDK generation URLs reused as in normal launches; warm filesystem"],"warmups":warmups,"samples":samples]
         try JSONSerialization.data(withJSONObject:report,options:[.prettyPrinted,.sortedKeys]).write(to:root.appendingPathComponent("result.json"))
         XCTAssertEqual(samples.count,60)
     }

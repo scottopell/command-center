@@ -23,6 +23,8 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     let externalOpener: (URL)->Bool
     let clipboardWriter: (String)->Bool
     var catalog = FunctionCatalog.current
+    var sdkRuntime=SDKRuntime.bundled
+    var runtimeError:String?
     var entries = [(String,String)]()
     let collector:DiagnosticsCollector
     let stragglerNotice=NSTextField(labelWithString:"")
@@ -211,9 +213,9 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         commandError=nil;commandFrame.layer?.borderColor=commandOrange.cgColor;updateCommandFeedback()
     }
     // REQ-SH-002: feedback occupies the empty input, ready for immediate correction.
-    func showCommandError(_ mnemonic:String) {
+    func showCommandError(_ mnemonic:String,message:String?=nil) {
         command.stringValue=""
-        commandError="UNKNOWN FUNCTION: \(mnemonic) · TYPE ANOTHER COMMAND"
+        commandError=message ?? "UNKNOWN FUNCTION: \(mnemonic) · TYPE ANOTHER COMMAND"
         commandFrame.layer?.borderColor=commandErrorColor.cgColor
         updateCommandFeedback();hideSuggestions();focusCommand()
     }
@@ -273,9 +275,12 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         normalizeCommand()
         guard let parsed=Command(command.stringValue) else { focusCommand();return }
         guard entries.contains(where:{$0.0==parsed.mnemonic}) else { showCommandError(parsed.mnemonic);return }
+        if let reason=runtimeError ?? catalog.commands.first(where:{$0.mnemonic==parsed.mnemonic})?.unavailableReason {showCommandError(parsed.mnemonic,message:reason);return}
+        if catalog.commands.first(where:{$0.mnemonic==parsed.mnemonic})?.apiEpoch != sdkRuntime.manifest.apiEpoch {showCommandError(parsed.mnemonic,message:"Update required: rebuild this function for API epoch \(sdkRuntime.manifest.apiEpoch).");return}
         clearCommandError()
         let submitted=command.stringValue.trimmingCharacters(in:.whitespacesAndNewlines)
         retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted,started:acceptedAt);active=invocation;launched+=1
+        invocation.apiEpoch=sdkRuntime.manifest.apiEpoch
         functionToolbar.setActiveFunction(invocation.mnemonic)
         beginMeasurement(invocation,kind:"launch",started:acceptedAt)
         updateBackControl()
@@ -286,7 +291,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         window.displayIfNeeded();let milliseconds=(ProcessInfo.processInfo.systemUptime-invocation.started)*1000
         samples.append(["generation":invocation.id,"function":invocation.mnemonic,"visualMs":milliseconds])
         if samples.count>200 { samples.removeFirst(samples.count-200) }
-        let configuration=WKWebViewConfiguration();configuration.setURLSchemeHandler(Assets(directory:catalog.commands.first{$0.mnemonic==parsed.mnemonic}!.directory()),forURLScheme:"commandcenter")
+        let configuration=WKWebViewConfiguration();configuration.setURLSchemeHandler(Assets(directory:catalog.commands.first{$0.mnemonic==parsed.mnemonic}!.directory(),runtime:sdkRuntime),forURLScheme:"commandcenter")
         configuration.userContentController.add(Bridge(self,invocation.id),name:"commandCenter")
         let view=FunctionWebView(frame:content.bounds,configuration:configuration);view.autoresizingMask=[.width,.height];view.navigationDelegate=self;view.underPageBackgroundColor=NSColor(calibratedWhite:0.035,alpha:1);web=view
         view.translatesAutoresizingMaskIntoConstraints=false
@@ -379,6 +384,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             }
             let started=ProcessInfo.processInfo.systemUptime,measurement=i.measurement
             var payload:[String:Any]=["function":fn,"operation":op,"input":message["input"] ?? [:]]
+            if let epoch=i.apiEpoch{payload["apiEpoch"]=epoch}
             if let revision=catalog.commands.first(where:{$0.mnemonic==fn})?.revision{payload["revision"]=revision}
             backend.request(payload, mutation:mutation) { [weak self] body in
                 measurement?.operation(function:fn,operation:op,durationMs:(ProcessInfo.processInfo.systemUptime-started)*1000,outcome:(body["ok"] as? Bool)==true ? "success" : ((body["error"] as? [String:Any])?["code"] as? String ?? "error"))
