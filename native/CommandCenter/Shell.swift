@@ -38,7 +38,6 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     var visibilityObservers=[NSObjectProtocol]()
     var samples = [[String:Any]]()
     var launched = 0, retired = 0
-    var operationMetadata = [String:[String:Bool]]()
     var suggestionMatches = [String]()
     var selectedSuggestion = -1
     var completionRequested = false
@@ -57,7 +56,6 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         functionToolbar.onLaunch={ [weak self] mnemonic in self?.launchFunction(mnemonic) }
         window.title = "CommandCenter"; window.minSize = NSSize(width:930,height:620); window.center()
         window.backgroundColor = NSColor(calibratedWhite:0.04,alpha:1)
-        if let url = Bundle.main.url(forResource:"operations",withExtension:"json"), let data = try? Data(contentsOf:url), let registry = try? JSONSerialization.jsonObject(with:data) as? [String:[String:Bool]] { operationMetadata = registry }
         reloadCatalog()
         build()
         window.functionArea=content
@@ -271,7 +269,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
     @objc func selectSuggestion(_ sender:NSButton) {launchFunction(sender.identifier!.rawValue)}
     @objc func execute() {
         let acceptedAt=ProcessInfo.processInfo.systemUptime
-        reloadCatalog()
+        reloadCatalog(reconcile:false)
         normalizeCommand()
         guard let parsed=Command(command.stringValue) else { focusCommand();return }
         guard entries.contains(where:{$0.0==parsed.mnemonic}) else { showCommandError(parsed.mnemonic);return }
@@ -279,8 +277,9 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         if catalog.commands.first(where:{$0.mnemonic==parsed.mnemonic})?.apiEpoch != sdkRuntime.manifest.apiEpoch {showCommandError(parsed.mnemonic,message:"Update required: rebuild this function for API epoch \(sdkRuntime.manifest.apiEpoch).");return}
         clearCommandError()
         let submitted=command.stringValue.trimmingCharacters(in:.whitespacesAndNewlines)
-        retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted,started:acceptedAt);active=invocation;launched+=1
+        retire();window.functionCanOwnFocus=false;let invocation=Invocation(parsed.mnemonic,parsed.tail,commandText:submitted,started:acceptedAt,commands:catalog.commands);active=invocation;launched+=1
         invocation.apiEpoch=sdkRuntime.manifest.apiEpoch
+        invocation.runtimeFingerprint=sdkRuntime.manifest.fingerprint
         functionToolbar.setActiveFunction(invocation.mnemonic)
         beginMeasurement(invocation,kind:"launch",started:acceptedAt)
         updateBackControl()
@@ -376,7 +375,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
         if kind == "rpc" {
             guard let entry=message["entryId"] as? String,!entry.isEmpty,entry.utf8.count<=128,
                   let id=message["id"] as? Int,let fn=message["function"] as? String,let op=message["operation"] as? String,
-                  let mutation=operationMetadata[fn]?[op] else{return}
+                  let mutation=i.contracts[fn]?.operations?[op] else{return}
             // Shared invocation queries may keep a descriptor from a popped
             // screen. Registry-declared reads do not gain UI mutation authority.
             if mutation && (entry != i.entryID || !i.allowsMutation) {
@@ -385,7 +384,7 @@ final class Shell: NSObject, NSTextFieldDelegate, WKNavigationDelegate, NSMenuIt
             let started=ProcessInfo.processInfo.systemUptime,measurement=i.measurement
             var payload:[String:Any]=["function":fn,"operation":op,"input":message["input"] ?? [:]]
             if let epoch=i.apiEpoch{payload["apiEpoch"]=epoch}
-            if let revision=catalog.commands.first(where:{$0.mnemonic==fn})?.revision{payload["revision"]=revision}
+            if let revision=i.contracts[fn]?.revision{payload["revision"]=revision}
             backend.request(payload, mutation:mutation) { [weak self] body in
                 measurement?.operation(function:fn,operation:op,durationMs:(ProcessInfo.processInfo.systemUptime-started)*1000,outcome:(body["ok"] as? Bool)==true ? "success" : ((body["error"] as? [String:Any])?["code"] as? String ?? "error"))
                 self?.reply(id,body,generation)

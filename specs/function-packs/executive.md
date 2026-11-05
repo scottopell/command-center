@@ -25,8 +25,9 @@ See [ADR-017](../adrs/017_runtime-packs-and-transition-diagnostics.md). The host
 | **REQ-PK-011:** Adopt compatible host runtime updates automatically | ✅ Complete | Shared browser/worker runtime, immutable document generations and source-independent adoption checks. |
 | **REQ-PK-012:** Reject incompatible installed code without losing data | ✅ Complete | Epoch gates at build/startup/activation and retained unavailable packs. |
 | **REQ-PK-013:** Reclaim unused runtime generations | ✅ Complete | Shared OS leases, crash recovery, cache confinement and real WebKit resource rereads verified. |
+| **REQ-PK-014:** Manage packs from an agent CLI | ✅ Complete | Authenticated CLI, exact-candidate checks, shared lifecycle effects and live CLI-triggered relaunch verified. |
 
-**Progress:** 13 of 13 complete.
+**Progress:** 14 of 14 complete.
 
 ## Open Questions & Future Directions
 

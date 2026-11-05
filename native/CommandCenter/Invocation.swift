@@ -20,7 +20,9 @@ final class Invocation {
     let commandText: String
     let started:Double
     var transitionToken="root"
+    let contracts:[String:FunctionCatalog.Command]
     var apiEpoch:Int?
+    var runtimeFingerprint:String?
     var measurement:TransitionMeasurement?
     var phase = Phase.resolving
     var ownsInput = true
@@ -32,7 +34,7 @@ final class Invocation {
     private(set) var entryStack = ["root"]
     var entryID: String { entryStack.last! }
     var entryDepth: Int { entryStack.count }
-    init(_ mnemonic: String, _ tail: String, commandText:String? = nil,started:Double=ProcessInfo.processInfo.systemUptime) { self.mnemonic = mnemonic; self.tail = tail;self.started=started;self.commandText=commandText ?? (mnemonic + (tail.isEmpty ? "" : " " + tail)) }
+    init(_ mnemonic: String, _ tail: String, commandText:String? = nil,started:Double=ProcessInfo.processInfo.systemUptime,commands:[FunctionCatalog.Command]=[]) { self.contracts=Dictionary(uniqueKeysWithValues:commands.map{($0.mnemonic,$0)}); self.mnemonic = mnemonic; self.tail = tail;self.started=started;self.commandText=commandText ?? (mnemonic + (tail.isEmpty ? "" : " " + tail)) }
     func retire() { measurement?.finish("canceled");phase = .retired; ownsInput = false; pending = PendingText() }
     var allowsMutation: Bool { phase == .interactive && ownsInput }
     // REQ-NV-002/006/007: admission replaces UI/capture authority before JS loads.

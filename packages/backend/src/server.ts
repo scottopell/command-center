@@ -13,6 +13,7 @@ import { publicError,SYSTEM_PACK } from './dispatcher.ts';
 import { dataDirectory, defaultPort } from './config.ts';
 import {WorkerRuntime} from './runtime.ts';
 import {PackManager} from '../../packs/src/manager.ts';
+import {managementActionSchema} from '../../packs/src/control.ts';
 import type {ActivePack} from './runtime-worker.ts';
 import {API_EPOCH} from '../../packs/src/runtime-contract.ts';
 
@@ -60,14 +61,14 @@ export async function startServer({ directory = dataDirectory(), port = defaultP
       for await (const chunk of req) { bytes += chunk.length; if (bytes > 1024*1024) throw new AppError('validation','Request exceeds 1 MiB'); chunks.push(chunk); }
       let raw: unknown; try { raw = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new AppError('validation','Expected a JSON request'); }
       if(req.url==='/management/packs'){
-        const action=raw as {action:string;id?:string;source?:string};let result:unknown;
+        const action=managementActionSchema.parse(raw);let result:unknown;
         if(action.action==='add'&&typeof action.source==='string')result=await packs.add(action.source);
         else if(action.action==='build'&&typeof action.id==='string')result=await packs.build(action.id);
-        else if(action.action==='apply'&&typeof action.id==='string')result=await packs.apply(action.id);
+        else if(action.action==='apply'&&typeof action.id==='string')result=await packs.apply(action.id,action.revision);
         else if(action.action==='remove'&&typeof action.id==='string')result=await packs.remove(action.id);
         else if(action.action==='purge'&&typeof action.id==='string')result=await packs.purge(action.id);
         else throw new AppError('validation','Invalid pack management action');
-        send(200,{ok:true,result});return;
+        send(200,{ok:true,result},true);return;
       }
       const reply=await runtime.call(raw);
       // Successful dispatch already established a valid registered envelope; payload flags never classify writes.

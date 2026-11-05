@@ -1,5 +1,5 @@
 -- allium: 3
--- REQ-PK-003, REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009, REQ-PK-011, REQ-PK-012, REQ-PK-013
+-- REQ-PK-003, REQ-PK-004, REQ-PK-005, REQ-PK-006, REQ-PK-007, REQ-PK-008, REQ-PK-009, REQ-PK-011, REQ-PK-012, REQ-PK-013, REQ-PK-014
 
 entity FunctionPack {
     identity: String
@@ -32,10 +32,11 @@ entity Activation {
 }
 
 rule RequestActivation {
-    when: ApplyRequested(pack, service, candidate_identity)
+    when: ApplyRequested(pack, service, candidate_identity, expected_revision)
     requires: service.admission_open
     requires: pack.candidate_valid
     requires: pack.candidate_revision != null
+    requires: pack.candidate_revision = expected_revision
     requires: pack.candidate_api_epoch = service.api_epoch
     requires: not pack.removed
     ensures:
@@ -129,6 +130,13 @@ contract PackBoundary {
         -- Client disconnection does not complete a handler. Requests rejected
         -- during maintenance are not queued, admitted or automatically replayed.
         -- Handlers cannot detach application work beyond their return promise.
+    @invariant ClientNeutralHostEffects
+        -- UI and agent clients submit the same management commands. Only a
+        -- committed installation changes host view lifetime: changed own code
+        -- relaunches the bare mnemonic, removed/reassigned/unavailable code
+        -- cancels, and unchanged code or failed activation preserves the view.
+        -- Hosts reconcile asynchronously. View RPC contracts and revisions
+        -- remain pinned to launch, including before reconciliation.
     @invariant NoDataRollback
         -- Worker initialization does not write application data. Code fallback
         -- is allowed only before candidate application-request admission. Data
@@ -146,7 +154,7 @@ surface RegisteredPack {
         pack.available
         pack.api_epoch
     provides:
-        ApplyRequested(pack, service, candidate_identity) when pack.candidate_valid and not pack.removed
+        ApplyRequested(pack, service, candidate_identity, expected_revision) when pack.candidate_valid and not pack.removed
         PackRemoved(pack) when not pack.removed
         InstalledPackChecked(pack, service)
     contracts:

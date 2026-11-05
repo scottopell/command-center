@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-11-05T16:24:49.027Z",
+  "requirements": [
+    "REQ-PK-007",
+    "REQ-PK-008",
+    "REQ-PK-014"
+  ],
+  "sourceBackend": {
+    "passed": 39,
+    "failed": 0
+  },
+  "nativeLocal": {
+    "passed": 32,
+    "skipped": 33,
+    "failed": 0,
+    "focusedLifecycleAndManagementCases": 10,
+    "foregroundConformance": "Skipped: test host did not obtain foreground visibility"
+  },
+  "packagedBuild": "passed",
+  "packagedServiceCLI": "passed",
+  "privatePack": {
+    "test": "passed",
+    "testedRevisionMatchedPreparedCandidate": true,
+    "activatedExactTestedRevisionThroughInstalledCLI": true
+  },
+  "liveHost": {
+    "readOnlyFunctionOpened": true,
+    "unsentSearchDraftSet": true,
+    "CLICommitTriggeredFrameworkRelaunch": true,
+    "draftCleared": true,
+    "managementWidgetUsed": false,
+    "externalOwnerWrites": false
+  },
+  "checks": [
+    "Missing/malformed/stale candidate rejected before maintenance",
+    "Explicit already-active revision is a no-op",
+    "Old views retain launch-time operation mutability and revision",
+    "Failed UI Apply preserves invocation and draft",
+    "Committed activation with an oversized/lost/malformed response is outcome_unknown; no retry",
+    "Headless CLI add/show/list/build/apply/remove and data retention",
+    "Source test artifact and prepared candidate revisions match with identical source/toolchain"
+  ],
+  "limits": [
+    "CLI success acknowledges backend activation, not a synchronous acknowledgment from every window",
+    "Native hosts observe committed catalog changes on their existing approximately two-second refresh",
+    "Saved-data purge remains outside the agent CLI"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T21:17:17.715Z",
+  "generatedAt": "2026-11-05T16:12:25.547Z",
   "scope": "Implementation-to-check mapping; not a claim that every possible interleaving was exhaustively explored",
   "requirements": [
     {
@@ -1402,12 +1402,17 @@
         "packages/packs/src/manager.ts",
         "packages/backend/src/runtime.ts",
         "packages/backend/src/runtime-worker.ts",
-        "native/CommandCenter/PackManagement.swift"
+        "native/CommandCenter/PackManagement.swift",
+        "native/CommandCenter/InstallationLifecycle.swift",
+        "native/CommandCenter/InstallationHost.swift",
+        "native/CommandCenter/Invocation.swift"
       ],
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
-        "native/CommandCenterTests/PackTests.swift"
+        "native/CommandCenterTests/PackTests.swift",
+        "tests/pack-control.test.ts",
+        "native/CommandCenterTests/InstallationLifecycleTests.swift"
       ]
     },
     {
@@ -1420,13 +1425,18 @@
         "packages/packs/src/manager.ts",
         "packages/backend/src/runtime.ts",
         "packages/backend/src/runtime-worker.ts",
-        "native/CommandCenter/PackManagement.swift"
+        "native/CommandCenter/PackManagement.swift",
+        "native/CommandCenter/InstallationLifecycle.swift",
+        "native/CommandCenter/InstallationHost.swift",
+        "native/CommandCenter/Invocation.swift"
       ],
       "tests": [
         "tests/packs.test.ts",
         "tests/types.tsx",
         "native/CommandCenterTests/PackTests.swift",
-        "native/CommandCenterTests/PackManagementTests.swift"
+        "native/CommandCenterTests/PackManagementTests.swift",
+        "tests/pack-control.test.ts",
+        "native/CommandCenterTests/InstallationLifecycleTests.swift"
       ]
     },
     {
@@ -1610,6 +1620,26 @@
       "tests": [
         "native/CommandCenterTests/SDKRuntimeCacheTests.swift",
         "native/CommandCenterTests/SDKRuntimeTests.swift"
+      ]
+    },
+    {
+      "id": "REQ-PK-014",
+      "title": "Manage packs from an agent CLI",
+      "feature": "function-packs",
+      "code": [
+        "packages/packs/src/control.ts",
+        "packages/packs/src/manager.ts",
+        "packages/backend/src/server.ts",
+        "packages/cli/src/main.ts",
+        "packages/cli/src/client.ts",
+        "native/CommandCenter/InstallationLifecycle.swift",
+        "native/CommandCenter/InstallationHost.swift"
+      ],
+      "tests": [
+        "tests/pack-control.test.ts",
+        "native/CommandCenterTests/InstallationLifecycleTests.swift",
+        "native/CommandCenterTests/PackTests.swift",
+        "native/CommandCenterTests/PackManagementTests.swift"
       ]
     }
   ]

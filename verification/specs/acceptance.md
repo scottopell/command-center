@@ -185,3 +185,12 @@ The input operation records are abstract specification history, not a requiremen
 | Live generation leases | Select a new runtime while an old document is open, then sweep. The current generation and all old generations with live owners remain; the old WebView can request a previously uncached module URL. Releasing the final owner reclaims the old generation. | REQ-PK-011, REQ-PK-013 |
 | Process exit | Another app process holds a generation lease. Sweeping leaves it intact; killing that process releases the lease and later cache activity reclaims it. | REQ-PK-013 |
 | Cleanup boundaries | Reclaim abandoned staging/trash and unleased generation folders. Preserve unknown entries, symlinks, application data and source runtime files. A malformed lease is retained and logged; later activity retries after repair. A sweep never waits for an in-progress selection. | REQ-PK-013 |
+
+## Agent pack control and installation effects
+
+| Scenario | Required observation | Requirements |
+| --- | --- | --- |
+| Headless agent delivery | A CLI process adds, inspects, builds and applies a pack through the shared authenticated API with no native window. Test artifact and prepared candidate revisions match for unchanged source/toolchain. JSON results and non-success error exits are machine-readable. | REQ-PK-014 |
+| Stale candidate | Missing, malformed or superseded candidate revisions fail before admission closes or installation identity changes. A lost/malformed management response is not retried. | REQ-PK-007, REQ-PK-014 |
+| Client-neutral effects | Publish an update using the CLI while its view is open. The host lifecycle handler relaunches the bare mnemonic, clears draft/navigation and preserves unrelated functions. Failed UI Apply keeps the existing invocation/draft. External removal cancels the open function. | REQ-PK-008, REQ-PK-014 |
+| Pinned bridge | Publish new metadata before host reconciliation. An existing invocation retains its old operation mutability and revision; old calls are never relabeled as the new code version. | REQ-PK-007 |

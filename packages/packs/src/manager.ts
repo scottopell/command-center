@@ -97,18 +97,23 @@ export class PackManager {
           r.candidate=artifact.revision;r.status=r.active===r.candidate?'active':'ready';
         }catch(error){failure=error;r.status='failed';r.error=error instanceof Error?error.message:'Pack build failed';}
         await this.save();
-        if(failure&&(!this.dirty.has(id)||r.removed||this.closed))throw failure;
+        if(failure&&(!this.dirty.has(id)||r.removed||this.closed))throw new AppError('build_failed',r.error??'Pack build failed');
       }while(this.dirty.has(id)&&!r.removed&&!this.closed);
       return r;
     })();
     this.jobs.set(id,job);
     try{return await job;}finally{this.building.delete(id);this.jobs.delete(id);}
   }
-  async apply(id:string){
+  async apply(id:string,revision:string){
+    // REQ-PK-007/014: capture the requested immutable candidate before maintenance.
+    if(!/^[a-f0-9]{64}$/.test(revision))throw new AppError('validation','Apply requires an exact candidate revision');
+    const selectedRevision=this.find(id).candidate;
+    if(selectedRevision!==revision)throw new AppError('conflict','Candidate changed. Inspect the pack and apply its exact candidate revision. This request was not admitted.');
     const r=this.find(id);if(r.removed||!r.candidate||!['ready','active'].includes(r.status)||this.building.has(id))throw new AppError('validation','Build a valid candidate before applying');
-    const candidateRevision=r.candidate;
+    const candidateRevision=revision;
     return this.change(async()=>{
       const candidate=await this.artifact(candidateRevision);const reason=epochError(candidate.artifact.apiEpoch);if(reason)throw new AppError('update_required',reason);
+      if(r.active===candidateRevision)return {pack:{...r},catalog:await this.catalog()};
       const selected=[...(await this.activePacks()).filter(p=>p.artifact.id!==id),candidate];
       const previousConfig=await this.configuration();const config=await this.configuration(selected);await this.runtime.pauseAndDrain();
       const previous=r.active;
@@ -121,7 +126,7 @@ export class PackManager {
     });
   }
   async remove(id:string){
-    const r=this.find(id);if(r.removed)return;
+    const r=this.find(id);if(r.removed)return {catalog:await this.catalog()};
     return this.change(async()=>{
       const previousConfig=await this.configuration(),previous=r.active;
       const selected=(await this.activePacks()).filter(p=>p.artifact.id!==id),config=await this.configuration(selected);await this.runtime.pauseAndDrain();

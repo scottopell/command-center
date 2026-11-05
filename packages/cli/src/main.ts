@@ -7,7 +7,7 @@ import {diagnosticsReader} from '../../backend/src/diagnostics.ts';
 import {dataDirectory} from '../../backend/src/config.ts';
 import { parseArgs } from 'node:util';
 import { readFile } from 'node:fs/promises';
-import { call } from './client.ts';
+import { call,serviceRequest } from './client.ts';
 import { AppError, type Actor } from '../../contracts/src/index.ts';
 
 const help = `CommandCenter local agent client
@@ -17,6 +17,12 @@ const help = `CommandCenter local agent client
   command-center drqs create --title text --body text --group 42 --requester employee:email [--actor name]
   command-center drqs get NUMBER
   command-center drqs update NUMBER [--comment text] [--group 44] [--state N] [--owner email|--clear-owner]
+  command-center pack list
+  command-center pack show ID
+  command-center pack add FOLDER
+  command-center pack build ID
+  command-center pack apply ID --revision CANDIDATE
+  command-center pack remove ID
   command-center pack check|test FOLDER
   command-center pack check-installed
   command-center strag list [--since ISO_DATE] [--function MNEMONIC] [--all]
@@ -35,14 +41,27 @@ Results are JSON; errors are JSON on stderr with exit status 1. Writes never ret
 export async function main(args = process.argv.slice(2)) {
   const {values,positionals} = parseArgs({args,allowPositionals:true,strict:true,options:{
     help:{type:'boolean',short:'h'},since:{type:'string'},function:{type:'string'},all:{type:'boolean'},human:{type:'boolean'},'clear-owner':{type:'boolean'},
-    title:{type:'string'},body:{type:'string'},group:{type:'string'},state:{type:'string'},type:{type:'string'},search:{type:'string'},comment:{type:'string'},owner:{type:'string'},actor:{type:'string'},'actor-name':{type:'string'},requester:{type:'string',multiple:true},json:{type:'string'},'input-file':{type:'string'},'data-dir':{type:'string'}
+    title:{type:'string'},body:{type:'string'},group:{type:'string'},state:{type:'string'},type:{type:'string'},search:{type:'string'},comment:{type:'string'},owner:{type:'string'},actor:{type:'string'},'actor-name':{type:'string'},requester:{type:'string',multiple:true},json:{type:'string'},'input-file':{type:'string'},'data-dir':{type:'string'},revision:{type:'string'}
   }});
   if (values.help || !positionals.length) { console.log(help); return; }
   const directory = values['data-dir'];
   const actor: Actor | undefined = values.human ? undefined : {kind:'agent',id:values.actor || process.env.COMMAND_CENTER_AGENT || 'local-cli',name:values['actor-name'] || values.actor || 'Local coding agent'};
   let result: unknown;
-  if(positionals[0].toLowerCase()==='pack'){
-    if(!['check','test','check-installed'].includes(positionals[1])||(positionals[1]!=='check-installed'&&!positionals[2]))throw new AppError('validation','Use pack check FOLDER, pack test FOLDER or pack check-installed');
+  if(positionals[0].toLowerCase()==='pack'&&['list','show','add','build','apply','remove'].includes(positionals[1])){
+    const action=positionals[1],argument=positionals[2];
+    if(positionals.length!==(action==='list'?2:3)||action!=='list'&&!argument)throw new AppError('validation','Specify exactly one folder or pack ID (list takes no arguments)');
+    if(action==='apply'&&!/^[a-f0-9]{64}$/.test(values.revision??''))throw new AppError('validation','Use pack apply ID --revision CANDIDATE, using the exact candidate returned by pack build/show');
+    if(action!=='apply'&&values.revision)throw new AppError('validation','--revision is only supported by pack apply');
+    if(action==='list'||action==='show'){
+      const packs=await serviceRequest('/management/packs',undefined,directory);
+      result=action==='list'?packs:packs.find((pack:any)=>pack.id===argument);
+      if(result===undefined)throw new AppError('not_found','Pack not registered');
+    }else{
+      const payload=action==='add'?{action,source:path.resolve(argument)}:{action,id:argument,...(action==='apply'?{revision:values.revision}:{})};
+      result=await serviceRequest('/management/packs',payload,directory,true,['add','build'].includes(action)?240000:30000);
+    }
+  }else if(positionals[0].toLowerCase()==='pack'){
+    if(!['check','test','check-installed'].includes(positionals[1])||(positionals[1]!=='check-installed'&&!positionals[2]))throw new AppError('validation','Use pack list/show/add/build/apply/remove/check/test/check-installed; see --help');
     const artifacts=await mkdtemp(path.join(tmpdir(),'cc-pack-check-'));
     try{const base=path.dirname(fileURLToPath(import.meta.url)),toolchain=import.meta.url.endsWith('.mjs')?path.join(base,'toolchain'):fileURLToPath(new URL('../../../dist/toolchain',import.meta.url));
       if(positionals[1]==='check-installed'){

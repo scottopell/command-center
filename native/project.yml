@@ -18,8 +18,6 @@ targets:
       - path: ../dist/functions
         type: folder
         buildPhase: resources
-      - path: ../dist/operations.json
-        buildPhase: resources
       - path: ../dist/catalog.json
         buildPhase: resources
       - path: ../dist/backend.mjs

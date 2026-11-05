@@ -79,7 +79,7 @@ Use `useOpenExternal()` from the framework to open validated sources directly fr
 
 ## Install, check and update
 
-In Functions management, choose Add Pack, wait for Ready to enable, then Enable Functions. Each card shows its functions and status. Source changes prepare updates automatically; activation is manual through Apply Update (or Apply & Relaunch for an open function). More contains Check for Changes, Pack Details and Remove Pack; removed packs expose Delete Saved Data there. Apply cancels an affected open function, finishes admitted work, briefly restarts the shared worker runtime, and relaunches its bare mnemonic without arguments. Other open functions remain mounted. A drain deadline postpones the update. Candidate startup failure retains the old installation; code fallback does not undo application writes.
+In Functions management, choose Add Pack, wait for Ready to enable, then Enable Functions. Each card shows its functions and status. Source changes prepare updates automatically; activation is manual through Apply Update (or Apply & Relaunch for an open function). More contains Check for Changes, Pack Details and Remove Pack; removed packs expose Delete Saved Data there. Apply names an exact prepared revision, finishes admitted work, briefly restarts the shared worker runtime and publishes the installation. A host lifecycle effect observes that committed state and relaunches an affected open function with its bare mnemonic, without arguments. This behavior is shared by UI and CLI activation. Failed activation and unrelated updates preserve the open view and draft. A drain deadline postpones the update. Candidate startup failure retains the old installation; code fallback does not undo application writes.
 
 ```sh
 command-center pack check /path/to/pack
@@ -87,6 +87,22 @@ command-center pack test /path/to/pack
 ```
 
 The second command also type-checks the pack's tests and runs its `tests/*.test.ts` through the installed SDK toolchain. `command-center pack check-installed` checks all non-removed registered source folders against the current SDK without applying their changes; it works with the service stopped and returns nonzero if any source is unavailable or incompatible.
+
+Agent pack management uses the same authenticated loopback API as the native UI. The CLI discovers the local service credential; callers should not copy credentials into function code or logs. Commands return JSON, and failures use JSON on stderr with a non-success exit code. There is no automatic retry of a management write after a lost response; inspect pack status before deciding what to do next.
+
+```sh
+command-center pack list
+command-center pack show example.notes
+command-center pack add /path/to/notes-pack
+command-center pack test /path/to/notes-pack
+command-center pack build example.notes
+command-center pack apply example.notes --revision <candidate-revision>
+command-center pack remove example.notes
+```
+
+Add prepares the folder without activating it. Build returns a pack registration with a `candidate` revision; test returns an artifact with a `revision`. With finished source edits and the same installed host toolchain, those revisions match. Compare them before Apply; if they differ, re-test and build the current source. Apply requires the exact 64-character candidate revision and refuses a changed candidate before maintenance. Reapplying the active prepared revision is a no-op. Remove unregisters code while retaining its KV records; saved-data purge has no agent CLI command.
+
+Apply success confirms the backend installation. A running native host observes external updates through its existing approximately two-second catalog refresh; the CLI does not claim that every window has acknowledged the change. Open views keep their launch-time operation contracts and revisions until retired, so stale requests are refused during that interval. Removing or reassigning the open function cancels it. The service and CLI work with the window closed.
 
 No native build or private npm install is needed for platform-provided dependencies. CommandCenter owns React 19.3.1, React DOM 19.3.1, TanStack Query 5.105.0, Zod 4.6.7 and the compiler. Omit those dependencies from a pack's package.json; CC supplies their runtime and types. Additional dependencies require exact registry versions and a SHA-512 integrity lockfile. Lifecycle/build scripts, native add-ons, computed runtime imports, symlinks and imports escaping the source snapshot are unsupported. Explicitly copy worker assets using the manifest `assets` list; browser asset imports are bundled. External owner services remain legitimate dependencies.
 

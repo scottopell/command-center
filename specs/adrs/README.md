@@ -25,6 +25,7 @@ All feature specs share this one chain. Accepted records explain agreed decision
 | [ADR-019](019_foreground-transition-budget.md) | Accepted | Foreground-only transition budget and a single frame-based readiness path |
 | [ADR-020](020_host-runtime-and-api-epoch.md) | Accepted | Host-provided SDK/React runtime and a single compatibility epoch |
 | [ADR-021](021_runtime-cache-reclamation.md) | Accepted | OS-managed runtime leases and background cache reclamation |
+| [ADR-022](022_agent-pack-control-and-installation-effects.md) | Accepted | Agent CLI and installation-driven host lifecycle effects |
 
 ## Task routing
 

@@ -27,9 +27,28 @@ import WebKit
         let deadline=Date().addingTimeInterval(20)
         while (try await shell.web!.evaluateJavaScript(expression) as? Bool) != true {if Date()>deadline{throw NSError(domain:"Pack DOM timeout",code:1)};try await Task.sleep(nanoseconds:20_000_000)}
     }
-    func manage(_ action:String,id:String?=nil,source:String?=nil) async throws {
-        let body:[String:Any]=await withCheckedContinuation{continuation in shell.managePack(action,id:id,source:source){continuation.resume(returning:$0)}}
+    func manage(_ action:String,id:String?=nil,source:String?=nil,revision requestedRevision:String?=nil) async throws {
+        let rows=(try? JSONSerialization.jsonObject(with:Data(contentsOf:directory.appendingPathComponent("packs/registry.json")))) as? [[String:Any]]
+        let revision=requestedRevision ?? (action=="apply" ? rows?.first(where:{$0["id"] as? String==id})?["candidate"] as? String : nil)
+        let body:[String:Any]=await withCheckedContinuation{continuation in shell.managePack(action,id:id,source:source,revision:revision){continuation.resume(returning:$0)}}
         if body["ok"] as? Bool != true{throw NSError(domain:"Pack management failed: \(body["error"] ?? "unknown")",code:1)}
+    }
+    // Separate CLI process: no Shell/management-widget callbacks are involved.
+    func cli(_ args:[String]) async throws -> [String:Any] {
+        let child=Process(),output=Pipe(),errors=Pipe();child.executableURL=Bundle.main.resourceURL!.appendingPathComponent("runtime/node")
+        child.arguments=[Bundle.main.resourceURL!.appendingPathComponent("cli.mjs").path]+args+["--data-dir",directory.path];child.standardOutput=output;child.standardError=errors
+        return try await withCheckedThrowingContinuation{continuation in
+            child.terminationHandler={process in
+                let data=output.fileHandleForReading.readDataToEndOfFile(),error=errors.fileHandleForReading.readDataToEndOfFile()
+                do{guard process.terminationStatus==0 else{throw NSError(domain:String(data:error,encoding:.utf8) ?? "CLI failure",code:1)};continuation.resume(returning:try JSONSerialization.jsonObject(with:data) as! [String:Any])}
+                catch{continuation.resume(throwing:error)}
+            }
+            do{try child.run()}catch{child.terminationHandler=nil;continuation.resume(throwing:error)}
+        }
+    }
+    func applyUsingCLI() async throws {
+        let pack=try await cli(["pack","show","example.notes"]),revision=try XCTUnwrap(pack["candidate"] as? String)
+        _=try await cli(["pack","apply","example.notes","--revision",revision])
     }
     func launch(_ command:String){shell.command.stringValue=command;shell.execute()}
 
@@ -47,7 +66,7 @@ import WebKit
         XCTAssertFalse(shell.entries.contains{$0.0=="NOTES"})
         XCTAssertFalse(shell.functionToolbar.subviews.contains{$0.identifier?.rawValue=="function:NOTES"})
         launch("SLOW 0 NAV");try await waitFor{self.shell.active?.phase == .interactive};let unrelated=shell.active!.id
-        try await manage("apply",id:"example.notes");XCTAssertEqual(shell.active?.id,unrelated)
+        try await applyUsingCLI();try await waitFor{self.shell.entries.contains{$0.0=="NOTES"}};XCTAssertEqual(shell.active?.id,unrelated)
         XCTAssertTrue(shell.entries.contains{$0.0=="NOTES"})
         XCTAssertTrue(shell.functionToolbar.subviews.contains{$0.identifier?.rawValue=="function:NOTES"})
         launch("NOTES EXTRA");shell.append("discard this draft");try await waitFor{self.shell.active?.phase == .interactive}
@@ -59,7 +78,11 @@ import WebKit
             guard let data=try? Data(contentsOf:self.directory.appendingPathComponent("packs/registry.json")),let rows=try? JSONSerialization.jsonObject(with:data) as? [[String:Any]] else{return false}
             return rows.first?["status"] as? String=="ready"
         }
-        try await manage("apply",id:"example.notes");try await waitFor{self.shell.active?.phase == .interactive}
+        let previous=try XCTUnwrap(shell.active),oldRevision=try XCTUnwrap(previous.contracts["NOTES"]?.revision)
+        do{try await manage("apply",id:"example.notes",revision:oldRevision);XCTFail("Stale candidate should fail")}catch{}
+        XCTAssertEqual(shell.active?.id,previous.id)
+        let retained=try await shell.web!.evaluateJavaScript("document.querySelector('textarea').value") as? String;XCTAssertEqual(retained,"discard this draft")
+        try await applyUsingCLI();try await waitFor{self.shell.active?.id != previous.id && self.shell.active?.phase == .interactive}
         XCTAssertEqual(shell.command.stringValue,"NOTES");XCTAssertEqual(shell.active?.tail,"")
         let cleared=try await shell.web!.evaluateJavaScript("document.querySelector('textarea').value") as? String;XCTAssertEqual(cleared,"")
         try await waitJS("document.body.textContent.includes('Updated independently')")
@@ -67,6 +90,8 @@ import WebKit
         launch("NOTES");shell.append("Persisted without checkout");try await waitFor{self.shell.active?.phase == .interactive}
         _=try await shell.web!.evaluateJavaScript("document.querySelector('form').requestSubmit()")
         try await waitJS("document.querySelector('p[data-nav-item]')?.textContent==='Persisted without checkout'")
+        _=try await cli(["pack","remove","example.notes"])
+        try await waitFor{self.shell.active==nil && !self.shell.entries.contains{$0.0=="NOTES"}}
     }
 
     // REQ-ST-001: command focus does not delay readiness or steal native focus.

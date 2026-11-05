@@ -44,13 +44,13 @@ WHEN Apply is requested, THE SYSTEM SHALL validate the complete candidate and co
 
 ### REQ-PK-007: Activate matching code and contracts
 
-THE SYSTEM SHALL restart the shared worker runtime with candidate registrations and confirm its exact installation identity before publishing the candidate catalog. Startup failure SHALL preserve the previous installation and attempt to restore its runtime. Automatic fallback SHALL occur only before admitting candidate application requests. Worker initialization SHALL NOT write application data; automatic data migrations and transactional data rollback SHALL NOT be provided.
+Each Apply request SHALL identify the immutable candidate revision to activate; a changed candidate SHALL be rejected before maintenance begins. View requests SHALL retain their launch-time operation contracts and revisions rather than adopting a newer catalog implicitly. THE SYSTEM SHALL restart the shared worker runtime with candidate registrations and confirm its exact installation identity before publishing the candidate catalog. Startup failure SHALL preserve the previous installation and attempt to restore its runtime. Automatic fallback SHALL occur only before admitting candidate application requests. Worker initialization SHALL NOT write application data; automatic data migrations and transactional data rollback SHALL NOT be provided.
 
 **Rationale:** The shell, frontend and worker must agree without simultaneous versions or migration machinery.
 
 ### REQ-PK-008: Relaunch an affected open function
 
-WHEN an affected open function's pack is applied, THE SYSTEM SHALL cancel that invocation and relaunch its mnemonic without tail or arguments after activation. Drafts and navigation SHALL be discarded. Unrelated open functions SHALL remain mounted. Ordinary launches SHALL NOT restart workers.
+WHEN a published installation changes the code revision of an open function, THE SYSTEM SHALL use a shared host lifecycle effect to retire that invocation and relaunch its mnemonic without tail or arguments, regardless of which client initiated activation. Drafts and navigation SHALL be discarded. Removal, reassignment or incompatibility of the open function SHALL cancel it. Failed activation and unrelated pack updates SHALL preserve the current invocation and draft. UI command handlers SHALL NOT own these lifecycle decisions. Hosts MAY observe committed changes asynchronously; old requests SHALL remain revision-pinned until reconciliation. Ordinary launches SHALL NOT restart workers.
 
 **Rationale:** Explicit Apply has a simple fresh-start meaning.
 
@@ -83,3 +83,9 @@ THE SYSTEM SHALL check epochs during build, activation, installed artifact loadi
 THE SYSTEM SHALL automatically reclaim host-cached SDK generations that are neither selected by a live shell nor retained by a function document, including generations abandoned by a terminated process. Selection and reclamation SHALL coordinate so a generation cannot be removed while it is being acquired or read by another CommandCenter process. Cleanup SHALL run outside the screen-transition path, remain confined to generated runtime-cache entries, and leave function data, installed pack artifacts and source runtimes intact. Cleanup failures SHALL be logged and retried on later cache activity without failing a function launch.
 
 **Rationale:** SDK updates must not accumulate obsolete code or break an open view.
+
+### REQ-PK-014: Manage packs from an agent CLI
+
+THE SYSTEM SHALL provide authenticated local CLI commands to list and inspect registered packs, add a source folder, build a candidate, apply an explicitly named candidate revision, and remove a pack while retaining data. These commands SHALL use the shared management API and return JSON results with non-success exit status on failure. CLI operations SHALL NOT automatically retry an uncertain management write. A successful Apply result SHALL report backend activation, independently of asynchronous host-view reconciliation. Saved-data purge SHALL NOT be exposed as an agent CLI command.
+
+**Rationale:** Agents need to deliver usable functions through a stable application interface without UI automation.

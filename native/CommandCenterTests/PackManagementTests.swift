@@ -88,7 +88,7 @@ private final class PackUIBackend: Backend {
 
     func testApplyIsSingleFlightAndRecoversAfterFailure() throws {
         controller.render([pack("ready")]);try XCTUnwrap(button("apply")).performClick(nil)
-        XCTAssertEqual(backend.requests.count,1);XCTAssertEqual(backend.requests[0].payload?["action"] as? String,"apply")
+        XCTAssertEqual(backend.requests.count,1);XCTAssertEqual(backend.requests[0].payload?["action"] as? String,"apply");XCTAssertEqual(backend.requests[0].payload?["revision"] as? String,revision)
         let pending=try XCTUnwrap(button("apply"));XCTAssertFalse(pending.isEnabled)
         pending.performClick(nil);XCTAssertEqual(backend.requests.count,1)
         backend.requests[0].finish(["ok":false,"error":["message":"Update postponed: work is still running."]])
